@@ -132,13 +132,12 @@ public class UserService {
         }
     }
 
-    // TODO: implement user deletion
-    /*
+    // TODO: implement deletion of user's products
     public void deleteUser(String id) {
-        productRepository.deleteAllByUserId(id);
+        // productRepository.deleteAllByUserId(id);
         userRepository.deleteById(id);
     }
-    */
+
 
     @PostConstruct
     public void initDefaultAdmin() {

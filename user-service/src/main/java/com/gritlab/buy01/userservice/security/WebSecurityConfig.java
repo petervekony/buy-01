@@ -9,7 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @EnableWebSecurity
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class WebSecurityConfig {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -60,8 +60,6 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/products").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()
                 );

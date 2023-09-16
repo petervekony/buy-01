@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,9 +79,6 @@ public class UserController {
         return userService.updateUser(id, userUpdateRequest, isSelf);
     }
 
-    // TODO: implement user deletion
-
-    /*
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/users/{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable String id) {
@@ -97,5 +95,4 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    */
 }
