@@ -8,7 +8,7 @@ public class RoleTests {
 
     @Test
     public void testRoleEnumValues() {
-        assertEquals(2, Role.values().length);
+        assertEquals(3, Role.values().length);
         assertEquals(Role.CLIENT, Role.valueOf("CLIENT"));
         assertEquals(Role.SELLER, Role.valueOf("SELLER"));
     }
