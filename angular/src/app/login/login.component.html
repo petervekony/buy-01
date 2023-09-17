@@ -8,21 +8,26 @@
     </div>
 
     <div>
-      <label for="login-email" class="block text-900 font-medium mb-2">Email</label>
-      <input id="login-email" type="text" placeholder="Email address" pInputText class="w-full mb-3">
+      <form [formGroup]="loginForm" ngSubmit="onSubmit()" (input)="onValidate()">
+        <label for="login-username" class="block text-900 font-medium mb-2">Username</label>
+        <input id="login-username" type="text" placeholder="Username" pInputText class="w-full mb-3" name="name"
+          formControlName="name">
 
-      <label for="login-password" class="block text-900 font-medium mb-2">Password</label>
-      <input id="login-password" type="password" placeholder="Password" pInputText class="w-full mb-3">
+        <label for="login-password" class="block text-900 font-medium mb-2">Password</label>
+        <input id="login-password" type="password" placeholder="Password" pInputText class="w-full mb-3" name="password"
+          formControlName="password">
 
-      <div class="flex align-items-center justify-content-between mb-6">
-        <!--   <div class="flex align-items-center"> -->
-        <!--     <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox> -->
-        <!--     <label for="rememberme1" class="text-900">Remember me</label> -->
-        <!--   </div> -->
-        <!--   <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot password?</a> -->
-      </div>
+        <div class="flex align-items-center justify-content-between mb-6">
+          <!--   <div class="flex align-items-center"> -->
+          <!--     <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox> -->
+          <!--     <label for="rememberme1" class="text-900">Remember me</label> -->
+          <!--   </div> -->
+          <!--   <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot password?</a> -->
+        </div>
 
-      <button pButton pRipple label="Sign In" icon="pi pi-user" class="w-full" (click)="sendLogin()"></button>
+        <button type="submit" [disabled]="!formValid" pButton pRipple label="Sign In" icon="pi pi-user"
+          (click)="onSubmit()" class="w-full"></button>
+      </form>
     </div>
   </div>
 </div>
