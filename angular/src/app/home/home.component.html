@@ -1,7 +1,7 @@
 <div class="container">
-  <p *ngIf="response.name">{{ response.name }}</p>
-  <p *ngIf="response.email">{{ response.email }}</p>
-  <p *ngIf="response.jwtToken">{{ response.jwtToken }}</p>
-  <p *ngIf="response.message">{{ response.message }}</p>
+  <p *ngIf="response?.name">{{ response.name }}</p>
+  <p *ngIf="response?.email">{{ response.email }}</p>
+  <p *ngIf="response?.jwtToken">{{ response.jwtToken }}</p>
+  <p *ngIf="response?.message">{{ response.message }}</p>
   <button pButton pRipple icon="pi pi-user" class="w-5 justify-content-center" (click)="goBack()">BACK</button>
 </div>
