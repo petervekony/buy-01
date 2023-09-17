@@ -17,7 +17,9 @@ import { SignupRequest } from '../signup-request';
   styleUrls: ['./signup.component.css'],
 })
 export class SignupComponent {
-  private checkPassword: ValidatorFn = (form: AbstractControl): ValidationErrors | null => {
+  private checkPassword: ValidatorFn = (
+    form: AbstractControl,
+  ): ValidationErrors | null => {
     return form.get('password')?.value === form.get('confirmPassword')?.value
       ? null
       : { notSame: true };
@@ -55,11 +57,6 @@ export class SignupComponent {
 
   goToLogin() {
     this.router.navigate(['login']);
-  }
-
-  sendRegisteration() {
-    console.log('sending the reg');
-    this.goToLogin();
   }
 
   onSubmit() {

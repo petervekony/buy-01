@@ -3,4 +3,5 @@ export interface SignupRequest {
   email: string;
   password: string;
   role: 'CLIENT' | 'SELLER';
+  confirmPassword?: string;
 }
