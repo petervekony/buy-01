@@ -10,12 +10,12 @@
     <div>
       <form [formGroup]="loginForm" ngSubmit="onSubmit()" (input)="onValidate()">
         <label for="login-username" class="block text-900 font-medium mb-2">Username</label>
-        <input id="login-username" type="text" placeholder="Username" pInputText class="w-full mb-3" name="name"
-          formControlName="name">
+        <input id="login-username" autocomplete="username" type="text" placeholder="Username" pInputText
+          class="w-full mb-3" name="name" formControlName="name">
 
         <label for="login-password" class="block text-900 font-medium mb-2">Password</label>
-        <input id="login-password" type="password" placeholder="Password" pInputText class="w-full mb-3" name="password"
-          formControlName="password">
+        <input id="login-password" autocomplete="current-password" type="password" placeholder="Password" pInputText
+          class="w-full mb-3" name="password" formControlName="password">
 
         <div class="flex align-items-center justify-content-between mb-6">
           <!--   <div class="flex align-items-center"> -->
