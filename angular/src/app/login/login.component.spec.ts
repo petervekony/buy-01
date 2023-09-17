@@ -56,6 +56,62 @@ describe('LoginComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['register']);
   });
 
+  it('should initialize variables', () => {
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should validate correct form', () => {
+    component.loginForm.setValue({
+      name: 'taneli',
+      password: 'test123',
+    });
+    component.onValidate();
+
+    expect(component.formValid).toEqual(true);
+  });
+
+  it('should not validate form: long name', () => {
+    component.loginForm.setValue({
+      name:
+        'tttanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdanelitaneliokok123123123kasdkaskdkasdttanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdanelitaneliokok123123123kasdkaskdkasd',
+      password: 'asdasd',
+    });
+    component.onValidate();
+
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should not validate form: long password', () => {
+    component.loginForm.setValue({
+      password:
+        'tttanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdanelitaneliokok123123123kasdkaskdkasdttanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdtanelitaneliokok123123123kasdkaskdkasdanelitaneliokok123123123kasdkaskdkasd',
+      name: 'asdasd',
+    });
+    component.onValidate();
+
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should not validate form: no name', () => {
+    component.loginForm.setValue({
+      name: ' ',
+      password: 'test123',
+    });
+    component.onValidate();
+
+    expect(component.formValid).toEqual(false);
+  });
+
+  it('should not validate form: no password', () => {
+    component.loginForm.setValue({
+      name: ' ',
+      password: 'asdasd',
+    });
+    component.onValidate();
+
+    expect(component.formValid).toEqual(false);
+  });
+
   it('should call onSubmit and navigate to home page on succesfull login', () => {
     const userService = TestBed.inject(UserService);
     const router = TestBed.inject(Router);
@@ -78,6 +134,7 @@ describe('LoginComponent', () => {
       name: 'testuser',
       password: 'testpassword',
     });
+
     expect(router.navigate).toHaveBeenCalledWith(['home'], {
       queryParams: {
         data: JSON.stringify({

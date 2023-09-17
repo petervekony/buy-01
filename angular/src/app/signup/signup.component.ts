@@ -17,15 +17,12 @@ import { SignupRequest } from '../signup-request';
   styleUrls: ['./signup.component.css'],
 })
 export class SignupComponent {
-  private checkPassword: ValidatorFn = (
-    form: AbstractControl,
-  ): ValidationErrors | null => {
+  private checkPassword: ValidatorFn = (form: AbstractControl): ValidationErrors | null => {
     return form.get('password')?.value === form.get('confirmPassword')?.value
       ? null
       : { notSame: true };
   };
   formValid: boolean = false;
-  target: string = 'signup';
 
   constructor(private router: Router, private userService: UserService) {}
 

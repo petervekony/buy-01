@@ -17,13 +17,7 @@
         <input id="login-password" autocomplete="current-password" type="password" placeholder="Password" pInputText
           class="w-full mb-3" name="password" formControlName="password">
 
-        <div class="flex align-items-center justify-content-between mb-6">
-          <!--   <div class="flex align-items-center"> -->
-          <!--     <p-checkbox id="rememberme1" [binary]="true" styleClass="mr-2"></p-checkbox> -->
-          <!--     <label for="rememberme1" class="text-900">Remember me</label> -->
-          <!--   </div> -->
-          <!--   <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot password?</a> -->
-        </div>
+        <div class="flex align-items-center justify-content-between mb-6"></div>
 
         <button type="submit" [disabled]="!formValid" pButton pRipple label="Sign In" icon="pi pi-user"
           (click)="onSubmit()" class="w-full"></button>

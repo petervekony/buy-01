@@ -11,7 +11,6 @@ import { LoginRequest } from '../login-request';
 })
 export class LoginComponent {
   formValid: boolean = false;
-  target: string = 'login';
 
   constructor(private router: Router, private userService: UserService) {}
 
@@ -50,9 +49,5 @@ export class LoginComponent {
 
   onValidate() {
     this.formValid = this.loginForm.valid;
-  }
-
-  sendLogin() {
-    console.log('sending the login info');
   }
 }
