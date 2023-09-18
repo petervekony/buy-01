@@ -1,13 +1,10 @@
 package com.gritlab.buy01.userservice.service;
 
-import com.gritlab.buy01.userservice.model.User;
-import com.gritlab.buy01.userservice.model.enums.Role;
-import com.gritlab.buy01.userservice.payload.response.MessageResponse;
-import com.gritlab.buy01.userservice.payload.response.UserUpdateRequest;
-import com.gritlab.buy01.userservice.repository.UserRepository;
-import com.gritlab.buy01.userservice.security.UserDetailsServiceImpl;
-import com.gritlab.buy01.userservice.utils.EmailValidator;
-import jakarta.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,10 +15,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import com.gritlab.buy01.userservice.model.User;
+import com.gritlab.buy01.userservice.model.enums.Role;
+import com.gritlab.buy01.userservice.payload.response.MessageResponse;
+import com.gritlab.buy01.userservice.payload.response.UserUpdateRequest;
+import com.gritlab.buy01.userservice.repository.UserRepository;
+import com.gritlab.buy01.userservice.security.UserDetailsServiceImpl;
+import com.gritlab.buy01.userservice.utils.EmailValidator;
+
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class UserService {
@@ -69,7 +71,7 @@ public class UserService {
             User _user = userData.get();
 
             // if username is not updated, ignore it
-            if (userUpdateRequest.getName() != null) {
+            if (userUpdateRequest.getName() != null && !userUpdateRequest.getName().equals(_user.getName())) {
                 if (userRepository.existsByName(userUpdateRequest.getName())) {
                     return ResponseEntity
                             .badRequest()
