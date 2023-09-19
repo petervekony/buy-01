@@ -28,83 +28,90 @@ import jakarta.servlet.http.Cookie;
 @Service
 public class AuthService {
 
-    @Autowired
-    AuthenticationManager authenticationManager;
+  @Autowired AuthenticationManager authenticationManager;
 
-    @Autowired
-    UserRepository userRepository;
+  @Autowired UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder encoder;
+  @Autowired PasswordEncoder encoder;
 
-    @Autowired
-    JwtUtils jwtUtils;
+  @Autowired JwtUtils jwtUtils;
 
-    public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getName(), loginRequest.getPassword()));
+  public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
+    Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getName(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        String jwtToken = jwtUtils.generateTokenFromUserId(userDetails.getId());
+    String jwtToken = jwtUtils.generateTokenFromUserId(userDetails.getId());
 
-        Cookie jwtCookie = new Cookie("buy-01", jwtToken);
-        jwtCookie.setHttpOnly(true);
-        jwtCookie.setSecure(true);
-        jwtCookie.setMaxAge(7 * 24 * 60 * 60);
+    Cookie jwtCookie = new Cookie("buy-01", jwtToken);
+    jwtCookie.setHttpOnly(true);
+    jwtCookie.setSecure(false);
+    jwtCookie.setMaxAge(7 * 24 * 60 * 60);
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.add("Set-Cookie", jwtCookie.toString());
-    
-    
-        // TODO: this might need to be fixed
-        String role = userDetails.getAuthorities().stream()
-                .findFirst()
-                .map(item -> item.getAuthority())
-                .orElse("user");
+    String cookieValue =
+        jwtCookie.getName()
+            + "="
+            + jwtCookie.getValue()
+            + "; Max-Age="
+            + jwtCookie.getMaxAge()
+            + "; Secure; HttpOnly";
+    HttpHeaders responseHeaders = new HttpHeaders();
+    responseHeaders.add("Set-Cookie", cookieValue);
 
-        return ResponseEntity.ok()
-                .headers(responseHeaders)
-                .header("Authorization", "Bearer " + jwtToken)
-                .body(new UserInfoResponse(userDetails.getId(),
-                        userDetails.getUsername(),
-                        userDetails.getEmail(),
-                        role,
-                        jwtToken));
+    // TODO: this might need to be fixed
+    String role =
+        userDetails.getAuthorities().stream()
+            .findFirst()
+            .map(item -> item.getAuthority())
+            .orElse("user");
+    ResponseEntity<UserInfoResponse> resp =
+        ResponseEntity.ok()
+            .headers(responseHeaders)
+            .body(
+                new UserInfoResponse(
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail(),
+                    role,
+                    jwtToken));
+    System.out.println("name" + jwtCookie.getName());
+    System.out.println("value" + jwtCookie.getValue());
+    System.out.println(resp);
+    return resp;
+  }
+
+  public ResponseEntity<?> registerUser(SignupRequest signupRequest) {
+    if (userRepository.existsByName(signupRequest.getName())) {
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse("Error: Username is already taken!"));
     }
 
-    public ResponseEntity<?> registerUser(SignupRequest signupRequest) {
-        if (userRepository.existsByName(signupRequest.getName())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
-        }
-
-        signupRequest.setEmail(signupRequest.getEmail().toLowerCase(Locale.ROOT));
-        if (!EmailValidator.isValidEmail(signupRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Invalid email format"));
-        }
-
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Error: Email is already in use!"));
-        }
-
-        // Create new user's account
-        User user =
-                new User(
-                        signupRequest.getName(),
-                        signupRequest.getEmail(),
-                        encoder.encode(signupRequest.getPassword()),
-                        signupRequest.getRole());
-
-        userRepository.save(user);
-
-        return new ResponseEntity<>(new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
+    signupRequest.setEmail(signupRequest.getEmail().toLowerCase(Locale.ROOT));
+    if (!EmailValidator.isValidEmail(signupRequest.getEmail())) {
+      return ResponseEntity.badRequest().body(new MessageResponse("Error: Invalid email format"));
     }
+
+    if (userRepository.existsByEmail(signupRequest.getEmail())) {
+      return ResponseEntity.badRequest()
+          .body(new MessageResponse("Error: Email is already in use!"));
+    }
+
+    // Create new user's account
+    User user =
+        new User(
+            signupRequest.getName(),
+            signupRequest.getEmail(),
+            encoder.encode(signupRequest.getPassword()),
+            signupRequest.getRole());
+
+    userRepository.save(user);
+
+    return new ResponseEntity<>(
+        new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
+  }
 }
