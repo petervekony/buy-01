@@ -21,4 +21,8 @@ export class HomeComponent {
   goBack() {
     this.router.navigate(['login']);
   }
+
+  showUsers() {
+    throw new Error('Method not implemented.');
+  }
 }

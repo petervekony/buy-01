@@ -14,12 +14,18 @@ export class UserService {
   //eslint-disable-next-line
   sendLoginRequest(request: LoginRequest): Observable<any> {
     const address = environment.loginURL;
-    return this.http.post(address, request);
+    return this.http.post(address, request, { withCredentials: true });
   }
 
   // eslint-disable-next-line
   sendSignupRequest(request: SignupRequest): Observable<any> {
     const address = environment.signupURL;
-    return this.http.post(address, request);
+    return this.http.post(address, request, { withCredentials: true });
+  }
+
+  // eslint-disable-next-line
+  sendUserInfoRequest(): Observable<any> {
+    const address = environment.usersURL;
+    return this.http.get(address, { withCredentials: true });
   }
 }
