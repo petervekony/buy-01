@@ -51,9 +51,9 @@ public class AuthService {
         ResponseCookie.from("buy-01", jwtToken)
             .httpOnly(true)
             .secure(false)
-            .path("/")
+            .path("/api")
             .maxAge(7 * 24 * 60 * 60)
-            // .domain("")
+            // .domain("localhost")
             .build();
 
     // TODO: this might need to be fixed
@@ -65,6 +65,7 @@ public class AuthService {
     ResponseEntity<UserInfoResponse> resp =
         ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+            .header(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true")
             .body(
                 new UserInfoResponse(
                     userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), role));
