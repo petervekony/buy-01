@@ -5,6 +5,7 @@ import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,8 +23,6 @@ import com.gritlab.buy01.userservice.repository.UserRepository;
 import com.gritlab.buy01.userservice.security.UserDetailsImpl;
 import com.gritlab.buy01.userservice.security.jwt.JwtUtils;
 import com.gritlab.buy01.userservice.utils.EmailValidator;
-
-import jakarta.servlet.http.Cookie;
 
 @Service
 public class AuthService {
@@ -48,20 +47,14 @@ public class AuthService {
 
     String jwtToken = jwtUtils.generateTokenFromUserId(userDetails.getId());
 
-    Cookie jwtCookie = new Cookie("buy-01", jwtToken);
-    jwtCookie.setHttpOnly(true);
-    jwtCookie.setSecure(false);
-    jwtCookie.setMaxAge(7 * 24 * 60 * 60);
-
-    String cookieValue =
-        jwtCookie.getName()
-            + "="
-            + jwtCookie.getValue()
-            + "; Max-Age="
-            + jwtCookie.getMaxAge()
-            + "; Secure; HttpOnly";
-    HttpHeaders responseHeaders = new HttpHeaders();
-    responseHeaders.add("Set-Cookie", cookieValue);
+    ResponseCookie jwtCookie =
+        ResponseCookie.from("buy-01", jwtToken)
+            .httpOnly(true)
+            .secure(false)
+            .path("/")
+            .maxAge(7 * 24 * 60 * 60)
+            // .domain("")
+            .build();
 
     // TODO: this might need to be fixed
     String role =
@@ -71,14 +64,10 @@ public class AuthService {
             .orElse("user");
     ResponseEntity<UserInfoResponse> resp =
         ResponseEntity.ok()
-            .headers(responseHeaders)
+            .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
             .body(
                 new UserInfoResponse(
-                    userDetails.getId(),
-                    userDetails.getUsername(),
-                    userDetails.getEmail(),
-                    role,
-                    jwtToken));
+                    userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), role));
     System.out.println("name" + jwtCookie.getName());
     System.out.println("value" + jwtCookie.getValue());
     System.out.println(resp);
