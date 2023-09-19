@@ -1,15 +1,9 @@
 package com.gritlab.buy01.userservice.service;
 
-import com.gritlab.buy01.userservice.model.User;
-import com.gritlab.buy01.userservice.payload.request.LoginRequest;
-import com.gritlab.buy01.userservice.payload.request.SignupRequest;
-import com.gritlab.buy01.userservice.payload.response.MessageResponse;
-import com.gritlab.buy01.userservice.payload.response.UserInfoResponse;
-import com.gritlab.buy01.userservice.repository.UserRepository;
-import com.gritlab.buy01.userservice.security.UserDetailsImpl;
-import com.gritlab.buy01.userservice.security.jwt.JwtUtils;
-import com.gritlab.buy01.userservice.utils.EmailValidator;
+import java.util.Locale;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +13,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
+import com.gritlab.buy01.userservice.model.User;
+import com.gritlab.buy01.userservice.payload.request.LoginRequest;
+import com.gritlab.buy01.userservice.payload.request.SignupRequest;
+import com.gritlab.buy01.userservice.payload.response.MessageResponse;
+import com.gritlab.buy01.userservice.payload.response.UserInfoResponse;
+import com.gritlab.buy01.userservice.repository.UserRepository;
+import com.gritlab.buy01.userservice.security.UserDetailsImpl;
+import com.gritlab.buy01.userservice.security.jwt.JwtUtils;
+import com.gritlab.buy01.userservice.utils.EmailValidator;
+
+import jakarta.servlet.http.Cookie;
 
 @Service
 public class AuthService {
@@ -46,6 +50,15 @@ public class AuthService {
 
         String jwtToken = jwtUtils.generateTokenFromUserId(userDetails.getId());
 
+        Cookie jwtCookie = new Cookie("buy-01", jwtToken);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true);
+        jwtCookie.setMaxAge(7 * 24 * 60 * 60);
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.add("Set-Cookie", jwtCookie.toString());
+    
+    
         // TODO: this might need to be fixed
         String role = userDetails.getAuthorities().stream()
                 .findFirst()
@@ -53,6 +66,7 @@ public class AuthService {
                 .orElse("user");
 
         return ResponseEntity.ok()
+                .headers(responseHeaders)
                 .header("Authorization", "Bearer " + jwtToken)
                 .body(new UserInfoResponse(userDetails.getId(),
                         userDetails.getUsername(),
