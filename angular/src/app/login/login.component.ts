@@ -37,7 +37,9 @@ export class LoginComponent {
     this.userService.sendLoginRequest(request).subscribe(
       (loginData) => {
         console.log('login response:\n', loginData);
-        this.router.navigate(['home', { data: JSON.stringify(loginData) }]);
+        this.router.navigate(['home'], {
+          queryParams: { data: JSON.stringify(loginData) },
+        });
       },
       (error) => {
         console.log('error in login', error);

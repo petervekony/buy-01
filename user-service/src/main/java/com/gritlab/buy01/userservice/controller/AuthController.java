@@ -14,7 +14,7 @@ import com.gritlab.buy01.userservice.service.AuthService;
 
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200/login", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {

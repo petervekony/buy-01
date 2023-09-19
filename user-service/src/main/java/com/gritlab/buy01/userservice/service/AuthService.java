@@ -65,7 +65,7 @@ public class AuthService {
     ResponseEntity<UserInfoResponse> resp =
         ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-            .header(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true")
+            // .header(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true")
             .body(
                 new UserInfoResponse(
                     userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), role));
