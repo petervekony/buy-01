@@ -7,7 +7,7 @@ COPY src ./src/
 
 RUN mvn clean package -DskipTests -X
 
-FROM eclipse-temurin:17
+FROM bellsoft/liberica-openjdk-alpine:latest 
 
 WORKDIR /app
 

@@ -37,7 +37,7 @@ public class UserService {
 
   @Autowired public UserDetailsServiceImpl userDetailsServiceImpl;
 
-  private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+  private BCryptPasswordEncoder passwordEncoder;
 
   @Value("${admin.username}")
   private String adminUsername;
@@ -150,6 +150,8 @@ public class UserService {
     if (!optionalAdmin.isEmpty()) {
       return;
     }
+
+    this.passwordEncoder = new BCryptPasswordEncoder();
 
     // Create admin user
     User adminUser =
