@@ -1,0 +1,14 @@
+.card-container {
+  display: flex;
+  width: 100vw;
+  height: 100vw;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.product-image {
+  width: auto;
+  height: auto;
+}
