@@ -9,10 +9,10 @@ import {
   Validators,
 } from '@angular/forms';
 import { UserService } from '../service/user.service';
-import { SignupRequest } from '../signup-request';
+import { SignupRequest } from '../interfaces/signup-request';
 
 @Component({
-  selector: 'app-signup',
+  selector: 'signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css'],
 })
@@ -28,28 +28,29 @@ export class SignupComponent {
 
   constructor(private router: Router, private userService: UserService) {}
 
-  registerForm: FormGroup = new FormGroup({
-    name: new FormControl('', [
-      Validators.required,
-      Validators.minLength(4),
-      Validators.maxLength(30),
-    ]),
-    email: new FormControl('', [
-      Validators.required,
-      Validators.minLength(3),
-      Validators.maxLength(300),
-      Validators.email,
-    ]),
-    password: new FormControl('', [
-      Validators.required,
-      Validators.minLength(4),
-      Validators.maxLength(30),
-    ]),
-    confirmPassword: new FormControl('', [
-      Validators.required,
-    ]),
-    role: new FormControl(false),
-  }, { validators: this.checkPassword });
+  registerForm: FormGroup = new FormGroup(
+    {
+      name: new FormControl('', [
+        Validators.required,
+        Validators.minLength(4),
+        Validators.maxLength(30),
+      ]),
+      email: new FormControl('', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(300),
+        Validators.email,
+      ]),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(4),
+        Validators.maxLength(30),
+      ]),
+      confirmPassword: new FormControl('', [Validators.required]),
+      role: new FormControl(false),
+    },
+    { validators: this.checkPassword },
+  );
 
   onValidate() {
     this.formValid = this.registerForm.valid;
@@ -62,15 +63,13 @@ export class SignupComponent {
   onSubmit() {
     this.formValid = false;
     const request: SignupRequest = this.registerForm.value;
-    request.role ? request.role = 'SELLER' : request.role = 'CLIENT';
+    request.role ? (request.role = 'SELLER') : (request.role = 'CLIENT');
     console.log('sending out the reg form:\n', request);
-    this.userService.sendSignupRequest(request).subscribe(
-      (signupData) => {
-        console.log('signup response:\n', signupData);
-        this.router.navigate(['home'], {
-          queryParams: { data: JSON.stringify(signupData) },
-        });
-      },
-    );
+    this.userService.sendSignupRequest(request).subscribe((signupData) => {
+      console.log('signup response:\n', signupData);
+      this.router.navigate(['home'], {
+        queryParams: { data: JSON.stringify(signupData) },
+      });
+    });
   }
 }

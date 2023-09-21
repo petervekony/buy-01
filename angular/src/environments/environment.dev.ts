@@ -3,4 +3,6 @@ export const environment = {
   loginURL: 'http://localhost:8080/api/auth/signin',
   signupURL: 'http://localhost:8080/api/auth/signup',
   usersURL: 'http://localhost:8080/api/users',
+  productsURL: 'http://localhost:8080/api/products',
+  productOwnerURL: 'http://localhost:8080/api/products',
 };

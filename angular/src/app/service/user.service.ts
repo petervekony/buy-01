@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LoginRequest } from '../login-request';
-import { SignupRequest } from '../signup-request';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { LoginRequest } from '../interfaces/login-request';
+import { SignupRequest } from '../interfaces/signup-request';
 
 @Injectable({
   providedIn: 'root',
