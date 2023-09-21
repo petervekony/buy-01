@@ -25,8 +25,13 @@ export class HomeComponent {
   }
 
   showUsers() {
-    this.userService.sendUserInfoRequest().subscribe((data) => {
-      console.log(data);
+    this.userService.sendUserInfoRequest().subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+      error: (error) => {
+        console.log('error', error);
+      },
     });
   }
 }
