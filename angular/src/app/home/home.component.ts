@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
 
 @Component({
@@ -11,18 +11,15 @@ export class HomeComponent {
   //eslint-disable-next-line
   response: any;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private userService: UserService,
-  ) {
-    this.route.queryParams.subscribe((params) => {
-      if (params['data']) {
-        this.response = JSON.parse(params['data']);
-        console.log('data in home:\n', this.response);
-      }
-    });
+  constructor(private router: Router, private userService: UserService) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation && navigation.extras.state) {
+      this.response = navigation.extras.state['data'];
+      console.log(navigation.extras.state['data']);
+      console.log(this.response);
+    }
   }
+
   goBack() {
     this.router.navigate(['login']);
   }

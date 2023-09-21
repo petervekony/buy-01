@@ -1,18 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
-import { LoginRequest } from '../login-request';
+import { NavigationExtras } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { LoginRequest } from '../interfaces/login-request';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   formValid: boolean = false;
+  subscription: Subscription;
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private userService: UserService) {
+    this.subscription = Subscription.EMPTY;
+  }
 
   loginForm: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -32,22 +37,22 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    console.log('sending login form:\n', this.loginForm);
     const request: LoginRequest = this.loginForm.value;
-    this.userService.sendLoginRequest(request).subscribe(
-      (loginData) => {
-        console.log('login response:\n', loginData);
-        this.router.navigate(['home'], {
-          queryParams: { data: JSON.stringify(loginData) },
-        });
+    this.subscription = this.userService.sendLoginRequest(request).subscribe({
+      next: (data) => {
+        console.log('login response:\n', data);
+        const navigationExtras: NavigationExtras = { state: { data: data } };
+        this.router.navigate(['home'], navigationExtras);
       },
-      (error) => {
-        console.log('error in login', error);
-      },
-    );
+      error: (data) => console.log(data),
+    });
   }
 
   onValidate() {
     this.formValid = this.loginForm.valid;
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }
