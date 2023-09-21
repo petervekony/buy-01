@@ -16,5 +16,17 @@ services:
       dockerfile: Dockerfile
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/buy01-db?authSource=admin
+    ports:
+      - '8080:8080'
     depends_on:
       - mongodb
+
+  frontend:
+    build:
+      context: ./angular
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./angular/cert:/etc/nginx/ssl:ro

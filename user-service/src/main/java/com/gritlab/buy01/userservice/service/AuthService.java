@@ -50,10 +50,11 @@ public class AuthService {
     ResponseCookie jwtCookie =
         ResponseCookie.from("buy-01", jwtToken)
             .httpOnly(true)
-            .secure(false)
-            .path("/api")
+            .sameSite("Lax")
+            .domain("localhost")
+            .secure(true)
+            .path("/")
             .maxAge(7 * 24 * 60 * 60)
-            // .domain("localhost")
             .build();
 
     // TODO: this might need to be fixed
