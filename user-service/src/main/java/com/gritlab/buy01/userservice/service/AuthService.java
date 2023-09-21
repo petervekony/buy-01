@@ -105,4 +105,15 @@ public class AuthService {
     return new ResponseEntity<>(
         new MessageResponse("User registered successfully!"), HttpStatus.CREATED);
   }
+
+  public User getUserDetailsFromToken(String token) {
+    try {
+      String userId = jwtUtils.getUserIdFromJwtToken(token);
+
+      return userRepository.findById(userId).orElse(null);
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+      return null;
+    }
+  }
 }
