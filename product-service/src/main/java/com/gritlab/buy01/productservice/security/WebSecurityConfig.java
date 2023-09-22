@@ -13,17 +13,21 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.gritlab.buy01.productservice.security.jwt.AuthEntryPointJwt;
+import com.gritlab.buy01.productservice.security.jwt.AuthTokenFilter;
+import com.gritlab.buy01.productservice.service.KafkaService;
+
 @EnableWebSecurity
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {
   @Autowired private AuthEntryPointJwt unauthorizedHandler;
 
-  @Autowired private TokenValidationService tokenValidationService;
+  @Autowired private KafkaService kafkaService;
 
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
-    return new AuthTokenFilter(tokenValidationService);
+    return new AuthTokenFilter(kafkaService);
   }
 
   @Bean
@@ -46,8 +50,6 @@ public class WebSecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated());
-
-    http.authenticationProvider(authenticationProvider());
 
     http.addFilterBefore(
         authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
