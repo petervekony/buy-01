@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../service/user.service';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { of } from 'rxjs';
 
 import { LoginComponent } from './login.component';
@@ -57,7 +57,7 @@ describe('LoginComponent', () => {
   });
 
   it('should initialize variables', () => {
-    expect(component.formValid).toEqual(false);
+    expect(component.formValid).toBeFalse();
   });
 
   it('should validate correct form', () => {
@@ -67,7 +67,7 @@ describe('LoginComponent', () => {
     });
     component.onValidate();
 
-    expect(component.formValid).toEqual(true);
+    expect(component.formValid).toBeTrue();
   });
 
   it('should not validate form: long name', () => {
@@ -78,7 +78,7 @@ describe('LoginComponent', () => {
     });
     component.onValidate();
 
-    expect(component.formValid).toEqual(false);
+    expect(component.formValid).toBeFalse();
   });
 
   it('should not validate form: long password', () => {
@@ -89,7 +89,7 @@ describe('LoginComponent', () => {
     });
     component.onValidate();
 
-    expect(component.formValid).toEqual(false);
+    expect(component.formValid).toBeFalse();
   });
 
   it('should not validate form: no name', () => {
@@ -99,7 +99,7 @@ describe('LoginComponent', () => {
     });
     component.onValidate();
 
-    expect(component.formValid).toEqual(false);
+    expect(component.formValid).toBeFalse();
   });
 
   it('should not validate form: no password', () => {
@@ -109,7 +109,7 @@ describe('LoginComponent', () => {
     });
     component.onValidate();
 
-    expect(component.formValid).toEqual(false);
+    expect(component.formValid).toBeFalse();
   });
 
   it('should call onSubmit and navigate to home page on succesfull login', () => {
@@ -135,16 +135,17 @@ describe('LoginComponent', () => {
       password: 'testpassword',
     });
 
-    expect(router.navigate).toHaveBeenCalledWith(['home'], {
-      queryParams: {
-        data: JSON.stringify({
+    const navigationExtras: NavigationExtras = {
+      state: {
+        data: {
           id: '123123123123',
           email: 'test@test.com',
           jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
           name: 'taneli',
           role: 'ROLE_CLIENT',
-        }),
+        },
       },
-    });
+    };
+    expect(router.navigate).toHaveBeenCalledWith(['home'], navigationExtras);
   });
 });

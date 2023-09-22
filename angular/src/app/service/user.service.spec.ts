@@ -4,10 +4,10 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { UserService } from './user.service';
-import { LoginRequest } from '../login-request';
-import { SignupRequest } from '../signup-request';
 import { environment } from 'src/environments/environment';
 import { of } from 'rxjs';
+import { LoginRequest } from '../interfaces/login-request';
+import { SignupRequest } from '../interfaces/signup-request';
 
 describe('UserService', () => {
   let service: UserService;
@@ -75,13 +75,13 @@ describe('UserService', () => {
 
   it('signup url should be environment.signupURL', () => {
     expect(environment.signupURL).toEqual(
-      'http://localhost:8080/api/auth/signup',
+      '/api/auth/signup',
     );
   });
 
   it('signup url should be environment.loginURL', () => {
     expect(environment.loginURL).toEqual(
-      'http://localhost:8080/api/auth/signin',
+      '/api/auth/signin',
     );
   });
 });
