@@ -1,16 +1,14 @@
 <div class="card-container">
   <div class="picture-container">
-    <img
-      src="../../assets/images/placeholder.png"
-      alt=""
-      class="product-image"
-    />
+    <img src="../../assets/images/placeholder.png" alt="" class="product-image" />
   </div>
-  <h3 class="product-title">{{ product.name }}</h3>
-  <div class="product-body">{{ product.description }}</div>
-  <div class="product-info">{{ product.quantity }}</div>
-  <div class="owner">{{ owner }}</div>
-  <div class="product-footer">
-    <button class="buy">BUY</button>
+  <div class="product-info-container" *ngFor="let product of products">
+    <h3 class="product-title">{{ product.name }}</h3>
+    <div class="product-body">{{ product.description }}</div>
+    <div class="product-info">{{ product.quantity }}</div>
+    <div class="owner">{{ owner }}</div>
+    <div class="product-footer">
+      <button class="buy">BUY</button>
+    </div>
   </div>
 </div>
