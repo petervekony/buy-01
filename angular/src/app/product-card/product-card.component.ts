@@ -13,6 +13,7 @@ import { MediaService } from '../service/media.service';
 export class ProductCardComponent implements OnDestroy {
   products: Product[] = [];
   subscription: Subscription;
+  owner: string = '';
 
   constructor(
     private productService: ProductService,
@@ -27,7 +28,9 @@ export class ProductCardComponent implements OnDestroy {
       map(([products, users, media]) => {
         return products.map((product) => {
           const owner = users.find((user) => user.id === product.userId);
-          const productMedia = media.find((mediaItem) => mediaItem.productId === product.id);
+          const productMedia = media.find((mediaItem) =>
+            mediaItem.productId === product.id
+          );
           return { ...product, owner, productMedia };
         });
       }),
