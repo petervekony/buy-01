@@ -17,7 +17,8 @@ export class UserService {
     return this.http.post<User>(address, request, { withCredentials: true });
   }
 
-  sendSignupRequest(request: SignupRequest): Observable<User> {
+  //eslint-disable-next-line
+  sendSignupRequest(request: SignupRequest): Observable<any> {
     const address = environment.signupURL;
     return this.http.post<User>(address, request, { withCredentials: true });
   }

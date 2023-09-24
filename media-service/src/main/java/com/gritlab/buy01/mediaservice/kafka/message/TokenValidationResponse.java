@@ -1,0 +1,13 @@
+package com.gritlab.buy01.mediaservice.kafka.message;
+
+import lombok.Data;
+
+@Data
+public class TokenValidationResponse {
+  private String userId;
+  private String name;
+  private String email;
+  private String role;
+  private String errorMessage;
+  private String correlationId;
+}
