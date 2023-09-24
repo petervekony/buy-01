@@ -10,9 +10,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -91,47 +93,80 @@ public class ProductController {
     }
   }
 
-  // @PreAuthorize("isAuthenticated()")
-  // @PutMapping("/products/{id}")
-  // public ResponseEntity<ProductModel> updateProduct(
-  //     @PathVariable("id") String id, @Valid @RequestBody ProductModel productModel) {
-  //   Optional<ProductModel> existingProduct = productService.getProductById(id);
-  //   if (existingProduct.isEmpty()) {
-  //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-  //   }
+  @PreAuthorize("isAuthenticated()")
+  @PutMapping("/products/{id}")
+  public ResponseEntity<?> updateProduct(
+      @PathVariable("id") String id, @Valid @RequestBody ProductModel productModel) {
+    try {
+      Optional<ProductModel> existingProduct = productService.getProductById(id);
+      if (existingProduct.isEmpty()) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+      ProductModel productToUpdate = existingProduct.get();
+      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      String userId = null;
 
-  //   PrincipalData principalData = new PrincipalData();
+      if (principal instanceof UserDetailsImpl) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+        userId = userDetails.getId();
 
-  //   if (!principalData.authCheck(existingProduct.get().getUserId())) {
-  //     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-  //   }
+        // check if the user is ADMIN or the owner to update the product
+        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+            && !userId.equals(productToUpdate.getUserId())) {
+          ErrorMessage errorMessage =
+              new ErrorMessage(
+                  HttpStatus.FORBIDDEN.toString(),
+                  "Error: only admins and the owner can update a product.");
+          return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
+        }
+      } else {
+        throw new Exception("Unexpected principal type");
+      }
 
-  //   Optional<ProductModel> updatedProduct = productService.updateProduct(id, productModel);
+      Optional<ProductModel> updatedProduct = productService.updateProduct(id, productModel);
 
-  //   return updatedProduct
-  //       .map(product -> new ResponseEntity<>(product, HttpStatus.OK))
-  //       .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-  // }
+      return updatedProduct
+          .map(product -> new ResponseEntity<>(product, HttpStatus.OK))
+          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    } catch (Exception e) {
+      System.out.println(e);
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
-  // @PreAuthorize("isAuthenticated()")
-  // @DeleteMapping("products/{id}")
-  // public ResponseEntity<HttpStatus> deleteProduct(@PathVariable String id) {
-  //   Optional<ProductModel> product = productService.getProductById(id);
-  //   if (product.isEmpty()) {
-  //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-  //   }
+  @PreAuthorize("isAuthenticated()")
+  @DeleteMapping("products/{id}")
+  public ResponseEntity<?> deleteProduct(@PathVariable String id) {
+    try {
+      Optional<ProductModel> product = productService.getProductById(id);
+      if (product.isEmpty()) {
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      }
+      ProductModel productToDelete = product.get();
 
-  //   PrincipalData principalData = new PrincipalData();
+      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      String userId = null;
 
-  //   if (!principalData.authCheck(product.get().getUserId())) {
-  //     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-  //   }
+      if (principal instanceof UserDetailsImpl) {
+        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+        userId = userDetails.getId();
 
-  //   try {
-  //     productService.deleteProduct(id);
-  //     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  //   } catch (Exception e) {
-  //     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
+        // check if the user is ADMIN or the owner to delete the product
+        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+            && !userId.equals(productToDelete.getUserId())) {
+          ErrorMessage errorMessage =
+              new ErrorMessage(
+                  HttpStatus.FORBIDDEN.toString(),
+                  "Error: only admins and the owner can delete a product.");
+          return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
+        }
+      } else {
+        throw new Exception("Unexpected principal type");
+      }
+      productService.deleteProduct(id);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
