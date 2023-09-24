@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gritlab.buy01.productservice.model.ProductModel;
+import com.gritlab.buy01.productservice.payload.response.ErrorMessage;
 import com.gritlab.buy01.productservice.security.UserDetailsImpl;
 import com.gritlab.buy01.productservice.service.ProductService;
 
@@ -57,13 +59,24 @@ public class ProductController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/products")
-  public ResponseEntity<ProductModel> createProduct(@Valid @RequestBody ProductModel productModel) {
+  public ResponseEntity<?> createProduct(@Valid @RequestBody ProductModel productModel) {
     try {
       Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
       String userId = null;
 
       if (principal instanceof UserDetailsImpl) {
-        userId = ((UserDetailsImpl) principal).getId();
+        UserDetailsImpl userDetails = (UserDetailsImpl) principal;
+        userId = userDetails.getId();
+
+        // check if the user is ADMIN or SELLER to create product
+        if (!userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+            && !userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SELLER"))) {
+          ErrorMessage errorMessage =
+              new ErrorMessage(
+                  HttpStatus.FORBIDDEN.toString(),
+                  "Error: only admins and sellers can create products.");
+          return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
+        }
       } else {
         throw new Exception("Unexpected principal type");
       }
