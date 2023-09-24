@@ -1,17 +1,20 @@
 package com.gritlab.buy01.productservice.security.jwt;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.productservice.security.UserDetailsImpl;
 import com.gritlab.buy01.productservice.service.KafkaService;
 
 import jakarta.servlet.FilterChain;
@@ -35,14 +38,20 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     try {
       String jwt = parseJwt(request);
       if (jwt != null) {
-        TokenValidationRequest validationRequest = new TokenValidationRequest();
-        validationRequest.setJwtToken(jwt);
+        TokenValidationRequest validationRequest =
+            new TokenValidationRequest(jwt, UUID.randomUUID().toString());
         TokenValidationResponse validationResponse =
             kafkaService.validateTokenWithUserMicroservice(validationRequest);
 
         // Assuming that a null response means an invalid token.
         if (validationResponse != null && validationResponse.getUserId() != null) {
-          UserDetails userDetails = new User(validationResponse.getName(), "", new ArrayList<>());
+          GrantedAuthority authority =
+              new SimpleGrantedAuthority("ROLE_" + validationResponse.getRole());
+
+          List<GrantedAuthority> authorities = Collections.singletonList(authority);
+          UserDetailsImpl userDetails =
+              new UserDetailsImpl(
+                  validationResponse.getUserId(), validationResponse.getName(), authorities);
           UsernamePasswordAuthenticationToken authentication =
               new UsernamePasswordAuthenticationToken(
                   userDetails, null, userDetails.getAuthorities());

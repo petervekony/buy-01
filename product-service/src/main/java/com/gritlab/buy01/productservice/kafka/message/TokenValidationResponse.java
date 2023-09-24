@@ -6,6 +6,7 @@ import lombok.Data;
 public class TokenValidationResponse {
   private String userId;
   private String name;
+  private String email;
   private String role;
   private String errorMessage;
   private String correlationId;

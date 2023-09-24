@@ -3,6 +3,7 @@ package com.gritlab.buy01.userservice.service;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -35,6 +36,9 @@ public class AuthService {
 
   @Autowired JwtUtils jwtUtils;
 
+  @Value("${buy01.app.jwtExpirationMs}")
+  private int jwtExpirationMs;
+
   public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
     Authentication authentication =
         authenticationManager.authenticate(
@@ -54,7 +58,7 @@ public class AuthService {
             .domain("localhost")
             .secure(true)
             .path("/")
-            .maxAge(7 * 24 * 60 * 60)
+            .maxAge(jwtExpirationMs / 1000)
             .build();
 
     // TODO: this might need to be fixed
@@ -70,9 +74,6 @@ public class AuthService {
             .body(
                 new UserInfoResponse(
                     userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), role));
-    System.out.println("name" + jwtCookie.getName());
-    System.out.println("value" + jwtCookie.getValue());
-    System.out.println(resp);
     return resp;
   }
 
