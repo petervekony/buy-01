@@ -13,6 +13,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
+
 @Configuration
 public class KafkaProducerConfig {
 
@@ -29,12 +31,12 @@ public class KafkaProducerConfig {
   }
 
   @Bean
-  public ProducerFactory<String, String> producerFactory() {
+  public ProducerFactory<String, TokenValidationRequest> producerFactory() {
     return new DefaultKafkaProducerFactory<>(producerConfigs());
   }
 
   @Bean
-  public KafkaTemplate<String, String> kafkaTemplate() {
+  public KafkaTemplate<String, TokenValidationRequest> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
   }
 }

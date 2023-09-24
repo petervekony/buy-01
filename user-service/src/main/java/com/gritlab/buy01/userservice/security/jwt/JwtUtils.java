@@ -40,6 +40,7 @@ public class JwtUtils {
   }
 
   public boolean validateJwtToken(String authToken) {
+    System.out.println("authToken in validateJwtToken: " + authToken);
     try {
       Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
       return true;
@@ -57,10 +58,14 @@ public class JwtUtils {
   }
 
   public String generateTokenFromUserId(String userId) {
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+    System.out.println("Current time: " + now);
+    System.out.println("Token expiration time: " + expiryDate);
     return Jwts.builder()
         .setSubject(userId)
-        .setIssuedAt(new Date())
-        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+        .setIssuedAt(now)
+        .setExpiration(expiryDate)
         .signWith(key(), SignatureAlgorithm.HS256)
         .compact();
   }

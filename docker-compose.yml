@@ -30,7 +30,7 @@ services:
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/buy01-db?authSource=admin
     ports:
-      - '8080:8080'
+      - '8081:8080'
     depends_on:
       - mongodb
       - zookeeper

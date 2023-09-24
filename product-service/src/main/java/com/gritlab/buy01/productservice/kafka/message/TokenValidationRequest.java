@@ -6,4 +6,9 @@ import lombok.Data;
 public class TokenValidationRequest {
   private String jwtToken;
   private String correlationId;
+
+  public TokenValidationRequest(String token, String correlationId) {
+    this.jwtToken = token;
+    this.correlationId = correlationId;
+  }
 }

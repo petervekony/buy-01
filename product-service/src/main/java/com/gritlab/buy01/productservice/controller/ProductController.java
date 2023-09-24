@@ -6,15 +6,22 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gritlab.buy01.productservice.model.ProductModel;
+import com.gritlab.buy01.productservice.security.UserDetailsImpl;
 import com.gritlab.buy01.productservice.service.ProductService;
+
+import jakarta.validation.Valid;
 
 @CrossOrigin
 @RestController
@@ -38,6 +45,7 @@ public class ProductController {
     }
   }
 
+  @PreAuthorize("isAuthenticated()")
   @GetMapping("/products/{id}")
   public ResponseEntity<ProductModel> getProductById(@PathVariable("id") String id) {
     Optional<ProductModel> productData = productService.getProductById(id);
@@ -47,24 +55,28 @@ public class ProductController {
         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 
-  // @PreAuthorize("isAuthenticated()")
-  // @PostMapping("/products")
-  // public ResponseEntity<ProductModel> createProduct(@Valid @RequestBody ProductModel
-  // productModel) {
-  //   try {
-  //     PrincipalData principalData = new PrincipalData();
+  @PreAuthorize("isAuthenticated()")
+  @PostMapping("/products")
+  public ResponseEntity<ProductModel> createProduct(@Valid @RequestBody ProductModel productModel) {
+    try {
+      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      String userId = null;
 
-  //     UserDetailsImpl userDetails = principalData.getUserDetails();
+      if (principal instanceof UserDetailsImpl) {
+        userId = ((UserDetailsImpl) principal).getId();
+      } else {
+        throw new Exception("Unexpected principal type");
+      }
+      productModel.setUserId(userId);
 
-  //     productModel.setUserId(userDetails.getId());
+      ProductModel _productModel = productService.createProduct(productModel);
 
-  //     ProductModel _productModel = productService.createProduct(productModel);
-
-  //     return new ResponseEntity<>(_productModel, HttpStatus.CREATED);
-  //   } catch (Exception e) {
-  //     return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-  //   }
-  // }
+      return new ResponseEntity<>(_productModel, HttpStatus.CREATED);
+    } catch (Exception e) {
+      System.out.println(e.toString());
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   // @PreAuthorize("isAuthenticated()")
   // @PutMapping("/products/{id}")
