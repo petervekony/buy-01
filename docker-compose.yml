@@ -36,6 +36,19 @@ services:
       - zookeeper
       - kafka
 
+  media-service:
+    build:
+      context: ./media-service
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/buy01-db?authSource=admin
+    ports:
+      - '8082:8080'
+    depends_on:
+      - mongodb
+      - zookeeper
+      - kafka
+
   frontend:
     build:
       context: ./angular
@@ -65,5 +78,6 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_LOG_DIRS: "/kafka/kafka-logs-1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "token-validation-request:1:1,token-validation-response:1:1"
     depends_on:
       - zookeeper

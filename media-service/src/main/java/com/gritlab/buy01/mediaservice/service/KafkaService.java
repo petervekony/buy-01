@@ -46,7 +46,7 @@ public class KafkaService {
     }
   }
 
-  @KafkaListener(topics = TOPIC_RESPONSE, groupId = "product-service-group")
+  @KafkaListener(topics = TOPIC_RESPONSE, groupId = "media-service-group")
   public void consumeTokenValidationResponse(TokenValidationResponse response) {
     BlockingQueue<TokenValidationResponse> queue = responseQueues.get(response.getCorrelationId());
     if (queue != null) {

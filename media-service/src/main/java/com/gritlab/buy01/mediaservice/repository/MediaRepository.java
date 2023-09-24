@@ -8,8 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.gritlab.buy01.mediaservice.model.Media;
 
 public interface MediaRepository extends MongoRepository<Media, String> {
-  List<Media> findByName(String name);
-
   Optional<Media> findById(String id);
 
   Optional<List<Media>> findAllByProductId(String productId);
@@ -25,5 +23,4 @@ public interface MediaRepository extends MongoRepository<Media, String> {
   Optional<Media> findByProductId(String productId);
 
   void deleteAllByUserId(String userId);
-  // List<ProductModel> findByOwner(String userId);
 }

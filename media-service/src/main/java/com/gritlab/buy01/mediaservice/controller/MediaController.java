@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.gritlab.buy01.mediaservice.model.Media;
 import com.gritlab.buy01.mediaservice.payload.response.MediaResponse;
@@ -43,6 +46,15 @@ public class MediaController {
   @DeleteMapping("/media")
   public ResponseEntity<?> deleteById(@RequestParam String userId, @RequestParam String productId) {
     return mediaService.deleteMediaById(userId, productId);
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @PostMapping("/media")
+  public ResponseEntity<?> createMedia(
+      @RequestParam(required = false) String userId,
+      @RequestParam(required = false) String productId,
+      @RequestPart MultipartFile image) {
+    return mediaService.createMedia(image, userId, productId);
   }
 
   // @PreAuthorize("isAuthenticated()")

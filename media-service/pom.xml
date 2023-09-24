@@ -10,7 +10,7 @@
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.gritlab.buy01</groupId>
-  <artifactId>mediaservice</artifactId>
+  <artifactId>media-service</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>mediaservice</name>
   <description>Media service for buy01</description>
