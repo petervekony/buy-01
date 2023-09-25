@@ -9,8 +9,13 @@ RUN mvn clean package -DskipTests -X
 
 FROM bellsoft/liberica-openjdk-alpine:latest 
 
+RUN apk add --no-cache bash
+
 WORKDIR /app
 
 COPY --from=build /app/target/user-service-*.jar user-service.jar
 
-CMD ["java", "-jar", "user-service.jar"]
+COPY wait-for-it.sh /wait-for-it.sh
+RUN chmod +x /wait-for-it.sh
+
+CMD ["/wait-for-it.sh", "kafka:9092", "--", "java", "-jar", "user-service.jar"]

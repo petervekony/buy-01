@@ -58,6 +58,10 @@ services:
       - '443:443'
     volumes:
       - ./angular/cert:/etc/nginx/ssl:ro
+    depends_on:
+      - user-service
+      - product-service
+      - media-service
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
@@ -65,6 +69,10 @@ services:
       - '2181:2181'
     volumes:
       - './zookeeper-data:/data'
+      - './wait-for-it.sh:/wait-for-it.sh'
+    depends_on:
+      - mongodb
+    command: ["/bin/sh", "-c", "/wait-for-it.sh mongodb:27017 -- /usr/sbin/sshd && bash /usr/bin/start-zk.sh"]
 
   kafka:
     image: wurstmeister/kafka:latest
@@ -83,3 +91,8 @@ services:
       KAFKA_CREATE_TOPICS: "token-validation-request:1:1,token-validation-response:1:1,user-products-deletion:1:1,user-avatar-deletion:1:1,product-avatar-deletion:1:1"
     depends_on:
       - zookeeper
+    volumes:
+      - './wait-for-it.sh:/wait-for-it.sh'
+      - './kafka-entrypoint.sh:/kafka-entrypoint.sh'
+    entrypoint: ["/bin/bash", "/kafka-entrypoint.sh"]
+    # command: ["/wait-for-it.sh", "zookeeper:2181", "--", "/start-kafka.sh"]
