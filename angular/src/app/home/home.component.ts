@@ -1,23 +1,54 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
+import { Product } from '../interfaces/product';
+import { Subscription } from 'rxjs';
+import { ProductService } from '../service/product.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent {
+export class HomeComponent implements OnDestroy {
   //eslint-disable-next-line
   response: any;
+  products: Product[] = [];
+  subscription: Subscription;
 
-  constructor(private router: Router, private userService: UserService) {
+  constructor(
+    private router: Router,
+    private userService: UserService,
+    private productService: ProductService,
+  ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state) {
       this.response = navigation.extras.state['data'];
       console.log(navigation.extras.state['data']);
       console.log(this.response);
     }
+    //TODO: for testing
+    this.subscription = Subscription.EMPTY;
+    // this.subscription = this.productService.getProducts().subscribe({
+    //   next: (products) => {
+    //     this.products = products;
+    //   },
+    //   error: (error) => {
+    //     console.log('error: ', error);
+    //   },
+    // });
+  }
+
+  //TODO: only for testing purposes
+  showProducts() {
+    this.subscription = this.productService.getProducts().subscribe({
+      next: (product) => {
+        this.products = product;
+      },
+      error: (error) => {
+        console.log(error);
+      },
+    });
   }
 
   goBack() {
@@ -33,5 +64,9 @@ export class HomeComponent {
         console.log('error', error);
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 }
