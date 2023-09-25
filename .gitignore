@@ -230,3 +230,7 @@ tags
 # Ignore all local history of files
 .history
 .ionide
+
+
+# Zookeeper data
+zookeeper_data/

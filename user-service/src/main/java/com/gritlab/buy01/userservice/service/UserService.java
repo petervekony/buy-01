@@ -29,6 +29,7 @@ import jakarta.annotation.PostConstruct;
 public class UserService {
   @Autowired public UserRepository userRepository;
 
+  @Autowired private KafkaService kafkaService;
   // @Autowired
   // public ProductRepository productRepository;
 
@@ -138,10 +139,12 @@ public class UserService {
     }
   }
 
-  // TODO: implement deletion of user's products
   public void deleteUser(String id) {
-    // productRepository.deleteAllByUserId(id);
-    userRepository.deleteById(id);
+    Optional<User> user = userRepository.findById(id);
+    if (user.isPresent()) {
+      kafkaService.deleteUserItems(user.get());
+      userRepository.deleteById(id);
+    }
   }
 
   @PostConstruct

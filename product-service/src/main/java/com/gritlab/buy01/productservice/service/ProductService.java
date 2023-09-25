@@ -55,4 +55,16 @@ public class ProductService {
   public void deleteProduct(String id) {
     productRepository.deleteById(id);
   }
+
+  public void deleteAllUserProducts(String userId) {
+    List<ProductModel> products = productRepository.findAllByUserId(userId);
+    if (products.size() != 0) {
+      products.forEach(
+          product -> {
+            String id = product.getId();
+            // TODO: send message to media service to delete media
+            productRepository.deleteById(id);
+          });
+    }
+  }
 }

@@ -63,6 +63,8 @@ services:
     image: wurstmeister/zookeeper:latest
     ports:
       - '2181:2181'
+    volumes:
+      - './zookeeper-data:/data'
 
   kafka:
     image: wurstmeister/kafka:latest
@@ -75,9 +77,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG_DIRS: "/kafka/kafka-logs-1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "token-validation-request:1:1,token-validation-response:1:1"
+      KAFKA_CREATE_TOPICS: "token-validation-request:1:1,token-validation-response:1:1,user-products-deletion:1:1,user-avatar-deletion:1:1,product-avatar-deletion:1:1"
     depends_on:
       - zookeeper

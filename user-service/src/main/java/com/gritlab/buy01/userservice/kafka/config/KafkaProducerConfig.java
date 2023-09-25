@@ -14,6 +14,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.gritlab.buy01.userservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.userservice.kafka.message.UserProfileDeleteMessage;
 
 @Configuration
 public class KafkaProducerConfig {
@@ -36,8 +37,18 @@ public class KafkaProducerConfig {
     return new DefaultKafkaProducerFactory<>(producerConfigs());
   }
 
-  @Bean
+  @Bean(name = "tokenValidationResponseKafkaTemplate")
   public KafkaTemplate<String, TokenValidationResponse> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
+  }
+
+  @Bean
+  public ProducerFactory<String, UserProfileDeleteMessage> producerFactoryForUserProfileDelete() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
+
+  @Bean(name = "userProfileDeleteMessageKafkaTemplate")
+  public KafkaTemplate<String, UserProfileDeleteMessage> userProfileDeleteMessageKafkaTemplate() {
+    return new KafkaTemplate<>(producerFactoryForUserProfileDelete());
   }
 }

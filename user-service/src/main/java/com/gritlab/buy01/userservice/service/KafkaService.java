@@ -2,10 +2,12 @@ package com.gritlab.buy01.userservice.service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.userservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.userservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.userservice.kafka.message.UserProfileDeleteMessage;
 import com.gritlab.buy01.userservice.model.User;
 
 @Service
@@ -22,7 +25,13 @@ public class KafkaService {
 
   @Autowired private AuthService authService;
 
-  @Autowired private KafkaTemplate<String, TokenValidationResponse> kafkaTemplate;
+  @Autowired
+  @Qualifier("tokenValidationResponseKafkaTemplate")
+  private KafkaTemplate<String, TokenValidationResponse> tokenValidationResponseKafkaTemplate;
+
+  @Autowired
+  @Qualifier("userProfileDeleteMessageKafkaTemplate")
+  private KafkaTemplate<String, UserProfileDeleteMessage> userProfileDeleteMessageKafkaTemplate;
 
   @Value("${kafka.topic.token-validation-response}")
   private String responseTopic;
@@ -31,7 +40,7 @@ public class KafkaService {
   private Set<String> processedCorrelationIds = new HashSet<>();
 
   public void sendMessage(TokenValidationResponse message) {
-    kafkaTemplate.send(responseTopic, message);
+    tokenValidationResponseKafkaTemplate.send(responseTopic, message);
   }
 
   @KafkaListener(topics = "token-validation-request", groupId = "user-service-group")
@@ -67,5 +76,23 @@ public class KafkaService {
       logger.error(
           "Error processing message with correlationId: {}", message.getCorrelationId(), e);
     }
+  }
+
+  public void deleteUserItems(User user) {
+    String correlationId = UUID.randomUUID().toString();
+
+    if (processedCorrelationIds.contains(correlationId)) {
+      logger.warn("Duplicate deletion request detected for user: {}", user.getId());
+      return;
+    }
+
+    UserProfileDeleteMessage message = new UserProfileDeleteMessage(correlationId, user.getId());
+    if (user.getAvatar() != null) {
+      // TODO: implement media message to delete avatar
+    }
+
+    userProfileDeleteMessageKafkaTemplate.send("user-products-deletion", message);
+
+    processedCorrelationIds.add(correlationId);
   }
 }
