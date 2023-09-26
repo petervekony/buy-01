@@ -14,6 +14,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.gritlab.buy01.userservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.userservice.kafka.message.UserAvatarDeleteMessage;
 import com.gritlab.buy01.userservice.kafka.message.UserProfileDeleteMessage;
 
 @Configuration
@@ -32,6 +33,8 @@ public class KafkaProducerConfig {
     return props;
   }
 
+  // User authentication by user and media service
+
   @Bean
   public ProducerFactory<String, TokenValidationResponse> producerFactory() {
     return new DefaultKafkaProducerFactory<>(producerConfigs());
@@ -42,6 +45,8 @@ public class KafkaProducerConfig {
     return new KafkaTemplate<>(producerFactory());
   }
 
+  // User products' deletion by product service
+
   @Bean
   public ProducerFactory<String, UserProfileDeleteMessage> producerFactoryForUserProfileDelete() {
     return new DefaultKafkaProducerFactory<>(producerConfigs());
@@ -50,5 +55,17 @@ public class KafkaProducerConfig {
   @Bean(name = "userProfileDeleteMessageKafkaTemplate")
   public KafkaTemplate<String, UserProfileDeleteMessage> userProfileDeleteMessageKafkaTemplate() {
     return new KafkaTemplate<>(producerFactoryForUserProfileDelete());
+  }
+
+  // User avatar deletion by media service
+
+  @Bean
+  public ProducerFactory<String, UserAvatarDeleteMessage> producerFactoryForUserAvatarDelete() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
+
+  @Bean(name = "userAvatarDeleteMessageKafkaTemplate")
+  public KafkaTemplate<String, UserAvatarDeleteMessage> userAvatarDeleteMessageKafkaTemplate() {
+    return new KafkaTemplate<>(producerFactoryForUserAvatarDelete());
   }
 }

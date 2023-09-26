@@ -13,6 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import com.gritlab.buy01.productservice.kafka.message.ProductMediaDeleteMessage;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
 
 @Configuration
@@ -30,13 +31,27 @@ public class KafkaProducerConfig {
     return props;
   }
 
+  // User authentication request
+
   @Bean
   public ProducerFactory<String, TokenValidationRequest> producerFactory() {
     return new DefaultKafkaProducerFactory<>(producerConfigs());
   }
 
-  @Bean
+  @Bean(name = "tokenValidationRequestKafkaTemplate")
   public KafkaTemplate<String, TokenValidationRequest> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
+  }
+
+  // Product media deletion request
+
+  @Bean
+  public ProducerFactory<String, ProductMediaDeleteMessage> producerFactoryForProductMediaDelete() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
+
+  @Bean(name = "productMediaDeleteMessageKafkaTemplate")
+  public KafkaTemplate<String, ProductMediaDeleteMessage> productMediaDeleteMessageKafkaTemplate() {
+    return new KafkaTemplate<>(producerFactoryForProductMediaDelete());
   }
 }

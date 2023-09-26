@@ -11,8 +11,10 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.gritlab.buy01.mediaservice.kafka.message.ProductMediaDeleteMessage;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarDeleteMessage;
 
 @Service
 public class KafkaService {
@@ -20,6 +22,8 @@ public class KafkaService {
   private static final String TOPIC_REQUEST = "token-validation-request";
   private static final String TOPIC_RESPONSE = "token-validation-response";
   @Autowired private KafkaTemplate<String, TokenValidationRequest> kafkaTemplate;
+
+  @Autowired private MediaService mediaService;
 
   private ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> responseQueues =
       new ConcurrentHashMap<>();
@@ -52,5 +56,21 @@ public class KafkaService {
     if (queue != null) {
       queue.offer(response);
     }
+  }
+
+  @KafkaListener(
+      topics = "user-avatar-deletion",
+      groupId = "user-avatar-deletion-group",
+      containerFactory = "kafkaAvatarDeletionContainerFactory")
+  public void deleteUserAvatar(UserAvatarDeleteMessage request) {
+    mediaService.deleteAllUserAvatars(request.getUserId());
+  }
+
+  @KafkaListener(
+      topics = "product-media-deletion",
+      groupId = "product-media-deletion-group",
+      containerFactory = "kafkaProductDeletionContainerFactory")
+  public void deleteProductMedia(ProductMediaDeleteMessage request) {
+    mediaService.deleteAllProductMedia(request.getProductId());
   }
 }
