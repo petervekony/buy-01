@@ -19,6 +19,7 @@ export class UserService {
 
   //eslint-disable-next-line
   sendSignupRequest(request: SignupRequest): Observable<any> {
+    console.log('sendSignupRequest: ', request);
     const address = environment.signupURL;
     return this.http.post<User>(address, request, { withCredentials: true });
   }

@@ -25,7 +25,7 @@ export class HomeComponent implements OnDestroy {
     if (navigation && navigation.extras.state) {
       this.response = navigation.extras.state['data'];
       console.log(navigation.extras.state['data']);
-      console.log(this.response);
+      // console.log(this.response);
     }
     //TODO: for testing
     this.subscription = Subscription.EMPTY;
@@ -43,6 +43,7 @@ export class HomeComponent implements OnDestroy {
   showProducts() {
     this.subscription = this.productService.getProducts().subscribe({
       next: (product) => {
+        console.log('products: ', product);
         this.products = product;
       },
       error: (error) => {

@@ -17,32 +17,34 @@ export class ProductCardComponent {
   // subscription: Subscription;
   // owner: string = '';
 
-  constructor() // private productService: ProductService,
-  // private userService: UserService,
+  constructor() // private userService: UserService,
+  // private productService: ProductService,
   // private mediaService: MediaService,
   {
     // this.subscription = combineLatest([
     //   this.productService.getProducts(),
     //   this.userService.getUserInfo(),
     //   this.mediaService.getProductMedia(),
-    // ]).pipe(
-    //   map(([products, users, media]) => {
-    //     return products.map((product) => {
-    //       const owner = users.find((user) => user.id === product.userId);
-    //       const productMedia = media.find((mediaItem) =>
-    //         mediaItem.productId === product.id
-    //       );
-    //       return { ...product, owner, productMedia };
-    //     });
-    //   }),
-    // ).subscribe({
-    //   next: (products) => {
-    //     this.products = products;
-    //   },
-    //   error: (error) => {
-    //     console.log('error: ', error);
-    //   },
-    // });
+    // ])
+    //   .pipe(
+    //     map(([products, users, media]) => {
+    //       return products.map((product) => {
+    //         const owner = users.find((user) => user.id === product.userId);
+    //         const productMedia = media.find(
+    //           (mediaItem) => mediaItem.productId === product.id,
+    //         );
+    //         return { ...product, owner, productMedia };
+    //       });
+    //     }),
+    //   )
+    //   .subscribe({
+    //     next: (products) => {
+    //       this.products = products;
+    //     },
+    //     error: (error) => {
+    //       console.log('error: ', error);
+    //     },
+    //   });
   }
 
   // ngOnDestroy(): void {

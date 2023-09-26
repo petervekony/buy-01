@@ -65,11 +65,14 @@ export class SignupComponent {
     const request: SignupRequest = this.registerForm.value;
     request.role ? (request.role = 'SELLER') : (request.role = 'CLIENT');
     console.log('sending out the reg form:\n', request);
-    this.userService.sendSignupRequest(request).subscribe((signupData) => {
-      console.log('signup response:\n', signupData);
-      this.router.navigate(['home'], {
-        queryParams: { data: JSON.stringify(signupData) },
-      });
+    this.userService.sendSignupRequest(request).subscribe({
+      next: (data) => {
+        const NavigationExtras = { state: { data: data } };
+        this.router.navigate(['home'], NavigationExtras);
+      },
+      error: (error) => {
+        console.log('error: ', error);
+      },
     });
   }
 }

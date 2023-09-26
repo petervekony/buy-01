@@ -9,10 +9,10 @@ import { User } from '../interfaces/user';
   providedIn: 'root',
 })
 export class ProductService {
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
-  getProducts(): Observable<Product[]> {
+  //eslint-disable-next-line
+  getProducts(): Observable<any> {
     const address = environment.productsURL;
     return this.http.get<Product[]>(address, { withCredentials: true });
   }

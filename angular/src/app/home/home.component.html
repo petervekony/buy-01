@@ -1,12 +1,22 @@
+<div class="nav-bar">
+  <div id="title">THE PRODUCT WAREHOUSE</div>
+  <div class="buttons">
+    <button
+      class="dashboard"
+      onclick="window.location.replace('dash.html')"
+    >
+      dash
+    </button>
+    <button class="logout">logout</button>
+  </div>
+</div>
 <div class="container">
+<div class="wrapper"> 
   <ng-container *ngFor="let product of products">
     <app-product-card [product]="product"></app-product-card>
   </ng-container>
-  <!-- <p *ngIf="response?.name">{{ response.name }}</p> -->
-  <!-- <p *ngIf="response?.email">{{ response.email }}</p> -->
-  <!-- <p *ngIf="response?.role">{{ response.role }}</p> -->
-  <!-- <p *ngIf="response?.id">{{ response.id }}</p> -->
-  <!-- <p *ngIf="response?.message">{{ response.message }}</p> -->
+    </div> 
+  
   <button pButton pRipple icon="pi pi-user" class="w-5 justify-content-center" (click)="goBack()" >BACK</button>
   <button pButton pRipple icon="pi pi-user" class="w-5 justify-content-center" (click)="showUsers()" >USERS</button>
   <button pButton pRipple icon="pi pi-user" class="w-5 justify-content-center" (click)="showProducts()" >PRODUCTS</button>

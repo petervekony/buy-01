@@ -70,8 +70,8 @@
           "configurations": {
             "options": {
               "ssl": true,
-              "sslKey": "./localhost-key.pem",
-              "sslCert": "./localhost.pem",
+              "sslKey": "./cert/buy01-key.pem",
+              "sslCert": "./cert/buy01.pem",
               "port": 4200
             },
             "production": {
@@ -103,6 +103,6 @@
     }
   },
   "cli": {
-    "analytics": "bce67a82-9fe2-4d45-a6df-53d80263fb82"
+    "analytics": false
   }
 }
