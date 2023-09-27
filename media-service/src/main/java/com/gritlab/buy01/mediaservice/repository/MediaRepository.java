@@ -14,13 +14,17 @@ public interface MediaRepository extends MongoRepository<Media, String> {
 
   Optional<Media> findByUserId(String userId);
 
+  Optional<List<Media>> findAllByUserId(String userId);
+
+  void deleteById(String id);
+
   void deleteByUserId(String userId);
 
   void deleteByProductId(String productId);
 
   void deleteAllByProductId(String productId);
 
-  Optional<Media> findByProductId(String productId);
-
   void deleteAllByUserId(String userId);
+
+  Optional<Media> findByProductId(String productId);
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.userservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.userservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.userservice.kafka.message.UserAvatarDeleteMessage;
 import com.gritlab.buy01.userservice.kafka.message.UserProfileDeleteMessage;
 import com.gritlab.buy01.userservice.model.User;
 
@@ -32,6 +33,10 @@ public class KafkaService {
   @Autowired
   @Qualifier("userProfileDeleteMessageKafkaTemplate")
   private KafkaTemplate<String, UserProfileDeleteMessage> userProfileDeleteMessageKafkaTemplate;
+
+  @Autowired
+  @Qualifier("userAvatarDeleteMessageKafkaTemplate")
+  private KafkaTemplate<String, UserAvatarDeleteMessage> UserAvatarDeleteMessageKafkaTemplate;
 
   @Value("${kafka.topic.token-validation-response}")
   private String responseTopic;
@@ -88,7 +93,11 @@ public class KafkaService {
 
     UserProfileDeleteMessage message = new UserProfileDeleteMessage(correlationId, user.getId());
     if (user.getAvatar() != null) {
-      // TODO: implement media message to delete avatar
+      String avatarCorrelationId = UUID.randomUUID().toString();
+      UserAvatarDeleteMessage avatarDeleteMessage =
+          new UserAvatarDeleteMessage(avatarCorrelationId, user.getId());
+      UserAvatarDeleteMessageKafkaTemplate.send("user-avatar-deletion", avatarDeleteMessage);
+      processedCorrelationIds.add(avatarCorrelationId);
     }
 
     userProfileDeleteMessageKafkaTemplate.send("user-products-deletion", message);

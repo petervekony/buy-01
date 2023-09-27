@@ -12,7 +12,14 @@ import com.gritlab.buy01.productservice.repository.ProductRepository;
 
 @Service
 public class ProductService {
+  @Autowired
+  public void setKafkaService(KafkaService kafkaService) {
+    this.kafkaService = kafkaService;
+  }
+
   @Autowired public ProductRepository productRepository;
+
+  private KafkaService kafkaService;
 
   public List<ProductModel> getAllProducts(String name) {
     List<ProductModel> products = new ArrayList<>();
@@ -62,7 +69,7 @@ public class ProductService {
       products.forEach(
           product -> {
             String id = product.getId();
-            // TODO: send message to media service to delete media
+            kafkaService.deleteProductMedia(product.getId());
             productRepository.deleteById(id);
           });
     }

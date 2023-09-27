@@ -62,4 +62,12 @@ public class MediaService {
     }
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
+
+  public void deleteAllUserAvatars(String userId) {
+    mediaRepository.deleteAllByUserId(userId);
+  }
+
+  public void deleteAllProductMedia(String productId) {
+    mediaRepository.deleteAllByProductId(productId);
+  }
 }
