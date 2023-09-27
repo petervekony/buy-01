@@ -52,15 +52,8 @@ export class ProductCardComponent implements OnInit, OnDestroy {
       .getProductThumbnail(this.product.id!)
       .subscribe({
         next: (media) => {
-          console.log('media: ', media);
-          if (media && media?.image && media?.image.data) {
-            const binary = media.image.data;
-            const blob = new Blob([binary], { type: media.mimeType });
-            const reader = new FileReader();
-            (reader.onload = () => {
-              this.imageSrc = reader.result as string;
-              console.log('imageSource: ', this.imageSrc);
-            }), reader.readAsDataURL(blob);
+          if (media && media?.image) {
+            this.imageSrc = 'data:' + media.mimeType + ';base64,' + media.image;
           } else {
             this.imageSrc = '../../assets/images/placeholder.png';
           }

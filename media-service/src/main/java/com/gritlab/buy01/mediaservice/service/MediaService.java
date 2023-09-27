@@ -1,6 +1,7 @@
 package com.gritlab.buy01.mediaservice.service;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.gritlab.buy01.mediaservice.model.Media;
 import com.gritlab.buy01.mediaservice.payload.response.ErrorMessage;
+import com.gritlab.buy01.mediaservice.payload.response.SingleMediaResponse;
 import com.gritlab.buy01.mediaservice.repository.MediaRepository;
 
 @Service
@@ -69,13 +71,17 @@ public class MediaService {
   }
 
   public ResponseEntity<?> getProductThumbnail(String productId) {
-    Optional<Media> media = mediaRepository.findFirstByProductId(productId);
-    if (media.isPresent()) {
+    Optional<Media> mediaOpt = mediaRepository.findFirstByProductId(productId);
+    if (mediaOpt.isPresent()) {
+      Media media = mediaOpt.get();
       // HttpHeaders headers = new HttpHeaders();
       // headers.set(HttpHeaders.CONTENT_TYPE, media.get().getMimeType());
-      return new ResponseEntity<>(media.get(), HttpStatus.OK);
+      String base64Image = Base64.getEncoder().encodeToString(media.getImage().getData());
+
+      SingleMediaResponse response = new SingleMediaResponse(media.getId(), base64Image, media.getProductId(), media.getUserId(), media.getMimeType());
+      return new ResponseEntity<>(response, HttpStatus.OK);
     } else {
-      return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
 }
