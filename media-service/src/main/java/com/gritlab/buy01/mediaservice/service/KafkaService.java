@@ -69,7 +69,7 @@ public class KafkaService {
   @KafkaListener(
       topics = "product-media-deletion",
       groupId = "product-media-deletion-group",
-      containerFactory = "kafkaProductDeletionContainerFactory")
+      containerFactory = "kafkaProductMediaDeletionContainerFactory")
   public void deleteProductMedia(ProductMediaDeleteMessage request) {
     mediaService.deleteAllProductMedia(request.getProductId());
   }
