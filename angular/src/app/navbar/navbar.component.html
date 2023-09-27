@@ -1,0 +1,11 @@
+<div class="nav-bar">
+  <div id="title">THE PRODUCT WAREHOUSE</div>
+  <div class="buttons">
+    <!-- fix the location and buttons to be conditional  -->
+    <button class="dashboard" *ngIf="home" (click)="move('dashboard')">
+      dash
+    </button>
+    <button class="dashboard" *ngIf="!home" (click)="move('home')">home</button>
+    <button class="logout">logout</button>
+  </div>
+</div>

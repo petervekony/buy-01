@@ -1,19 +1,19 @@
 <div class="card-container">
   <div class="picture-container">
     <img
-      src="../../assets/images/placeholder.png"
+      [src]="imageSrc ? imageSrc : '../../assets/images/placeholder.png'"
       alt=""
       class="product-image"
     />
   </div>
   <div class="body-container">
     <h3 class="product-title">{{ product.name }}</h3>
-    <div class="product-body">{{ product.description }}</div>
-    <div class="product-price">{{ product.price }}</div>
-    <div class="product-quantity">{{ product.quantity }}</div>
+    <!-- <div class="product-body">{{ product.description }}</div> -->
+    <div class="product-price">${{ product.price }}</div>
+    <div class="product-quantity">items left: {{ product.quantity }}</div>
     <!-- <div class="owner">{{ owner }}</div> -->
     <div class="product-footer">
-      <button class="buy">BUY</button>
+      <button id="buy-button">BUY</button>
     </div>
   </div>
 </div>

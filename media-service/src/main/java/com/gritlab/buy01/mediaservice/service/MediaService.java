@@ -55,11 +55,27 @@ public class MediaService {
     }
     try {
       byte[] bytes = image.getBytes();
+      String contentType = image.getContentType();
+      System.out.println("MEDIATYPE: !!!!!!!!!!!!!!!!!!!!!!!!!!! " + contentType);
       Media media = new Media(new Binary(bytes), productId, userId);
+      media.setMimeType(contentType);
       mediaRepository.save(media);
     } catch (IOException e) {
+      System.out.println("THIS IS MESSAGE" + e.getMessage());
+      System.out.println("THIS IS CAUSE" + e.getCause());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+  public ResponseEntity<?> getProductThumbnail(String productId) {
+    Optional<Media> media = mediaRepository.findFirstByProductId(productId);
+    if (media.isPresent()) {
+      // HttpHeaders headers = new HttpHeaders();
+      // headers.set(HttpHeaders.CONTENT_TYPE, media.get().getMimeType());
+      return new ResponseEntity<>(media.get(), HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(HttpStatus.I_AM_A_TEAPOT);
+    }
   }
 }

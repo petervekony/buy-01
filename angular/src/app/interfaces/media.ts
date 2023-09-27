@@ -1,5 +1,9 @@
+import { Binary } from './binary';
+
 export interface Media {
+  id: string;
+  image: Binary;
   productId: string;
-  mediaId: string;
-  mediaType: string;
+  userId: string;
+  mimeType: string;
 }

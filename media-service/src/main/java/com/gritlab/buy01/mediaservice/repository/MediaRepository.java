@@ -20,7 +20,7 @@ public interface MediaRepository extends MongoRepository<Media, String> {
 
   void deleteAllByProductId(String productId);
 
-  Optional<Media> findByProductId(String productId);
+  Optional<Media> findFirstByProductId(String productId);
 
   void deleteAllByUserId(String userId);
 }

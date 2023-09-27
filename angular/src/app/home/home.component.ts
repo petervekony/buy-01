@@ -21,6 +21,7 @@ export class HomeComponent implements OnDestroy {
     private userService: UserService,
     private productService: ProductService,
   ) {
+    this.showProducts();
     const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state) {
       this.response = navigation.extras.state['data'];

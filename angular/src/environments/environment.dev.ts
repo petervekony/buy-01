@@ -4,5 +4,7 @@ export const environment = {
   signupURL: 'https://localhost:443/api/auth/signup',
   usersURL: 'https://localhost:443/api/users',
   productsURL: 'https://localhost:443/api/products',
-  productMediaURL: 'https://localhost:443/api/media',
+  mediaURL: 'https://localhost:443/api/media',
+  userMediaURL: 'https://localhost:443/api/media/user/',
+  productMediaURL: 'https://localhost:443/api/media/product/',
 };
