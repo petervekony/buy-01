@@ -8,6 +8,7 @@ import { environment } from 'src/environments/environment';
 import { of } from 'rxjs';
 import { LoginRequest } from '../interfaces/login-request';
 import { SignupRequest } from '../interfaces/signup-request';
+import { User } from '../interfaces/user';
 
 describe('UserService', () => {
   let service: UserService;
@@ -35,13 +36,15 @@ describe('UserService', () => {
       name: 'peter',
       password: 'test123',
     };
-    const expectedResponse = of({
+    const user: User = {
       id: '123123123123',
       email: 'test@test.com',
       jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
       name: 'taneli',
       role: 'ROLE_CLIENT',
-    });
+    };
+
+    const expectedResponse = user;
 
     service.sendLoginRequest(loginRequest).subscribe((response) => {
       expect(response).toEqual(expectedResponse);
@@ -75,13 +78,13 @@ describe('UserService', () => {
 
   it('signup url should be environment.signupURL', () => {
     expect(environment.signupURL).toEqual(
-      '/api/auth/signup',
+      'https://localhost:443/api/auth/signup',
     );
   });
 
   it('signup url should be environment.loginURL', () => {
     expect(environment.loginURL).toEqual(
-      '/api/auth/signin',
+      'https://localhost:443/api/auth/signin',
     );
   });
 });
