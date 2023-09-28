@@ -5,6 +5,7 @@ import { HomeComponent } from './home.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserService } from '../service/user.service';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { ProductContainerComponent } from '../product-container/product-container.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -12,7 +13,7 @@ describe('HomeComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [HomeComponent, NavbarComponent],
+      declarations: [HomeComponent, NavbarComponent, ProductContainerComponent],
       imports: [HttpClientTestingModule],
       providers: [
         {

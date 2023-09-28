@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ProductCardComponent } from './product-card.component';
-import { MediaService } from '../service/media.service';
-import { UserService } from '../service/user.service';
-import { ProductService } from '../service/product.service';
 import {
   HttpClientTestingModule,
   // HttpTestingController,
 } from '@angular/common/http/testing';
+import { ProductService } from 'src/app/service/product.service';
+import { UserService } from 'src/app/service/user.service';
+import { MediaService } from 'src/app/service/media.service';
+import { ProductCardModalComponent } from '../product-card-modal/product-card-modal.component';
 
 describe('ProductCardComponent', () => {
   let component: ProductCardComponent;
@@ -16,7 +16,7 @@ describe('ProductCardComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ProductCardComponent],
+      declarations: [ProductCardComponent, ProductCardModalComponent],
       imports: [HttpClientTestingModule],
       providers: [ProductService, UserService, MediaService],
     });

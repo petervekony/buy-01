@@ -3,7 +3,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../service/user.service';
 import { NavigationExtras, Router } from '@angular/router';
 import { of } from 'rxjs';
-
+import { AuthService } from '../service/auth.service';
 import { LoginComponent } from './login.component';
 
 describe('LoginComponent', () => {
@@ -33,6 +33,19 @@ describe('LoginComponent', () => {
           provide: Router,
           useValue: {
             navigate: jasmine.createSpy('navigate'),
+          },
+        },
+        {
+          provide: AuthService,
+          useValue: {
+            getAuth: () => {
+              of({
+                name: 'taneli',
+                email: 'taneli@taneli.com',
+                id: '123123123123123',
+                role: 'SELLER',
+              });
+            },
           },
         },
       ],
@@ -116,13 +129,15 @@ describe('LoginComponent', () => {
     const userService = TestBed.inject(UserService);
     const router = TestBed.inject(Router);
 
-    spyOn(userService, 'sendLoginRequest').and.returnValue(of({
-      id: '123123123123',
-      email: 'test@test.com',
-      jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
-      name: 'taneli',
-      role: 'ROLE_CLIENT',
-    }));
+    spyOn(userService, 'sendLoginRequest').and.returnValue(
+      of({
+        id: '123123123123',
+        email: 'test@test.com',
+        jwtToken: 'ajsdklajsdlskldjaskdjalksdjlaksjdlkasjdlkajsdlslkajsd',
+        name: 'taneli',
+        role: 'ROLE_CLIENT',
+      }),
+    );
 
     component.loginForm.setValue({
       name: 'testuser',

@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of, switchMap } from 'rxjs';
 import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 
@@ -12,8 +12,7 @@ import { ProductRequest } from '../interfaces/product-request';
 export class ProductService {
   constructor(private http: HttpClient) {}
 
-  //eslint-disable-next-line
-  getProducts(): Observable<any> {
+  getProducts(): Observable<Product[]> {
     const address = environment.productsURL;
     return this.http.get<Product[]>(address, { withCredentials: true });
   }
@@ -26,30 +25,31 @@ export class ProductService {
     });
   }
 
-  addProduct(form: ProductRequest, mediaForm: FormData) {
+  addProduct(form: ProductRequest, mediaForm: FormData): Observable<boolean> {
     const address = environment.productsURL;
-    this.http
-      //eslint-disable-next-line
-      .post<any>(address, form, { withCredentials: true })
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-          mediaForm.append('name', '');
-          this.addMedia(data?.id, mediaForm);
-        },
-        error: (error) => {
+    return this.http
+      .post<Product>(address, form, { withCredentials: true })
+      .pipe(
+        switchMap((data: Product) => {
+          if (mediaForm.get('image') !== null) {
+            this.addMedia(data.id!, mediaForm);
+            mediaForm.append('name', '');
+            return of(true);
+          }
+          return of(true);
+        }),
+        catchError((error) => {
           console.log(error);
-        },
-      });
+          return of(false);
+        }),
+      );
   }
 
-  addMedia(id: number, image: FormData) {
+  addMedia(id: string, image: FormData) {
     const address = environment.mediaURL;
     const headers = new HttpHeaders();
     headers.append('Content-Type', 'multipart/form-data');
-    console.log('this shit ', image.get('image'), { productId: id }, headers);
     this.http
-      //eslint-disable-next-line
       .post(address, image, {
         params: { productId: id },
         headers: headers,

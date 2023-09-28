@@ -1,16 +1,5 @@
 <div class="container">
-  <!-- <form #productForm="ngForm" (ngSubmit)="submitProduct(productForm)" class="product-form"> -->
-  <!--   <input type="text" class="form-control" placeholder="" name="product-name"> -->
-  <!--     <label for="product-name" class="block text-900 font-medium mb-2">U   sername</label> -->
-  <!--   <input type="text" class="form-control" placeholder="" name="product-description"> -->
-  <!--   <input type="text" class="form-control" placeholder="" name="product-quantity"> -->
-  <!--   <input type="text" class="form-control" placeholder="" name="product-price"> -->
-  <!-- </form> -->
-  <!--     <form #imageForm="ngForm" (ngSubmit)="submitImage(imageForm)" class="image-form">   -->
-  <!--     <input type="file" name="product-image" class="product-image" > -->
-  <!--     <button type="submit">OK</button> -->
-  <!--   </form> -->
-
+  <div class="created" *ngIf="requestSent">{{ productResult }}</div>
   <form [formGroup]="productForm" ngSubmit="onSubmit()" (input)="onValidate()">
     <label for="product-name" class="block text-900 font-medium mb-2">Product name</label>
     <input id="product-name" type="text" placeholder="Product name" pInputText class="w-full mb-3" name="product-name"
@@ -33,6 +22,6 @@
     <button type="submit" [disabled]="!formValid" pButton pRipple label="Submit" icon="pi pi-user"
       (click)="submitProduct()" class="w-full"></button>
   </form>
-  <input type="file" name="image" id="product-image" (change)="onFileSelected($event)" accept="image/*">
-  <label for="image" class="block text-900 font-medium mb-2">Image</label>
+  <label for="image" class="block text-900 font-medium mb-2">Add an image?</label>
+  <input #imageUpload type="file" name="image" id="product-image" (change)="onFileSelected($event)" accept="image/*">
   <!-- </form> -->

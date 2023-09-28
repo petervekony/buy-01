@@ -8,14 +8,25 @@ describe('ProductCardModalComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ProductCardModalComponent]
+      declarations: [ProductCardModalComponent],
     });
     fixture = TestBed.createComponent(ProductCardModalComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have a product from the @Input', () => {
+    const testProduct = {
+      name: 'test',
+      description: 'test',
+      price: 10,
+      quantity: 10,
+    };
+    component.product = testProduct;
+    fixture.detectChanges();
+    expect(component.product).toEqual(testProduct);
   });
 });

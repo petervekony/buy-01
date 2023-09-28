@@ -1,4 +1,11 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
@@ -15,15 +22,15 @@ import { MediaService } from 'src/app/service/media.service';
 })
 export class ProductCardComponent implements OnInit, OnDestroy {
   @ViewChild('productModal')
-  productModal: ElementRef | undefined;
+    productModal: ElementRef | undefined;
 
   @Input()
-  product: Product = {} as Product;
+    product: Product = {} as Product;
   subscription: Subscription = Subscription.EMPTY;
   imageSrc: string | ArrayBuffer | null = null;
   // owner: string = '';
 
-  constructor(private mediaService: MediaService) { } // private productService: ProductService, // private userService: UserService,
+  constructor(private mediaService: MediaService) {} // private productService: ProductService, // private userService: UserService,
   // private mediaService: MediaService,
   // this.subscription = combineLatest([
   //   this.productService.getProducts(),

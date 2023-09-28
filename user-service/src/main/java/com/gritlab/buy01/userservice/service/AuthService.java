@@ -117,4 +117,10 @@ public class AuthService {
       return null;
     }
   }
+
+  public User checkAuth(String token) {
+    String userId = jwtUtils.getUserIdFromJwtToken(token);
+    User user = userRepository.findById(userId).orElse(null);
+    return user;
+  }
 }

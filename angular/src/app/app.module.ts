@@ -21,6 +21,7 @@ import { AddProductComponent } from './add-product/add-product.component';
 import { ProductContainerComponent } from './product-container/product-container.component';
 import { ProductCardModalComponent } from './product-container/product-card-modal/product-card-modal.component';
 import { ProductCardComponent } from './product-container/product-card/product-card.component';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,7 @@ import { ProductCardComponent } from './product-container/product-card/product-c
     ReactiveFormsModule,
     HttpClientModule,
   ],
-  providers: [],
+  providers: [CookieService],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

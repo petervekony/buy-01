@@ -5,4 +5,5 @@ export interface User {
   jwtToken?: string;
   id: string;
   role: string;
+  avatar?: string;
 }

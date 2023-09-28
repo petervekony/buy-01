@@ -5,6 +5,7 @@ import { UserService } from '../service/user.service';
 import { NavigationExtras } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { LoginRequest } from '../interfaces/login-request';
+import { StateService } from '../service/state.service';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,11 @@ export class LoginComponent implements OnDestroy {
   formValid: boolean = false;
   subscription: Subscription;
 
-  constructor(private router: Router, private userService: UserService) {
+  constructor(
+    private router: Router,
+    private userService: UserService,
+    private stateService: StateService,
+  ) {
     this.subscription = Subscription.EMPTY;
   }
 
@@ -42,6 +47,7 @@ export class LoginComponent implements OnDestroy {
       next: (data) => {
         console.log('login response:\n', data);
         const navigationExtras: NavigationExtras = { state: { data: data } };
+        this.stateService.refreshState(data.jwtToken!, data);
         this.router.navigate(['home'], navigationExtras);
       },
       error: (data) => console.log(data),

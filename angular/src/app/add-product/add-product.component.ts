@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
@@ -9,9 +9,17 @@ import { ProductRequest } from '../interfaces/product-request';
   styleUrls: ['./add-product.component.css'],
 })
 export class AddProductComponent {
+  @Input('modalRef')
+    modalRef: HTMLDialogElement | undefined;
+  @ViewChild('imageUpload')
+    imageUpload: ElementRef | undefined;
+
   formValid = false;
   fileSelected: File | null = null;
   filename: string | null = null;
+  requestSent = false;
+  productResult: string = '';
+  success = false;
   constructor(private productService: ProductService) {}
 
   productForm: FormGroup = new FormGroup({
@@ -43,11 +51,11 @@ export class AddProductComponent {
     if (input.files && input.files?.length > 0) {
       this.filename = input.files[0].name;
       this.fileSelected = input.files[0];
-      console.log('ajdshdshd');
       console.log(this.fileSelected.toString());
-      input.value = '';
+      // this.imageUpload!.nativeElement.value = this.filename;
     } else {
       this.fileSelected = null;
+      // this.imageUpload!.nativeElement.value = '';
     }
   }
 
@@ -56,12 +64,10 @@ export class AddProductComponent {
     return blob;
   }
 
-  // imageForm: FormGroup = new FormGroup({});
-
   onValidate() {
     this.formValid = this.productForm.valid;
   }
-  // loginForm: FormGroup<any>;
+
   submitImage() {}
 
   submitProduct() {
@@ -80,7 +86,25 @@ export class AddProductComponent {
         price: this.productForm.value.price,
         quantity: this.productForm.value.quantity,
       } as ProductRequest;
-      this.productService.addProduct(productRequest, mediaData);
+      this.productService.addProduct(productRequest, mediaData).subscribe({
+        next: (success: boolean) => {
+          this.success = success;
+          if (this.modalRef) {
+            this.modalRef.close();
+          }
+        },
+        error: () => {
+          this.success = false;
+        },
+      });
+
+      // this.requestSent = true;
+      // this.productResult = this.success
+      //   ? 'Product added successfully'
+      //   : 'Error adding product';
     }
+    // this.productForm.reset();
+    // this.fileSelected = null;
+    // this.imageUpload!.nativeElement.value = '';
   }
 }

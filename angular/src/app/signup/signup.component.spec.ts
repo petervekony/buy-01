@@ -6,10 +6,22 @@ import { of } from 'rxjs';
 import { CheckboxModule } from 'primeng/checkbox';
 import { UserService } from '../service/user.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../service/auth.service';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
+  const userServiceMock = {
+    sendSignupRequest: () => of({ message: 'User registered successfully' }),
+    sendLoginRequest: () =>
+      of({
+        name: 'taneli',
+        email: 'taneli@gmail.com',
+        password: 'test123',
+        confirmPassword: 'test123',
+        role: 'SELLER',
+      }),
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -22,17 +34,25 @@ describe('SignupComponent', () => {
         },
         {
           provide: UserService,
-          useValue: {
-            sendSignupRequest: () =>
-              of({
-                message: 'User registered successfully',
-              }),
-          },
+          useValue: userServiceMock,
         },
         {
           provide: Router,
           useValue: {
             navigate: jasmine.createSpy('navigate'),
+          },
+        },
+        {
+          provide: AuthService,
+          useValue: {
+            getAuth: () => {
+              of({
+                name: 'taneli',
+                email: 'taneli@taneli.com',
+                id: '123123123123123',
+                role: 'SELLER',
+              });
+            },
           },
         },
       ],
@@ -76,12 +96,20 @@ describe('SignupComponent', () => {
     });
 
     spyOn(userService, 'sendSignupRequest').and.returnValue(
-      of({ message: 'User registered succesfully' }),
+      of({
+        data: {
+          name: 'taneli',
+          password: 'test123',
+          confirmPassword: 'test123',
+          email: 'email@gmail.com',
+          role: 'SELLER',
+        },
+      }),
     );
 
     component.registerForm.setValue({
       name: 'taneli',
-      email: 'email@gmail.com',
+      email: 'taneli@gmail.com',
       password: 'test123',
       confirmPassword: 'test123',
       role: true,
@@ -91,7 +119,15 @@ describe('SignupComponent', () => {
 
     expect(userService.sendSignupRequest).toHaveBeenCalledWith({
       name: 'taneli',
-      email: 'email@gmail.com',
+      email: 'taneli@gmail.com',
+      password: 'test123',
+      confirmPassword: 'test123',
+      role: 'SELLER',
+    });
+
+    component.autoLogin({
+      name: 'taneli',
+      email: 'taneli@gmail.com',
       password: 'test123',
       confirmPassword: 'test123',
       role: 'SELLER',
@@ -100,7 +136,11 @@ describe('SignupComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['home'], {
       state: {
         data: {
-          message: 'User registered succesfully',
+          name: 'taneli',
+          email: 'taneli@gmail.com',
+          password: 'test123',
+          confirmPassword: 'test123',
+          role: 'SELLER',
         },
       },
     });
