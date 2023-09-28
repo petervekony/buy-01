@@ -10,6 +10,11 @@ import { Observable } from 'rxjs';
 export class MediaService {
   constructor(private http: HttpClient) {}
 
+  getProductThumbnail(productId: string): Observable<Media> {
+    const address = environment.productMediaURL + productId;
+    return this.http.get<Media>(address, { withCredentials: true });
+  }
+
   getProductMedia(): Observable<Media[]> {
     const address = environment.productMediaURL;
     return this.http.get<Media[]>(address, { withCredentials: true });

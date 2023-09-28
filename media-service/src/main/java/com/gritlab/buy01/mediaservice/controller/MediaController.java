@@ -29,7 +29,7 @@ public class MediaController {
   @Autowired MediaService mediaService;
 
   @PreAuthorize("isAuthenticated()")
-  @GetMapping("/products/{id}")
+  @GetMapping("/media/{id}")
   public ResponseEntity<MediaResponse> getMediaByProductId(
       @PathVariable("productId") String productId) {
     Optional<List<Media>> media = mediaService.getAllMediaByProductId(productId);
@@ -57,6 +57,11 @@ public class MediaController {
     return mediaService.createMedia(image, userId, productId);
   }
 
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/media/product/{productId}")
+  public ResponseEntity<?> getProductThumbnail(@PathVariable("productId") String productId) {
+    return mediaService.getProductThumbnail(productId);
+  }
   // @PreAuthorize("isAuthenticated()")
   // @PostMapping("/products")
   // public ResponseEntity<?> createProduct(@Valid @RequestBody ProductModel productModel) {

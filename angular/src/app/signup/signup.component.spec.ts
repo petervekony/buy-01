@@ -14,10 +14,7 @@ describe('SignupComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [SignupComponent],
-      imports: [
-        CheckboxModule,
-        ReactiveFormsModule,
-      ],
+      imports: [CheckboxModule, ReactiveFormsModule],
       providers: [
         {
           provide: ActivatedRoute,
@@ -101,10 +98,10 @@ describe('SignupComponent', () => {
     });
 
     expect(router.navigate).toHaveBeenCalledWith(['home'], {
-      queryParams: {
-        data: JSON.stringify({
+      state: {
+        data: {
           message: 'User registered succesfully',
-        }),
+        },
       },
     });
   });

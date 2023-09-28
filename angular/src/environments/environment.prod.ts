@@ -4,5 +4,7 @@ export const environment = {
   signupURL: '/api/auth/signup',
   usersURL: '/api/users',
   productsURL: '/api/products',
-  productMediaURL: '/api/media',
+  mediaURL: '/api/media',
+  productMediaURL: '/api/media/product/',
+  userMediaURL: '/api/media/user/',
 };

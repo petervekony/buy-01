@@ -4,6 +4,7 @@ import { of } from 'rxjs';
 import { HomeComponent } from './home.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserService } from '../service/user.service';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 describe('HomeComponent', () => {
   let component: HomeComponent;
@@ -11,7 +12,7 @@ describe('HomeComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [HomeComponent],
+      declarations: [HomeComponent, NavbarComponent],
       imports: [HttpClientTestingModule],
       providers: [
         {

@@ -14,6 +14,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ProductCardComponent } from './product-card/product-card.component';
+import { EditUserDetailsComponent } from './edit-user-details/edit-user-details.component';
+import { EditProductDetailsComponent } from './edit-product-details/edit-product-details.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { NavbarComponent } from './navbar/navbar.component';
+import { AddProductComponent } from './add-product/add-product.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +27,11 @@ import { ProductCardComponent } from './product-card/product-card.component';
     SignupComponent,
     HomeComponent,
     ProductCardComponent,
+    EditUserDetailsComponent,
+    EditProductDetailsComponent,
+    DashboardComponent,
+    NavbarComponent,
+    AddProductComponent,
   ],
   imports: [
     BrowserModule,

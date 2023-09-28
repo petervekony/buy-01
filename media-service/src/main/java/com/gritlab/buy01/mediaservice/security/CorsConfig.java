@@ -1,4 +1,4 @@
-package com.gritlab.buy01.userservice.security;
+package com.gritlab.buy01.mediaservice.security;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

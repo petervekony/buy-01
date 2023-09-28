@@ -1,0 +1,13 @@
+<app-navbar></app-navbar>
+<div class="container">
+  <div class="manage-products" (click)="manageProducts($event)">
+    MANAGE PRODUCTS
+  </div>
+  <div class="manage-profile" (click)="openProfileForm($event)">
+    MANAGE PROFILE
+  </div>
+</div>
+<dialog #productDialog>
+  <app-add-product></app-add-product>
+</dialog>
+<dialog id="user-dialog"></dialog>

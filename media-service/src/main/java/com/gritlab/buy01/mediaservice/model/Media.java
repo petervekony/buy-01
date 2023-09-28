@@ -15,6 +15,7 @@ public class Media {
   @Field @NotNull Binary image;
   @Field String productId;
   @Field String userId;
+  @Field String mimeType;
 
   public Media(Binary image, String productId, String userId) {
     this.image = image;

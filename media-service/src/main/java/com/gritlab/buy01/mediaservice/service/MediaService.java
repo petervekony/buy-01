@@ -1,6 +1,7 @@
 package com.gritlab.buy01.mediaservice.service;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.gritlab.buy01.mediaservice.model.Media;
 import com.gritlab.buy01.mediaservice.payload.response.ErrorMessage;
+import com.gritlab.buy01.mediaservice.payload.response.SingleMediaResponse;
 import com.gritlab.buy01.mediaservice.repository.MediaRepository;
 
 @Service
@@ -55,9 +57,14 @@ public class MediaService {
     }
     try {
       byte[] bytes = image.getBytes();
+      String contentType = image.getContentType();
+      System.out.println("MEDIATYPE: !!!!!!!!!!!!!!!!!!!!!!!!!!! " + contentType);
       Media media = new Media(new Binary(bytes), productId, userId);
+      media.setMimeType(contentType);
       mediaRepository.save(media);
     } catch (IOException e) {
+      System.out.println("THIS IS MESSAGE" + e.getMessage());
+      System.out.println("THIS IS CAUSE" + e.getCause());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return new ResponseEntity<>(HttpStatus.CREATED);
@@ -69,5 +76,24 @@ public class MediaService {
 
   public void deleteAllProductMedia(String productId) {
     mediaRepository.deleteAllByProductId(productId);
+  }
+
+  public ResponseEntity<?> getProductThumbnail(String productId) {
+    Optional<Media> mediaOpt = mediaRepository.findFirstByProductId(productId);
+    if (mediaOpt.isPresent()) {
+      Media media = mediaOpt.get();
+      String base64Image = Base64.getEncoder().encodeToString(media.getImage().getData());
+
+      SingleMediaResponse response =
+          new SingleMediaResponse(
+              media.getId(),
+              base64Image,
+              media.getProductId(),
+              media.getUserId(),
+              media.getMimeType());
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
   }
 }

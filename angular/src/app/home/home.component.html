@@ -1,13 +1,26 @@
+<app-navbar></app-navbar>
 <div class="container">
-  <ng-container *ngFor="let product of products">
-    <app-product-card [product]="product"></app-product-card>
-  </ng-container>
-  <!-- <p *ngIf="response?.name">{{ response.name }}</p> -->
-  <!-- <p *ngIf="response?.email">{{ response.email }}</p> -->
-  <!-- <p *ngIf="response?.role">{{ response.role }}</p> -->
-  <!-- <p *ngIf="response?.id">{{ response.id }}</p> -->
-  <!-- <p *ngIf="response?.message">{{ response.message }}</p> -->
-  <button pButton pRipple icon="pi pi-user" class="w-5 justify-content-center" (click)="goBack()" >BACK</button>
-  <button pButton pRipple icon="pi pi-user" class="w-5 justify-content-center" (click)="showUsers()" >USERS</button>
-  <button pButton pRipple icon="pi pi-user" class="w-5 justify-content-center" (click)="showProducts()" >PRODUCTS</button>
+  <div class="wrapper">
+    <ng-container *ngFor="let product of products">
+      <app-product-card [product]="product"></app-product-card>
+    </ng-container>
+  </div>
+
+  <div class="footer">
+    <button pButton pRipple icon="pi pi-user" class="w-3" (click)="goBack()">
+      BACK
+    </button>
+    <button pButton pRipple icon="pi pi-user" class="w-3" (click)="showUsers()">
+      USERS
+    </button>
+    <button
+      pButton
+      pRipple
+      icon="pi pi-user"
+      class="w-3"
+      (click)="showProducts()"
+    >
+      PRODUCTS
+    </button>
+  </div>
 </div>
