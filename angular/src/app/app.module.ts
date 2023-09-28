@@ -13,12 +13,14 @@ import { RippleModule } from 'primeng/ripple';
 import { InputTextModule } from 'primeng/inputtext';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ProductCardComponent } from './product-card/product-card.component';
 import { EditUserDetailsComponent } from './edit-user-details/edit-user-details.component';
 import { EditProductDetailsComponent } from './edit-product-details/edit-product-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { AddProductComponent } from './add-product/add-product.component';
+import { ProductContainerComponent } from './product-container/product-container.component';
+import { ProductCardModalComponent } from './product-container/product-card-modal/product-card-modal.component';
+import { ProductCardComponent } from './product-container/product-card/product-card.component';
 
 @NgModule({
   declarations: [
@@ -26,12 +28,14 @@ import { AddProductComponent } from './add-product/add-product.component';
     LoginComponent,
     SignupComponent,
     HomeComponent,
-    ProductCardComponent,
     EditUserDetailsComponent,
     EditProductDetailsComponent,
     DashboardComponent,
     NavbarComponent,
     AddProductComponent,
+    ProductContainerComponent,
+    ProductCardModalComponent,
+    ProductCardComponent,
   ],
   imports: [
     BrowserModule,
@@ -49,4 +53,4 @@ import { AddProductComponent } from './add-product/add-product.component';
   providers: [],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

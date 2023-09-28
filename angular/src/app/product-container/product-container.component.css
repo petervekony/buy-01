@@ -1,0 +1,23 @@
+.container {
+  margin-top: 200px;
+}
+
+.wrapper {
+  padding-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer button {
+  justify-content: center;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding-bottom: 3rem;
+  width: 80vw;
+  justify-content: center;
+}

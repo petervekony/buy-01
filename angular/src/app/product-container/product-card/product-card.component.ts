@@ -1,7 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Product } from '../interfaces/product';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { MediaService } from '../service/media.service';
+import { Product } from 'src/app/interfaces/product';
+import { MediaService } from 'src/app/service/media.service';
 
 // import { combineLatest, map, Subscription } from 'rxjs';
 // import { ProductService } from '../service/product.service';
@@ -14,13 +14,16 @@ import { MediaService } from '../service/media.service';
   styleUrls: ['./product-card.component.css'],
 })
 export class ProductCardComponent implements OnInit, OnDestroy {
+  @ViewChild('productModal')
+  productModal: ElementRef | undefined;
+
   @Input()
-    product: Product = {} as Product;
+  product: Product = {} as Product;
   subscription: Subscription = Subscription.EMPTY;
   imageSrc: string | ArrayBuffer | null = null;
   // owner: string = '';
 
-  constructor(private mediaService: MediaService) {} // private productService: ProductService, // private userService: UserService,
+  constructor(private mediaService: MediaService) { } // private productService: ProductService, // private userService: UserService,
   // private mediaService: MediaService,
   // this.subscription = combineLatest([
   //   this.productService.getProducts(),
@@ -68,5 +71,17 @@ export class ProductCardComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  showModal() {
+    if (this.productModal) {
+      this.productModal.nativeElement.show();
+    }
+  }
+
+  hideModal() {
+    if (this.productModal) {
+      this.productModal.nativeElement.close();
+    }
   }
 }
