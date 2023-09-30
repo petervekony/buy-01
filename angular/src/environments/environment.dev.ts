@@ -8,4 +8,5 @@ export const environment = {
   mediaURL: 'https://localhost:443/api/media',
   userMediaURL: 'https://localhost:443/api/media/user/',
   productMediaURL: 'https://localhost:443/api/media/product/',
+  logoutURL: 'https://localhost:443/api/auth/signout',
 };

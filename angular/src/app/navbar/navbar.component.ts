@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { StateService } from '../service/state.service';
+import { UserService } from '../service/user.service';
 
 @Component({
   selector: 'app-navbar',
@@ -9,7 +10,11 @@ import { StateService } from '../service/state.service';
 })
 export class NavbarComponent {
   home: boolean = false;
-  constructor(private router: Router, private stateService: StateService) {
+  constructor(
+    private router: Router,
+    private stateService: StateService,
+    private userService: UserService,
+  ) {
     this.home = this.router.url === '/home';
   }
 
@@ -18,6 +23,7 @@ export class NavbarComponent {
   }
 
   logout() {
+    this.userService.logout();
     this.stateService.resetState();
     this.move('login');
   }

@@ -33,4 +33,13 @@ export class UserService {
     const address = environment.usersURL;
     return this.http.get<User[]>(address, { withCredentials: true });
   }
+
+  logout() {
+    const address = environment.logoutURL;
+    this.http.post(address, { withCredentials: true }).subscribe({
+      error: (error) => {
+        console.error('ERROR: ', error);
+      },
+    });
+  }
 }

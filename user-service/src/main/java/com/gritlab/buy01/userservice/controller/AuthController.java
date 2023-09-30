@@ -1,10 +1,14 @@
 package com.gritlab.buy01.userservice.controller;
 
+import com.gritlab.buy01.userservice.model.User;
+import com.gritlab.buy01.userservice.payload.request.LoginRequest;
+import com.gritlab.buy01.userservice.payload.request.SignupRequest;
+import com.gritlab.buy01.userservice.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,13 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.gritlab.buy01.userservice.model.User;
-import com.gritlab.buy01.userservice.payload.request.LoginRequest;
-import com.gritlab.buy01.userservice.payload.request.SignupRequest;
-import com.gritlab.buy01.userservice.service.AuthService;
-
-import jakarta.validation.Valid;
 
 @CrossOrigin(maxAge = 3600)
 @RestController
@@ -42,6 +39,7 @@ public class AuthController {
     User user = authService.checkAuth(cookie);
     if (user != null) return new ResponseEntity<>(user, HttpStatus.OK);
     return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+  }
 
   @PostMapping("/signout")
   public ResponseEntity<HttpStatus> signOut(@CookieValue(name = "buy-01") String token) {
