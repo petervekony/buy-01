@@ -1,11 +1,37 @@
 <div class="modal-container">
   <div class="product-image-container">
-    <!-- image carousel -->
+    <ng-container
+      *ngIf="imageSrc && imageSrc.media && imageSrc.media.length > 0"
+    >
+      <p-carousel
+        [value]="imageSrc.media"
+        [numVisible]="3"
+        [numScroll]="imageSrc.media.length"
+        [circular]="false"
+      >
+        <ng-template *ngFor="let image of imageSrc.media">
+          <div
+            class="border-1 surface-border border-round m-2 text-center py-5 px-3"
+          >
+            <div class="mb-3">
+              <img
+                [src]="image.image"
+                [alt]="product.name"
+                class="w-6 shadow-2"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-carousel>
+    </ng-container>
+    <ng-container *ngIf="!imageSrc">
+      <img [src]="placeholder" alt="" />
+    </ng-container>
   </div>
   <div class="product-details-body">
-    <h3>{{product.name}}</h3>
-    <p>{{product.description}}</p>
-    <p>{{product.price}}</p>
-    <p>{{product.quantity}}</p>
+    <h3>{{ product.name }}</h3>
+    <p>{{ product.description }}</p>
+    <p id="price">${{ product.price }}</p>
+    <p>items left: {{ product.quantity }}</p>
   </div>
 </div>

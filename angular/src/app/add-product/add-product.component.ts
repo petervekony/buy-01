@@ -89,22 +89,17 @@ export class AddProductComponent {
       this.productService.addProduct(productRequest, mediaData).subscribe({
         next: (success: boolean) => {
           this.success = success;
-          if (this.modalRef) {
-            this.modalRef.close();
-          }
+          this.requestSent = true;
+          this.productResult = 'Product added successfully';
         },
         error: () => {
           this.success = false;
+          this.productResult = 'Error adding product';
         },
       });
-
-      // this.requestSent = true;
-      // this.productResult = this.success
-      //   ? 'Product added successfully'
-      //   : 'Error adding product';
     }
-    // this.productForm.reset();
-    // this.fileSelected = null;
-    // this.imageUpload!.nativeElement.value = '';
+    this.productForm.reset();
+    this.fileSelected = null;
+    // this.imageUpload!.nativeElement.files[0].name = '';
   }
 }

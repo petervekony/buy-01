@@ -22,6 +22,8 @@ import { ProductContainerComponent } from './product-container/product-container
 import { ProductCardModalComponent } from './product-container/product-card-modal/product-card-modal.component';
 import { ProductCardComponent } from './product-container/product-card/product-card.component';
 import { CookieService } from 'ngx-cookie-service';
+import { CarouselModule } from 'primeng/carousel';
+import { ProfilePageComponent } from './profile-page/profile-page.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +39,7 @@ import { CookieService } from 'ngx-cookie-service';
     ProductContainerComponent,
     ProductCardModalComponent,
     ProductCardComponent,
+    ProfilePageComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,6 +53,7 @@ import { CookieService } from 'ngx-cookie-service';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
+    CarouselModule,
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

@@ -1,6 +1,10 @@
 <div class="card-container" (click)="showModal()">
   <div class="picture-container">
-    <img [src]="imageSrc ? imageSrc : '../../assets/images/placeholder.png'" alt="" class="product-image" />
+    <img
+      [src]="imageSrc ? imageSrc : placeholder"
+      alt=""
+      class="product-image"
+    />
   </div>
   <div class="body-container">
     <h3 class="product-title">{{ product.name }}</h3>
@@ -14,7 +18,10 @@
   </div>
 </div>
 <dialog #productModal>
-  <app-product-card-modal [product]="product" (id)="'productCardModal' + product.id"></app-product-card-modal>
+  <app-product-card-modal
+    [product]="product"
+    (id)="('productCardModal' + product.id)"
+  ></app-product-card-modal>
   <button (click)="hideModal()"></button>
 </dialog>
 <!-- <div class="card-container"> -->

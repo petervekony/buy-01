@@ -1,0 +1,27 @@
+.profile-container {
+  width: 80vw;
+  height: 80vh;
+  margin-left: 10vw;
+  margin-top: 10vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#profile-picture {
+  width: 3rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.profile-container h3 {
+  font-size: 2rem;
+  margin: 1rem;
+}
+
+.profile-container p {
+  margin: 1rem;
+  font-size: 1rem;
+}

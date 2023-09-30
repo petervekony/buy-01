@@ -1,6 +1,7 @@
 import {
   Component,
   ElementRef,
+  // HostListener,
   Input,
   OnDestroy,
   OnInit,
@@ -28,6 +29,8 @@ export class ProductCardComponent implements OnInit, OnDestroy {
     product: Product = {} as Product;
   subscription: Subscription = Subscription.EMPTY;
   imageSrc: string | ArrayBuffer | null = null;
+  modalVisible = false;
+  placeholder: string = '../../assets/images/placeholder.png';
   // owner: string = '';
 
   constructor(private mediaService: MediaService) {} // private productService: ProductService, // private userService: UserService,
@@ -80,15 +83,29 @@ export class ProductCardComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
+  // TODO: FIX THE CLICK LISTENER!
+  // @HostListener('document:click')
+  // onClick(event: MouseEvent) {
+  //   if (
+  //     this.modalVisible &&
+  //     this.productModal &&
+  //     this.productModal.nativeElement.contains(event.target)
+  //   ) {
+  //     this.hideModal();
+  //   }
+  // }
+
   showModal() {
     if (this.productModal) {
       this.productModal.nativeElement.show();
+      this.modalVisible = true;
     }
   }
 
   hideModal() {
     if (this.productModal) {
       this.productModal.nativeElement.close();
+      this.modalVisible = false;
     }
   }
 }
