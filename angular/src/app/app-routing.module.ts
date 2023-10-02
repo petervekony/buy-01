@@ -8,8 +8,11 @@ import { authGuard } from './guard/auth.guard';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent, canActivate: [authGuard] },
-  { path: 'register', component: SignupComponent, canActivate: [authGuard] },
+  { path: '*', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  // canActivate: [authGuard] },
+  { path: 'register', component: SignupComponent },
+  // canActivate: [authGuard] },
   {
     path: 'dashboard',
     component: DashboardComponent,
@@ -21,7 +24,7 @@ const routes: Routes = [
     component: ProfilePageComponent,
     canActivate: [authGuard],
   },
-  { path: '**', redirectTo: 'home' },
+  { path: '**', redirectTo: 'home', pathMatch: 'full' },
 ];
 
 @NgModule({

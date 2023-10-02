@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { User } from '../interfaces/user';
-import { UserService } from '../service/user.service';
-import { StateService } from '../service/state.service';
+// import { UserService } from '../service/user.service';
+// import { StateService } from '../service/state.service';
 import {
   AbstractControl,
   FormControl,
@@ -10,6 +10,8 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
+import { AuthService } from '../service/auth.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-profile-page',
@@ -18,15 +20,24 @@ import {
 })
 export class ProfilePageComponent {
   placeholder: string = '../../assets/images/placeholder.png';
-  user: User;
+  user$ = new Subject<User>();
   formOpen = false;
   formValid = false;
 
   constructor(
-    private userService: UserService,
-    private stateService: StateService,
+    // private userService: UserService,
+    // private stateService: StateService,
+    private authService: AuthService,
   ) {
-    this.user = this.stateService.state!;
+    // this.user = this.stateService.state!;
+    this.authService.getAuth().subscribe({
+      next: (user) => {
+        this.user$.next(user);
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
     this.formValid = true;
   }
 
@@ -39,8 +50,8 @@ export class ProfilePageComponent {
 
       return Validators.minLength(4)(control) ||
           Validators.maxLength(30)(control)
-        ? null
-        : { invalidPassword: true };
+        ? { invalidPassword: true }
+        : null;
     };
   }
   private usernameValidator(): ValidatorFn {
@@ -52,8 +63,8 @@ export class ProfilePageComponent {
 
       return Validators.minLength(4)(control) ||
           Validators.maxLength(30)(control)
-        ? null
-        : { invalidName: true };
+        ? { invalidName: true }
+        : null;
     };
   }
   private emailValidator(): ValidatorFn {
@@ -66,8 +77,8 @@ export class ProfilePageComponent {
       return Validators.minLength(4)(control) ||
           Validators.maxLength(30)(control) ||
           Validators.email(control)
-        ? null
-        : { invalidEmail: true };
+        ? { invalidEmail: true }
+        : null;
     };
   }
 

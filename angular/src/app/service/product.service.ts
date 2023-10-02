@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
-import { catchError, Observable, of, switchMap } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 
@@ -30,13 +30,13 @@ export class ProductService {
     return this.http
       .post<Product>(address, form, { withCredentials: true })
       .pipe(
-        switchMap((data: Product) => {
+        map((data: Product) => {
           if (mediaForm.get('image') !== null) {
             this.addMedia(data.id!, mediaForm);
             mediaForm.append('name', '');
-            return of(true);
+            return true;
           }
-          return of(true);
+          return true;
         }),
         catchError((error) => {
           console.log(error);

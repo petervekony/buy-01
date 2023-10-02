@@ -1,11 +1,24 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { StateService } from '../service/state.service';
+// import { StateService } from '../service/state.service';
+import { AuthService } from '../service/auth.service';
+import { User } from '../interfaces/user';
+import { Subject } from 'rxjs';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  const stateService = inject(StateService);
+  const authService = inject(AuthService);
+  // const stateService = inject(StateService);
   const path = route.url.toString();
-  const currentUser = stateService.state;
+  const currentUser$ = new Subject<User>();
+  authService.getAuth().subscribe({
+    next: (user) => {
+      currentUser$.next(user);
+    },
+    error: (err) => {
+      console.error(err);
+    },
+  });
+  // const currentUser = stateService.state;
   const router = inject(Router);
 
   console.log('path:', path);
@@ -14,23 +27,25 @@ export const authGuard: CanActivateFn = (route, state) => {
   switch (path) {
   case 'register':
   case 'login': {
-    if (!currentUser) {
+    // return !currentUser;
+    if (!currentUser$) {
       return true;
     } else {
-      router.navigate(['/home']);
+      router.navigate(['home']);
+      return false;
     }
-    break;
   }
   case 'profile':
   case 'dashboard':
   case 'home': {
-    if (currentUser) {
+    // return !!currentUser;
+    if (currentUser$) {
       return true;
     } else {
-      router.navigate(['/login']);
+      router.navigate(['login']);
+      return false;
     }
-    break;
   }
   }
-  return false;
+  return true;
 };

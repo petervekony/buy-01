@@ -1,6 +1,6 @@
 <div class="nav-bar">
   <div class="user-info" (click)="goToProfile()">
-    <p>{{ user.name }}</p>
+    <p *ngIf="user$ | async as user">{{ user.name }}</p>
   </div>
   <div id="title">THE PRODUCT WAREHOUSE</div>
   <div class="buttons">
