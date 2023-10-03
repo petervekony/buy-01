@@ -7,23 +7,39 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
+import { of } from 'rxjs';
+import { AuthService } from '../service/auth.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
-  // let service: ProductService;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DashboardComponent, NavbarComponent, AddProductComponent],
-      providers: [ProductService],
-      imports: [HttpClientTestingModule, HttpClientModule, ReactiveFormsModule],
+      providers: [
+        {
+          provide: ProductService,
+          useValue: {},
+        },
+        {
+          provide: AuthService,
+          useValue: {
+            getAuth: () =>
+              of({
+                name: 'taneli',
+                email: 'taneli@taneli.com',
+                id: '123123123123123',
+                role: 'SELLER',
+              }),
+          },
+        },
+      ],
+      imports: [HttpClientTestingModule, ReactiveFormsModule],
     });
     fixture = TestBed.createComponent(DashboardComponent);
-    // service = TestBed.inject(ProductService);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
     fixture.detectChanges();

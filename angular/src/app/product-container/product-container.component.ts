@@ -8,7 +8,7 @@ import { ProductService } from '../service/product.service';
 @Component({
   selector: 'app-product-container',
   templateUrl: './product-container.component.html',
-  styleUrls: ['./product-container.component.css']
+  styleUrls: ['./product-container.component.css'],
 })
 export class ProductContainerComponent implements OnDestroy {
   //eslint-disable-next-line
@@ -26,7 +26,6 @@ export class ProductContainerComponent implements OnDestroy {
     if (navigation && navigation.extras.state) {
       this.response = navigation.extras.state['data'];
       console.log(navigation.extras.state['data']);
-      // console.log(this.response);
     }
     //TODO: for testing
     this.subscription = Subscription.EMPTY;

@@ -9,6 +9,7 @@ export class DashboardComponent {
   @ViewChild('productDialog')
     productDialog: ElementRef | undefined;
   constructor() {}
+
   manageProducts(event: MouseEvent) {
     console.log('here');
     if (this.productDialog) {

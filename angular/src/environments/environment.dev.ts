@@ -1,12 +1,14 @@
+const baseURL = 'https://localhost:443/api';
+
 export const environment = {
   production: false,
-  authCheckURL: 'https://localhost:443/api/auth/check',
-  loginURL: 'https://localhost:443/api/auth/signin',
-  signupURL: 'https://localhost:443/api/auth/signup',
-  usersURL: 'https://localhost:443/api/users',
-  productsURL: 'https://localhost:443/api/products',
-  mediaURL: 'https://localhost:443/api/media',
-  userMediaURL: 'https://localhost:443/api/media/user/',
-  productMediaURL: 'https://localhost:443/api/media/product/',
-  logoutURL: 'https://localhost:443/api/auth/signout',
+  authCheckURL: `${baseURL}/auth/check`,
+  loginURL: `${baseURL}/auth/signin`,
+  signupURL: `${baseURL}/auth/signup`,
+  usersURL: `${baseURL}/users`,
+  productsURL: `${baseURL}/products`,
+  mediaURL: `${baseURL}/media`,
+  userMediaURL: `${baseURL}/media/user/`,
+  productMediaURL: `${baseURL}/media/product/`,
+  logoutURL: `${baseURL}/auth/signout`,
 };

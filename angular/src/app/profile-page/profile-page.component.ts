@@ -25,11 +25,8 @@ export class ProfilePageComponent {
   formValid = false;
 
   constructor(
-    // private userService: UserService,
-    // private stateService: StateService,
     private authService: AuthService,
   ) {
-    // this.user = this.stateService.state!;
     this.authService.getAuth().subscribe({
       next: (user) => {
         this.user$.next(user);

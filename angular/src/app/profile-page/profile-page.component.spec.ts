@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ProfilePageComponent } from './profile-page.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AuthService } from '../service/auth.service';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 describe('ProfilePageComponent', () => {
   let component: ProfilePageComponent;
@@ -8,7 +10,9 @@ describe('ProfilePageComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ProfilePageComponent]
+      declarations: [ProfilePageComponent, NavbarComponent],
+      imports: [HttpClientTestingModule],
+      providers: [AuthService],
     });
     fixture = TestBed.createComponent(ProfilePageComponent);
     component = fixture.componentInstance;

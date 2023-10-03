@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ProductCardModalComponent } from './product-card-modal.component';
+import { MediaService } from 'src/app/service/media.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('ProductCardModalComponent', () => {
   let component: ProductCardModalComponent;
@@ -9,6 +10,8 @@ describe('ProductCardModalComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ProductCardModalComponent],
+      imports: [HttpClientTestingModule],
+      providers: [MediaService],
     });
     fixture = TestBed.createComponent(ProductCardModalComponent);
     component = fixture.componentInstance;
