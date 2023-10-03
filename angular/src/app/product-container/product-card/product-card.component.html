@@ -12,17 +12,19 @@
     <div class="product-price">${{ product.price }}</div>
     <div class="product-quantity">items left: {{ product.quantity }}</div>
     <!-- <div class="owner">{{ owner }}</div> -->
-    <div class="product-footer">
-      <button id="buy-button">BUY</button>
-    </div>
+  </div>
+  <div class="product-footer">
+    <button id="buy-button">BUY</button>
   </div>
 </div>
 <dialog #productModal>
+  <!-- <button id="closeButton" (click)="hideModal()">X</button> -->
   <app-product-card-modal
+    [dialog]="productModal"
+    [thumbNail]="imageSrc"
     [product]="product"
     (id)="('productCardModal' + product.id)"
   ></app-product-card-modal>
-  <button (click)="hideModal()"></button>
 </dialog>
 <!-- <div class="card-container"> -->
 <!--   <div class="picture-container"> -->

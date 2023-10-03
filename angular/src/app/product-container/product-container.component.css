@@ -1,4 +1,4 @@
-.container {
+.product-container {
   margin-top: 200px;
 }
 
@@ -14,10 +14,11 @@
 }
 
 .footer {
+  position: absolute;
+  bottom: 1rem;
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  padding-bottom: 3rem;
-  width: 80vw;
+  width: 100vw;
   justify-content: center;
 }

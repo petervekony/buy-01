@@ -19,14 +19,21 @@ import { MediaService } from 'src/app/service/media.service';
 export class ProductCardModalComponent implements OnInit, OnDestroy {
   @ViewChild('productModal')
     productModal: ElementRef | undefined;
-
+  @Input()
+    dialog: HTMLDialogElement | undefined;
+  @Input()
+    thumbNail: string | ArrayBuffer | null | undefined;
   @Input()
     product!: Product;
   imageSrc: MediaResponse | null = null;
   subscription: Subscription = Subscription.EMPTY;
   placeholder: string = '../../assets/images/placeholder.png';
+  picture: string | ArrayBuffer | null | undefined;
+  // this.imageSrc = 'data:' + media.mimeType + ';base64,' + media.image;
 
-  constructor(private mediaService: MediaService) {}
+  constructor(private mediaService: MediaService) {
+    console.log(this.thumbNail);
+  }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
@@ -42,6 +49,15 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
           console.error(error);
         },
       });
+
+    if (!this.thumbNail) {
+      this.picture = this.placeholder;
+    } else {
+      this.picture = this.thumbNail;
+    }
+  }
+  hideModal() {
+    this.dialog?.close();
   }
 
   getSeverity() {}

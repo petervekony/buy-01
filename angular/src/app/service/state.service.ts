@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { User } from '../interfaces/user';
 import { AuthService } from './auth.service';
 import { Subscription } from 'rxjs';
@@ -7,7 +7,7 @@ import { CookieService } from 'ngx-cookie-service';
 @Injectable({
   providedIn: 'root',
 })
-export class StateService implements OnInit, OnDestroy {
+export class StateService implements OnDestroy {
   private _state: User | undefined = undefined;
   private subscription: Subscription = Subscription.EMPTY;
   private _cookie: string | undefined = undefined;
@@ -15,19 +15,25 @@ export class StateService implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private cookieService: CookieService,
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.cookie = this.cookieService.get('buy-01');
-    if (!this.cookie) return;
+    console.log('stateService constructor & cookie is: ', this.cookie);
+    this.initialize();
+  }
+
+  initialize(): void {
+    this.cookie = this.cookieService.get('buy-01');
+    console.log('cookie: ', this.cookie);
+    // if (!this.cookie) return;
 
     this.subscription = this.authService.getAuth().subscribe({
       next: (user: User) => {
+        console.log('stateService|getAuth next(user):', user);
         this.state = user;
       },
       error: (error: string) => {
-        console.log(error);
-        this.resetState();
+        console.error(error);
+        // this.resetState();
       },
     });
   }
@@ -61,7 +67,8 @@ export class StateService implements OnInit, OnDestroy {
       true,
       'Lax',
     );
-    this.ngOnInit();
+    console.log('resetState, this shouldnt happen');
+    this.initialize();
   }
 
   refreshState(jwtToken: string, user: User) {

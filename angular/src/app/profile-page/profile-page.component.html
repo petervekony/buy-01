@@ -1,7 +1,7 @@
 <app-navbar></app-navbar>
 <div class="profile-container">
   <ng-container *ngIf="user$ | async as user">
-    <div class="profile-page" *ngIf="!formOpen">
+    <div class="profile-page" *ngIf="!formOpen" #profile>
       <img id="profile-picture" [src]="placeholder" alt="profile-picture" />
       <h3>{{ user.name }}</h3>
       <p>{{ user.email }}</p>
@@ -17,7 +17,7 @@
     </div>
 
     <div class="container flex justify-content-center mt-5" *ngIf="formOpen">
-      <div class="surface-card p-4 shadow-2 border-round lg:w-5">
+      <div class="surface-card p-4 shadow-2 border-round lg:w-5" #profileForm>
         <div class="text-900 text-3xl font-medium mb-3">Edit information</div>
         <div>
           <form

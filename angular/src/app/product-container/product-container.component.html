@@ -1,4 +1,4 @@
-<div class="container">
+<div class="product-container">
   <div class="wrapper">
     <ng-container *ngFor="let product of products">
       <app-product-card [product]="product"></app-product-card>
@@ -11,7 +11,13 @@
     <button pButton pRipple icon="pi pi-user" class="w-3" (click)="showUsers()">
       USERS
     </button>
-    <button pButton pRipple icon="pi pi-user" class="w-3" (click)="showProducts()">
+    <button
+      pButton
+      pRipple
+      icon="pi pi-user"
+      class="w-3"
+      (click)="showProducts()"
+    >
       PRODUCTS
     </button>
   </div>
