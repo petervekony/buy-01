@@ -24,3 +24,19 @@ body {
   gap: 2rem;
   word-wrap: break-word;
 }
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: #08101c;
+  color: azure;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+}

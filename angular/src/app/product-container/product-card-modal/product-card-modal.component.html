@@ -1,31 +1,35 @@
 <div class="modal-container">
+  <button class="close-button" (click)="hideModal()">X</button>
   <div class="product-image-container">
-    <ng-container
-      *ngIf="imageSrc && imageSrc.media && imageSrc.media.length > 0"
-    >
-      <p-carousel
-        [value]="imageSrc.media"
-        [numVisible]="3"
-        [numScroll]="imageSrc.media.length"
-        [circular]="false"
-      >
-        <ng-template *ngFor="let image of imageSrc.media">
-          <div
-            class="border-1 surface-border border-round m-2 text-center py-5 px-3"
-          >
-            <div class="mb-3">
-              <img
-                [src]="image.image"
-                [alt]="product.name"
-                class="w-6 shadow-2"
-              />
-            </div>
-          </div>
-        </ng-template>
-      </p-carousel>
+    <!-- <ng-container -->
+    <!--   *ngIf="imageSrc && imageSrc.media && imageSrc.media.length > 0" -->
+    <!-- > -->
+    <!--   <p-carousel -->
+    <!--     [value]="imageSrc.media" -->
+    <!--     [numVisible]="3" -->
+    <!--     [numScroll]="imageSrc.media.length" -->
+    <!--     [circular]="false" -->
+    <!--   > -->
+    <!--     <ng-template *ngFor="let image of imageSrc.media"> -->
+    <!--       <div -->
+    <!--         class="border-1 surface-border border-round m-2 text-center py-5 px-3" -->
+    <!--       > -->
+    <!--         <div class="mb-3"> -->
+    <!--           <img -->
+    <!--             [src]="image.image" -->
+    <!--             [alt]="product.name" -->
+    <!--             class="w-6 shadow-2" -->
+    <!--           /> -->
+    <!--         </div> -->
+    <!--       </div> -->
+    <!--     </ng-template> -->
+    <!--   </p-carousel> -->
+    <!-- </ng-container> -->
+    <ng-container *ngIf="!picture">
+      <img [src]="placeholder" alt="" class="product-modal-image" />
     </ng-container>
-    <ng-container *ngIf="!imageSrc">
-      <img [src]="placeholder" alt="" />
+    <ng-container *ngIf="picture">
+      <img [src]="picture" alt="product picture" class="product-modal-image" />
     </ng-container>
   </div>
   <div class="product-details-body">

@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
+import { FormStateService } from '../service/form-state.service';
 
 @Component({
   selector: 'app-add-product',
@@ -20,7 +21,15 @@ export class AddProductComponent {
   requestSent = false;
   productResult: string = '';
   success = false;
-  constructor(private productService: ProductService) {}
+  showProductForm = false;
+  constructor(
+    private productService: ProductService,
+    private formStateService: FormStateService,
+  ) {
+    this.formStateService.formOpen$.subscribe((isOpen) => {
+      this.showProductForm = isOpen;
+    });
+  }
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -101,5 +110,10 @@ export class AddProductComponent {
     this.productForm.reset();
     this.fileSelected = null;
     // this.imageUpload!.nativeElement.files[0].name = '';
+  }
+
+  closeModal() {
+    this.formStateService.setFormOpen(false);
+    this.modalRef!.close();
   }
 }

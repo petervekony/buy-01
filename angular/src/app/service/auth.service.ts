@@ -11,6 +11,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   getAuth(): Observable<User> {
+    console.log('authService.getAuth() gets called');
     const address = environment.authCheckURL;
     return this.http.get<User>(address, { withCredentials: true });
   }

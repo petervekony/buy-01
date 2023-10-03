@@ -24,6 +24,7 @@ import { ProductCardComponent } from './product-container/product-card/product-c
 import { CookieService } from 'ngx-cookie-service';
 import { CarouselModule } from 'primeng/carousel';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
+import { StateService } from './service/state.service';
 
 @NgModule({
   declarations: [
@@ -58,4 +59,9 @@ import { ProfilePageComponent } from './profile-page/profile-page.component';
   providers: [CookieService],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private stateService: StateService) {
+    console.log('AppModule constructor is called!');
+    this.stateService.initialize();
+  }
+}

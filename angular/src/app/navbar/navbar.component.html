@@ -1,5 +1,8 @@
 <div class="nav-bar">
   <div class="user-info" (click)="goToProfile()">
+    <div id="image-container">
+      <img [src]="placeholder" alt="" />
+    </div>
     <p *ngIf="user$ | async as user">{{ user.name }}</p>
   </div>
   <div id="title">THE PRODUCT WAREHOUSE</div>

@@ -1,5 +1,5 @@
 <app-navbar></app-navbar>
-<div class="container">
+<div class="dashboard-container">
   <div class="manage-products" (click)="manageProducts($event)">
     MANAGE PRODUCTS
   </div>
@@ -7,7 +7,11 @@
     MANAGE PROFILE
   </div>
 </div>
-<dialog #productDialog>
-  <app-add-product [modalRef]="productDialog"></app-add-product>
-</dialog>
-<dialog id="user-dialog"></dialog>
+<ng-container *ngIf="showProductForm">
+  <dialog #productDialog id="product-dialog">
+    <app-add-product [modalRef]="productDialog"></app-add-product>
+  </dialog>
+</ng-container>
+<ng-container *ngIf="showUserForm">
+  <dialog id="user-dialog" #userDialog id="user-dialog"></dialog>
+</ng-container>
