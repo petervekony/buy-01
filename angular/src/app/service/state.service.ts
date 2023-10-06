@@ -1,23 +1,26 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { User } from '../interfaces/user';
 import { AuthService } from './auth.service';
-import { Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StateService implements OnDestroy {
-  private _state: User | undefined = undefined;
+  private _state: Observable<User> | undefined;
   private subscription: Subscription = Subscription.EMPTY;
   private _cookie: string | undefined = undefined;
 
   constructor(
     private authService: AuthService,
     private cookieService: CookieService,
+    private router: Router,
   ) {
     this.cookie = this.cookieService.get('buy-01');
     console.log('stateService constructor & cookie is: ', this.cookie);
+    if (!this.cookie) return;
     this.initialize();
   }
 
@@ -28,21 +31,23 @@ export class StateService implements OnDestroy {
 
     this.subscription = this.authService.getAuth().subscribe({
       next: (user: User) => {
-        console.log('stateService|getAuth next(user):', user);
-        this.state = user;
+        this.state = of(user);
+        console.log(user);
+        // this.router.navigate(['home']);
       },
-      error: (error: string) => {
-        console.error(error);
+      error: (error) => {
+        if (error.statusText !== 'OK') console.error(error);
+        this.router.navigate(['login']);
         // this.resetState();
       },
     });
   }
 
-  get state(): User | undefined {
+  get state(): Observable<User> | undefined {
     return this._state;
   }
 
-  set state(user: User | undefined) {
+  set state(user: Observable<User> | undefined) {
     this._state = user;
   }
 
@@ -73,7 +78,7 @@ export class StateService implements OnDestroy {
 
   refreshState(jwtToken: string, user: User) {
     this.cookie = jwtToken;
-    this.state = user;
+    this.state = of(user);
   }
 
   ngOnDestroy(): void {
