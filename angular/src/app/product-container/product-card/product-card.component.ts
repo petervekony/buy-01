@@ -7,7 +7,7 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { map, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
@@ -32,6 +32,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   imageSrc: string | ArrayBuffer | null = null;
   modalVisible = false;
   placeholder: string = '../../assets/images/placeholder.png';
+  userSubscription: Subscription = Subscription.EMPTY;
   currentUser?: User;
   // owner: string = '';
 
@@ -77,21 +78,19 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.log('Error fetching media:', error);
-          // Handle the error and set a placeholder image
           this.imageSrc = '../../assets/images/placeholder.png';
         },
       });
 
-    this.authservice.getAuth().pipe(
-      map((user) => {
-        this.currentUser = user;
-        console.log('prodcard-currentUser:', this.currentUser);
-      }),
-    );
+    this.userSubscription = this.authservice.getAuth().subscribe((user) => {
+      this.currentUser = user;
+      console.log('prodcard-currentUser:', this.currentUser);
+    });
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.userSubscription.unsubscribe();
   }
 
   // TODO: FIX THE CLICK LISTENER!

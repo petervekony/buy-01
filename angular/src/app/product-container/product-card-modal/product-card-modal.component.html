@@ -5,30 +5,12 @@
       <ng-template matTabContent>
         <div class="product-tab-container">
           <div class="product-image-container">
-            <!-- <ng-container -->
-            <!--   *ngIf="imageSrc && imageSrc.media && imageSrc.media.length > 0" -->
-            <!-- > -->
-            <!--   <p-carousel -->
-            <!--     [value]="imageSrc.media" -->
-            <!--     [numVisible]="3" -->
-            <!--     [numScroll]="imageSrc.media.length" -->
-            <!--     [circular]="false" -->
-            <!--   > -->
-            <!--     <ng-template *ngFor="let image of imageSrc.media"> -->
-            <!--       <div -->
-            <!--         class="border-1 surface-border border-round m-2 text-center py-5 px-3" -->
-            <!--       > -->
-            <!--         <div class="mb-3"> -->
-            <!--           <img -->
-            <!--             [src]="image.image" -->
-            <!--             [alt]="product.name" -->
-            <!--             class="w-6 shadow-2" -->
-            <!--           /> -->
-            <!--         </div> -->
-            <!--       </div> -->
-            <!--     </ng-template> -->
-            <!--   </p-carousel> -->
-            <!-- </ng-container> -->
+            <!-- new approach -->
+            <ng-container *ngIf="images">
+              <app-media-gallery [images]="images">
+              </app-media-gallery>
+            </ng-container>
+
             <ng-container *ngIf="!picture">
               <img [src]="placeholder" alt="" class="product-modal-image" />
             </ng-container>
@@ -59,7 +41,7 @@
             <input id="product-description" type="text" [placeholder]="product ? product.description : 'Description'"
               pInputText class="w-full mb-3" name="product-description" formControlName="description" />
 
-            <label for="product-price" class="block text-900 font-medium mb-2">Price</label>
+            <label for="product-price" class="block text-896 font-medium mb-2">Price</label>
             <input id="product-price" type="text" [placeholder]="product ? product.price : 'Price'" pInputText
               class="w-full mb-3" name="product-price" formControlName="price" />
 
@@ -79,7 +61,7 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Delete">
+    <mat-tab label="Delete" *ngIf="user?.id === product.userId">
       <ng-template matTabContent>
         <div class="delete-container">
           <button *ngIf="!confirm" id="delete-button" pButton pRipple label="Delete product?"

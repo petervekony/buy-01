@@ -32,7 +32,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     product!: Product;
   @Input()
     user?: User;
-  imageSrc: MediaResponse | null = null;
+  images: string[] = [];
   subscription: Subscription = Subscription.EMPTY;
   placeholder: string = '../../assets/images/placeholder.png';
   picture: string | ArrayBuffer | null | undefined;
@@ -68,6 +68,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     ]),
     image: new FormControl(),
   });
+
   // this.imageSrc = 'data:' + media.mimeType + ';base64,' + media.image;
 
   constructor(
@@ -83,7 +84,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       .getProductMedia(this.product.id!)
       .subscribe({
         next: (data) => {
-          this.imageSrc = data;
+          this.images = this.convertImages(data);
         },
         error: (error) => {
           console.error(error);
@@ -107,6 +108,12 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     this.formStateService.setFormOpen(false);
     this.dialog?.close();
     this.confirm = false;
+  }
+
+  private convertImages(data: MediaResponse): string[] {
+    return data.media.map((media) =>
+      'data' + media.mimeType + ';base64,' + media.image
+    );
   }
 
   ngOnDestroy(): void {

@@ -32,7 +32,8 @@
     <!-- THIS IS THE NEW MULTIFILE UPLOAD PART: -->
     <!-- this takes the url straight here -->
     <div class="card flex justify-content-center" id="file-upload">
-      <p-fileUpload name="myfile[]" url="https://localhost/api/media/product" [multiple]="true" accept="image/*">
+      <p-fileUpload name="myfile[]" url="https://localhost/api/media/product" [multiple]="true" accept="image/*"
+        [withCredentials]="true" [fileLimit]="6">
         <!-- <ng-template pTemplate="toolbar"> -->
         <!--   <div class="py-3">Upload 3 Files</div> -->
         <!-- </ng-template> -->

@@ -27,6 +27,8 @@ import { StateService } from './service/state.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { FileUploadModule } from 'primeng/fileupload';
+import { GalleriaModule } from 'primeng/galleria';
+import { MediaGalleryComponent } from './media-gallery/media-gallery.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +44,7 @@ import { FileUploadModule } from 'primeng/fileupload';
     ProductCardModalComponent,
     ProductCardComponent,
     ProfilePageComponent,
+    MediaGalleryComponent,
   ],
   imports: [
     BrowserModule,
@@ -59,6 +62,7 @@ import { FileUploadModule } from 'primeng/fileupload';
     MatIconModule,
     MatTabsModule,
     FileUploadModule,
+    GalleriaModule,
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],
