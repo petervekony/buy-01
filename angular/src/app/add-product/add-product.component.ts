@@ -28,6 +28,7 @@ export class AddProductComponent implements OnInit {
   success = false;
   showProductForm = false;
   edit: boolean = this.product !== undefined;
+
   constructor(
     private productService: ProductService,
     private formStateService: FormStateService,
@@ -52,12 +53,12 @@ export class AddProductComponent implements OnInit {
     name: new FormControl('', [
       Validators.required,
       Validators.minLength(4),
-      Validators.maxLength(300),
+      Validators.maxLength(100),
     ]),
     description: new FormControl('', [
       Validators.required,
       Validators.minLength(4),
-      Validators.maxLength(30),
+      Validators.maxLength(300),
     ]),
     price: new FormControl('', [
       Validators.required,

@@ -7,9 +7,11 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
+import { User } from 'src/app/interfaces/user';
+import { AuthService } from 'src/app/service/auth.service';
 
 // import { combineLatest, map, Subscription } from 'rxjs';
 // import { ProductService } from '../service/product.service';
@@ -30,9 +32,13 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   imageSrc: string | ArrayBuffer | null = null;
   modalVisible = false;
   placeholder: string = '../../assets/images/placeholder.png';
+  currentUser?: User;
   // owner: string = '';
 
-  constructor(private mediaService: MediaService) {} // private productService: ProductService, // private userService: UserService,
+  constructor(
+    private mediaService: MediaService,
+    private authservice: AuthService,
+  ) {} // private productService: ProductService, // private userService: UserService,
   // private mediaService: MediaService,
   // this.subscription = combineLatest([
   //   this.productService.getProducts(),
@@ -75,6 +81,13 @@ export class ProductCardComponent implements OnInit, OnDestroy {
           this.imageSrc = '../../assets/images/placeholder.png';
         },
       });
+
+    this.authservice.getAuth().pipe(
+      map((user) => {
+        this.currentUser = user;
+        console.log('prodcard-currentUser:', this.currentUser);
+      }),
+    );
   }
 
   ngOnDestroy(): void {

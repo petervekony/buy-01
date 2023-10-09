@@ -19,7 +19,6 @@ export class DashboardComponent implements OnInit {
   showProductForm = false;
   showUserForm = false;
   userProducts$: Observable<Product[]> = of([]);
-  userId = '';
   constructor(
     private formStateService: FormStateService,
     private productService: ProductService,

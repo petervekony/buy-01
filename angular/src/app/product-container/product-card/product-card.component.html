@@ -16,7 +16,7 @@
   </div>
 </div>
 <dialog #productModal>
-  <app-product-card-modal [dialog]="productModal" [thumbNail]="imageSrc" [product]="product"
+  <app-product-card-modal [user]="currentUser" [dialog]="productModal" [thumbNail]="imageSrc" [product]="product"
     (id)="('productCardModal' + product.id)"></app-product-card-modal>
 </dialog>
 <!-- <div class="card-container"> -->

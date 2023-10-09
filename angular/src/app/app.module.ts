@@ -26,6 +26,7 @@ import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { StateService } from './service/state.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
+import { FileUploadModule } from 'primeng/fileupload';
 
 @NgModule({
   declarations: [
@@ -57,6 +58,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     CarouselModule,
     MatIconModule,
     MatTabsModule,
+    FileUploadModule,
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { MediaResponse } from 'src/app/interfaces/media';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
+import { User } from 'src/app/interfaces/user';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
 import { ProductService } from 'src/app/service/product.service';
@@ -29,6 +30,8 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     thumbNail?: string | ArrayBuffer | null | undefined;
   @Input()
     product!: Product;
+  @Input()
+    user?: User;
   imageSrc: MediaResponse | null = null;
   subscription: Subscription = Subscription.EMPTY;
   placeholder: string = '../../assets/images/placeholder.png';

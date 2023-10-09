@@ -45,9 +45,9 @@
         </div>
       </ng-template>
     </mat-tab>
-    <mat-tab label="Edit">
+    <mat-tab label="Edit" *ngIf="user?.id === product.userId">
       <ng-template matTabContent>
-        <div class="add-product-container">
+        <div class="edit-product-container">
           <div class="created" *ngIf="requestSent">{{ productResult }}</div>
 
           <form [formGroup]="productForm" ngSubmit="onSubmit()" (input)="onValidate()">
