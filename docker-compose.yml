@@ -9,6 +9,8 @@ services:
     ports:
       - '27017:27017'
     restart: always
+    volumes:
+      - mongodb_data:/data/db
 
   user-service:
     build:
@@ -96,3 +98,6 @@ services:
       - './kafka-entrypoint.sh:/kafka-entrypoint.sh'
     entrypoint: ["/bin/bash", "/kafka-entrypoint.sh"]
     # command: ["/wait-for-it.sh", "zookeeper:2181", "--", "/start-kafka.sh"]
+
+volumes:
+  mongodb_data:
