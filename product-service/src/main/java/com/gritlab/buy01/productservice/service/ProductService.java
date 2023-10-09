@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.gritlab.buy01.productservice.model.ProductDTO;
 import com.gritlab.buy01.productservice.model.ProductModel;
 import com.gritlab.buy01.productservice.repository.ProductRepository;
 
@@ -39,7 +40,7 @@ public class ProductService {
     return productRepository.findAllByUserId(userId);
   }
 
-  public ProductModel createProduct(ProductModel productModel) {
+  public ProductModel createProduct(ProductDTO productModel) {
     return productRepository.save(
         new ProductModel(
             productModel.getName(),
