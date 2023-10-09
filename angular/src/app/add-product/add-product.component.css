@@ -7,6 +7,7 @@
   background-color: #08101c;
   flex-direction: column;
   border: 1px solid #002d56;
+  border-radius: 10px;
 }
 
 .upload-container {

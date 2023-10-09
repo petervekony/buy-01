@@ -6,8 +6,15 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 2px solid purple;
+  border: 1px solid #c3b5fd;
   background-color: #08101c;
+  border-radius: 10px;
+  box-shadow: 0 0 7px #8d45ce80;
+}
+
+.product-tab-container {
+  width: 100%;
+  height: calc(70vh - 4rem);
 }
 
 .product-image-container {
@@ -40,4 +47,50 @@
 
 #price {
   text-align: right;
+}
+
+
+#submit-button {
+  margin-top: 3rem;
+}
+
+.add-product-container {
+  margin-top: 1rem;
+  width: 100%;
+  height: calc(70vh - 4rem);
+}
+
+.delete-container {
+  height: calc(70vh - 4rem);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.confirm-button {
+  margin-inline: 1rem;
+  width: 24vw;
+}
+
+.confirm-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirm-text p {
+  margin-bottom: 5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#no-button {
+  background-color: #ff739a;
 }

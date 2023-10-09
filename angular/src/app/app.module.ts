@@ -14,7 +14,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { EditUserDetailsComponent } from './edit-user-details/edit-user-details.component';
-import { EditProductDetailsComponent } from './edit-product-details/edit-product-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { AddProductComponent } from './add-product/add-product.component';
@@ -25,6 +24,8 @@ import { CookieService } from 'ngx-cookie-service';
 import { CarouselModule } from 'primeng/carousel';
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { StateService } from './service/state.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,6 @@ import { StateService } from './service/state.service';
     SignupComponent,
     HomeComponent,
     EditUserDetailsComponent,
-    EditProductDetailsComponent,
     DashboardComponent,
     NavbarComponent,
     AddProductComponent,
@@ -55,6 +55,8 @@ import { StateService } from './service/state.service';
     ReactiveFormsModule,
     HttpClientModule,
     CarouselModule,
+    MatIconModule,
+    MatTabsModule,
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

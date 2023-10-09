@@ -1,32 +1,35 @@
 .dashboard-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  flex-flow: column wrap;
   height: calc(100vh - 100px);
   width: 100vw;
-  flex-direction: column;
-  gap: 2rem;
 }
 
-.manage-profile {
-  width: 33vw;
-  border: 1px solid azure;
+.top-bar {
+  position: sticky;
+  height: 3rem;
+  width: 100vw;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  padding: 10px;
+  flex-direction: row;
+  justify-content: flex-end;
+  z-index: 10;
+  top: 100px;
+
 }
 
-.manage-products {
-  width: 33vw;
-  border: 1px solid azure;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  padding: 10px;
+.add-product {
+  width: max-content;
+  height: 2rem;
+  padding: 0.5rem;
+  margin-right: 1.5rem;
+  margin-top: -1rem;
 }
+
+/* .wrapper { */
+/*   display: flex; */
+/*   justify-content: space-around; */
+/* } */
 
 dialog {
   display: flex;
@@ -38,13 +41,3 @@ dialog {
   z-index: 15;
   border: none;
 }
-
-/* dialog { */
-/*   position: absolute; */
-/*   left: 10%; */
-/*   top: 15%; */
-/*   z-index: 7; */
-/*   height: 70vh; */
-/*   width: 80vw; */
-/*   border: none; */
-/* } */

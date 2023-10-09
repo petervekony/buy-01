@@ -1,13 +1,30 @@
 .profile-container {
   width: 80vw;
-  height: 80vh;
+  height: calc(80vh - 100px);
   margin-left: 10vw;
-  margin-top: 10vh;
+  /* margin-top: 10vh; */
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
 }
+
+.profile-page {
+  width: 80%;
+  text-align: justify;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 5rem;
+}
+
+
+.footer button {
+  width: 50%;
+}
+
 
 #profile-picture {
   width: 3rem;

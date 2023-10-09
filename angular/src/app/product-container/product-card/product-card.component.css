@@ -1,14 +1,22 @@
 /* TODO:SET BREAKPOINTS FOR THIS */
 .card-container {
-  width: 30vw;
-  min-height: 300px;
+  min-width: calc(50vw - 40px);
+  width: 20vw;
+  min-height: 250px;
   padding: 10px;
   margin: 10px;
   background-color: #08101c;
-  color: azure;
-  box-shadow: 2px 0 10px #a449c933;
+  box-shadow: 2px 2px 13px 2px #c3b5fd34;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  border-radius: 10px;
+  color: #c3b5fd;
+}
+
+.card-container:hover {
+  transform: scale(1.02);
+  box-shadow: 2px 2px 13px 2px #c36ffd81;
 }
 
 .picture-container {
@@ -23,6 +31,7 @@
 }
 
 .product-image {
+  border-radius: 5px 5px 0 0;
   width: 100%;
   height: auto;
   aspect-ratio: 2/1;
@@ -61,23 +70,26 @@
   outline: none;
 }
 
-#buy-button {
-  color: #8d45ce;
-  text-shadow: 0 0 5px #8d45ce;
-  padding: 5px 10px;
-  font-size: 1rem;
-  background-color: #08101c;
-  border-radius: 10px;
-  border: 1px solid #8d45ce;
+#info-button {
+  font-size: 1.1rem;
+  height: 1.5rem;
+  overflow: hidden;
+  border-radius: 50%;
+  border: none;
   outline: none;
+  box-shadow: none;
+  cursor: pointer;
+  background-color: #c3b5fd;
+  color: #08101c;
 }
 
-#buy-button:hover {
-  /* background-color: #a449c9; */
-  /* color: #c6cfd0; */
-  box-shadow: 0 0 10px #bf72fc;
-  /* text-shadow: 0 0 5px #c6cfd0; */
+#info-button:hover {
+  /* text-shadow: 0 0 1px #8d45ce; */
   font-weight: bold;
+  transform: scale(1.1);
+  overflow: hidden;
+  background-color: transparent;
+  color: #c3b5fd;
 }
 
 dialog {
@@ -85,7 +97,19 @@ dialog {
   left: 10%;
   top: 15%;
   z-index: 7;
-  height: 70vh;
+  height: 80vh;
   width: 80vw;
   border: none;
+}
+
+@media screen and (width >= 700px) {
+  .card-container {
+    min-width: 30vw;
+  }
+}
+
+@media screen and (width >= 1000px) {
+  .card-container {
+    min-width: 23vw;
+  }
 }

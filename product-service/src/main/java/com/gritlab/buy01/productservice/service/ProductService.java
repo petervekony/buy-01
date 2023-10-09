@@ -35,6 +35,10 @@ public class ProductService {
     return productRepository.findById(id);
   }
 
+  public List<ProductModel> getAllProductsByUserId(String userId) {
+    return productRepository.findAllByUserId(userId);
+  }
+
   public ProductModel createProduct(ProductModel productModel) {
     return productRepository.save(
         new ProductModel(

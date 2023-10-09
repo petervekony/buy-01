@@ -3,15 +3,20 @@
     <div id="image-container">
       <img [src]="placeholder" alt="" />
     </div>
-    <p *ngIf="user$ | async as user">{{ user.name }}</p>
+    <button *ngIf="user$ | async as user" aria-hidden="false" aria-label="user profile" id="profile-button">{{ user.name
+      }}</button>
   </div>
-  <div id="title">THE PRODUCT WAREHOUSE</div>
+  <div id="title" (click)="move('home')">THE PRODUCT WAREHOUSE</div>
   <div class="buttons">
     <!-- fix the location and buttons to be conditional  -->
-    <button class="dashboard" *ngIf="home" (click)="move('dashboard')">
-      dash
+    <button class="dashboard" *ngIf="!home" (click)="move('home')">
+      <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="home"></mat-icon>
     </button>
-    <button class="dashboard" *ngIf="!home" (click)="move('home')">home</button>
-    <button class="logout" (click)="logout()">logout</button>
+    <button class="dashboard" *ngIf="!dash" (click)="move('dashboard')">
+      <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="apps"></mat-icon>
+    </button>
+    <button class="logout" (click)="logout()">
+      <mat-icon aria-hidden="false" aria-label="logout icon" fontIcon="logout"></mat-icon>
+    </button>
   </div>
 </div>

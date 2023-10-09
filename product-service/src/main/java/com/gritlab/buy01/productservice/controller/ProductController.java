@@ -60,6 +60,15 @@ public class ProductController {
   }
 
   @PreAuthorize("isAuthenticated()")
+  @GetMapping("/products/user/{userId}")
+  public ResponseEntity<List<ProductModel>> getProductsByUserId(
+      @PathVariable("userId") String userId) {
+    List<ProductModel> usersProducts = productService.getAllProductsByUserId(userId);
+    if (usersProducts.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(usersProducts, HttpStatus.OK);
+  }
+
+  @PreAuthorize("isAuthenticated()")
   @PostMapping("/products")
   public ResponseEntity<?> createProduct(@Valid @RequestBody ProductModel productModel) {
     try {

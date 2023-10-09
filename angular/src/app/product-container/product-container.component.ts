@@ -21,7 +21,6 @@ export class ProductContainerComponent implements OnDestroy {
     private userService: UserService,
     private productService: ProductService,
   ) {
-    this.showProducts();
     const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state) {
       this.response = navigation.extras.state['data'];
@@ -39,6 +38,10 @@ export class ProductContainerComponent implements OnDestroy {
     // });
   }
 
+  ngOnInit(): void {
+    this.showProducts();
+  }
+
   //TODO: only for testing purposes
   showProducts() {
     this.subscription = this.productService.getProducts().subscribe({
@@ -50,10 +53,6 @@ export class ProductContainerComponent implements OnDestroy {
         console.log(error);
       },
     });
-  }
-
-  goBack() {
-    this.router.navigate(['login']);
   }
 
   showUsers() {

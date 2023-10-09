@@ -1,12 +1,15 @@
+const baseURL = '/api';
+
 export const environment = {
   production: true,
-  authCheckURL: '/api/auth/check',
-  loginURL: '/api/auth/signin',
-  signupURL: '/api/auth/signup',
-  usersURL: '/api/users',
-  productsURL: '/api/products',
-  mediaURL: '/api/media',
-  productMediaURL: '/api/media/product/',
-  userMediaURL: '/api/media/user/',
-  logoutURL: '/api/auth/signout',
+  authCheckURL: `${baseURL}/auth/check`,
+  loginURL: `${baseURL}/auth/signin`,
+  signupURL: `${baseURL}/auth/signup`,
+  usersURL: `${baseURL}/users`,
+  productsURL: `${baseURL}/products`,
+  userProductsURL: `${baseURL}/products/user/`,
+  mediaURL: `${baseURL}/media`,
+  userMediaURL: `${baseURL}/media/user/`,
+  productMediaURL: `${baseURL}/media/product/`,
+  logoutURL: `${baseURL}/auth/signout`,
 };

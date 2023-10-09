@@ -24,7 +24,6 @@ import { MediaService } from 'src/app/service/media.service';
 export class ProductCardComponent implements OnInit, OnDestroy {
   @ViewChild('productModal')
     productModal: ElementRef | undefined;
-
   @Input()
     product: Product = {} as Product;
   subscription: Subscription = Subscription.EMPTY;
@@ -60,7 +59,6 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   //     },
   //   });
   ngOnInit(): void {
-    console.log('this is the productID: ', this.product.id);
     this.subscription = this.mediaService
       .getProductThumbnail(this.product.id!)
       .subscribe({

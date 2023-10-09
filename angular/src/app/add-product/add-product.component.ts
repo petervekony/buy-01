@@ -1,19 +1,24 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
 import { FormStateService } from '../service/form-state.service';
+import { Product } from '../interfaces/product';
 
 @Component({
   selector: 'app-add-product',
   templateUrl: './add-product.component.html',
   styleUrls: ['./add-product.component.css'],
 })
-export class AddProductComponent {
+export class AddProductComponent implements OnInit {
+  @Input()
+    product?: Product;
   @Input('modalRef')
-    modalRef: HTMLDialogElement | undefined;
+    modalRef?: HTMLDialogElement;
   @ViewChild('imageUpload')
-    imageUpload: ElementRef | undefined;
+    imageUpload?: ElementRef;
+  @Input()
+    dialog?: HTMLDialogElement;
 
   formValid = false;
   fileSelected: File | null = null;
@@ -22,12 +27,24 @@ export class AddProductComponent {
   productResult: string = '';
   success = false;
   showProductForm = false;
+  edit: boolean = this.product !== undefined;
   constructor(
     private productService: ProductService,
     private formStateService: FormStateService,
-  ) {
+  ) {}
+
+  ngOnInit(): void {
+    if (this.dialog) {
+      this.dialog.show();
+      this.modalRef?.show();
+      this.showProductForm = true;
+      this.formStateService.setFormOpen(true);
+    }
+
     this.formStateService.formOpen$.subscribe((isOpen) => {
-      this.showProductForm = isOpen;
+      this.product
+        ? this.showProductForm = true
+        : this.showProductForm = isOpen;
     });
   }
 
@@ -108,12 +125,11 @@ export class AddProductComponent {
       });
     }
     this.productForm.reset();
-    this.fileSelected = null;
     // this.imageUpload!.nativeElement.files[0].name = '';
   }
 
   closeModal() {
     this.formStateService.setFormOpen(false);
-    this.modalRef!.close();
+    this.modalRef?.close();
   }
 }

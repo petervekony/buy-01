@@ -9,8 +9,7 @@
   justify-content: space-evenly;
   gap: 2rem;
   color: azure;
-  background-color: #08101c;
-  box-shadow: 2px 0 10px #a449c933;
+  background-color: #121212;
 }
 
 .user-info {
@@ -19,6 +18,14 @@
   gap: 7px;
   margin-left: 1rem;
   align-items: center;
+  cursor: pointer;
+  color: #c3b5fd;
+  font-size: 1.2rem;
+}
+
+.user-info p:hover {
+  transform: scale(1.1);
+  color: #8d45ce;
 }
 
 #image-container {
@@ -33,7 +40,7 @@
   border-radius: 50%;
   height: 3rem;
   aspect-ratio: 1;
-  border: 1px solid #8d45ce;
+  border: 1px solid #c3b5fd;
   box-shadow: 1px 1px 5px #8d45ce4d;
 }
 
@@ -41,6 +48,15 @@
   clear: both;
   margin-left: auto;
   margin-right: auto;
+  color: #c3b5fd;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 0 5px #8d45cecd;
+}
+
+#title:hover {
+  color: #8d45ce;
+  transform: scale(1.05);
 }
 
 .buttons {
@@ -49,14 +65,29 @@
 
 .buttons button {
   background-color: #08101c;
-  width: 3rem;
+  width: 2rem;
   height: 2rem;
-  border-radius: 10px;
-  border: 1px solid #8d45ce;
   outline: none;
-  box-shadow: 1px 1px 5px #8d45ce4d;
-  margin-inline: 0.2rem;
+  box-shadow: none;
+  border: none;
+  /* margin-inline: 0.2rem; */
+  color: #c3b5fd;
+  cursor: pointer;
+}
+
+.buttons button:hover {
+  transform: scale(1.2);
   color: #8d45ce;
+}
+
+#profile-button {
+  font-size: 1.2rem;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  color: #c3b5fd;
+  cursor: pointer;
 }
 
 @media screen and (width <= 600px) {
