@@ -1,12 +1,19 @@
-<app-navbar></app-navbar>
-<div class="dashboard-container">
-  <div class="manage-products" (click)="manageProducts($event)">
-    MANAGE PRODUCTS
-  </div>
-  <div class="manage-profile" (click)="openProfileForm($event)">
-    MANAGE PROFILE
-  </div>
+<div class="top-bar">
+  <button type="button" pButton pRipple label="Add product" icon="" (click)="manageProducts($event)"
+    class="add-product"></button>
 </div>
+<!-- <button id="add-product" (click)="manageProducts($event)">Add product</button> -->
+<div class="dashboard-container">
+  <ng-container *ngFor="let product of (userProducts$ | async)">
+    <app-product-card [product]="product"></app-product-card>
+  </ng-container>
+</div>
+<!-- <div class="manage-products" (click)="manageProducts($event)"> -->
+<!--   MANAGE PRODUCTS -->
+<!-- </div> -->
+<!-- <div class="manage-profile" (click)="openProfileForm($event)"> -->
+<!--   MANAGE PROFILE -->
+<!-- </div> -->
 <ng-container *ngIf="showProductForm">
   <dialog #productDialog id="product-dialog">
     <app-add-product [modalRef]="productDialog"></app-add-product>

@@ -1,9 +1,20 @@
-@import url("primeflex/primeflex.css");
+@import "primeflex/primeflex.css";
+@import "../node_modules/@angular/material/prebuilt-themes/purple-green.css";
+
+html, body {
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
+}
 
 body {
-  font-family: var(--font-family);
+  /* font-family: var(--font-family); */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 * {
@@ -12,6 +23,7 @@ body {
   box-sizing: border-box;
   /* background-color: #0e0f0f; */
   font-family: Roboto, sans-serif;
+  user-select: none;
 }
 
 .container {
@@ -27,16 +39,22 @@ body {
 
 .close-button {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 3rem;
-  height: 3rem;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 2rem;
+  height:2rem;
   border-radius: 50%;
   background-color: #08101c;
-  color: azure;
-  border: none;
+  color: #c3b5fd;
+  border: 1px solid #c3b5fd;
   box-shadow: none;
   outline: none;
   font-size: 1.2rem;
   font-weight: bold;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  box-shadow: 0 0 5px #c3b5fd;
+  transform: scale(1.1);
 }

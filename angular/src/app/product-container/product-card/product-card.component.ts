@@ -10,6 +10,8 @@ import {
 import { Subscription } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
+import { User } from 'src/app/interfaces/user';
+import { AuthService } from 'src/app/service/auth.service';
 
 // import { combineLatest, map, Subscription } from 'rxjs';
 // import { ProductService } from '../service/product.service';
@@ -24,16 +26,20 @@ import { MediaService } from 'src/app/service/media.service';
 export class ProductCardComponent implements OnInit, OnDestroy {
   @ViewChild('productModal')
     productModal: ElementRef | undefined;
-
   @Input()
     product: Product = {} as Product;
   subscription: Subscription = Subscription.EMPTY;
   imageSrc: string | ArrayBuffer | null = null;
   modalVisible = false;
   placeholder: string = '../../assets/images/placeholder.png';
+  userSubscription: Subscription = Subscription.EMPTY;
+  currentUser?: User;
   // owner: string = '';
 
-  constructor(private mediaService: MediaService) {} // private productService: ProductService, // private userService: UserService,
+  constructor(
+    private mediaService: MediaService,
+    private authservice: AuthService,
+  ) {} // private productService: ProductService, // private userService: UserService,
   // private mediaService: MediaService,
   // this.subscription = combineLatest([
   //   this.productService.getProducts(),
@@ -60,7 +66,6 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   //     },
   //   });
   ngOnInit(): void {
-    console.log('this is the productID: ', this.product.id);
     this.subscription = this.mediaService
       .getProductThumbnail(this.product.id!)
       .subscribe({
@@ -73,14 +78,19 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.log('Error fetching media:', error);
-          // Handle the error and set a placeholder image
           this.imageSrc = '../../assets/images/placeholder.png';
         },
       });
+
+    this.userSubscription = this.authservice.getAuth().subscribe((user) => {
+      this.currentUser = user;
+      console.log('prodcard-currentUser:', this.currentUser);
+    });
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.userSubscription.unsubscribe();
   }
 
   // TODO: FIX THE CLICK LISTENER!

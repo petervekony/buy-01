@@ -7,6 +7,7 @@ export const environment = {
   signupURL: `${baseURL}/auth/signup`,
   usersURL: `${baseURL}/users`,
   productsURL: `${baseURL}/products`,
+  userProductsURL: `${baseURL}/products/user/`,
   mediaURL: `${baseURL}/media`,
   userMediaURL: `${baseURL}/media/user/`,
   productMediaURL: `${baseURL}/media/product/`,

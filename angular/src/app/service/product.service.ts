@@ -17,6 +17,22 @@ export class ProductService {
     return this.http.get<Product[]>(address, { withCredentials: true });
   }
 
+  // TODO: create the endpoint to get products by userId
+  // getProductsByUserId(userId: string): Observable<Product[]> {
+  //   const address = environment.userProductsURL+userId;
+  //   return this.http.get<Product[]>(address, { withCredentials: true });
+  // }
+
+  getProductsById(userId: string): Observable<Product[]> {
+    const address = environment.productsURL;
+    return this.http.get<Product[]>(address, { withCredentials: true })
+      .pipe(
+        map((products) =>
+          products?.filter((product) => product.userId == userId)
+        ),
+      );
+  }
+
   getOwner(userId: string): Observable<User> {
     const address = environment.productsURL;
     return this.http.get<User>(address, {
@@ -45,7 +61,7 @@ export class ProductService {
       );
   }
 
-  addMedia(id: string, image: FormData) {
+  addMedia(id: string, image: FormData): void {
     const address = environment.mediaURL;
     const headers = new HttpHeaders();
     headers.append('Content-Type', 'multipart/form-data');
@@ -63,5 +79,9 @@ export class ProductService {
           console.log(error);
         },
       });
+  }
+
+  deleteProduct(id: string): void {
+    console.log(id);
   }
 }

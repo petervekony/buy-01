@@ -1,41 +1,87 @@
 <div class="modal-container">
   <button class="close-button" (click)="hideModal()">X</button>
-  <div class="product-image-container">
-    <!-- <ng-container -->
-    <!--   *ngIf="imageSrc && imageSrc.media && imageSrc.media.length > 0" -->
-    <!-- > -->
-    <!--   <p-carousel -->
-    <!--     [value]="imageSrc.media" -->
-    <!--     [numVisible]="3" -->
-    <!--     [numScroll]="imageSrc.media.length" -->
-    <!--     [circular]="false" -->
-    <!--   > -->
-    <!--     <ng-template *ngFor="let image of imageSrc.media"> -->
-    <!--       <div -->
-    <!--         class="border-1 surface-border border-round m-2 text-center py-5 px-3" -->
-    <!--       > -->
-    <!--         <div class="mb-3"> -->
-    <!--           <img -->
-    <!--             [src]="image.image" -->
-    <!--             [alt]="product.name" -->
-    <!--             class="w-6 shadow-2" -->
-    <!--           /> -->
-    <!--         </div> -->
-    <!--       </div> -->
-    <!--     </ng-template> -->
-    <!--   </p-carousel> -->
-    <!-- </ng-container> -->
-    <ng-container *ngIf="!picture">
-      <img [src]="placeholder" alt="" class="product-modal-image" />
-    </ng-container>
-    <ng-container *ngIf="picture">
-      <img [src]="picture" alt="product picture" class="product-modal-image" />
-    </ng-container>
-  </div>
-  <div class="product-details-body">
-    <h3>{{ product.name }}</h3>
-    <p>{{ product.description }}</p>
-    <p id="price">${{ product.price }}</p>
-    <p>items left: {{ product.quantity }}</p>
-  </div>
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center">
+    <mat-tab label="Info">
+      <ng-template matTabContent>
+        <div class="product-tab-container">
+          <div class="product-image-container">
+            <!-- new approach -->
+            <ng-container *ngIf="images">
+              <app-media-gallery [images]="images">
+              </app-media-gallery>
+            </ng-container>
+
+            <ng-container *ngIf="!picture">
+              <img [src]="placeholder" alt="" class="product-modal-image" />
+            </ng-container>
+            <ng-container *ngIf="picture">
+              <img [src]="picture" alt="product picture" class="product-modal-image" />
+            </ng-container>
+          </div>
+          <div class="product-details-body">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description }}</p>
+            <p id="price">${{ product.price }}</p>
+            <p>items left: {{ product.quantity }}</p>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Edit" *ngIf="user?.id === product.userId">
+      <ng-template matTabContent>
+        <div class="edit-product-container">
+          <div class="created" *ngIf="requestSent">{{ productResult }}</div>
+
+          <form [formGroup]="productForm" ngSubmit="onSubmit()" (input)="onValidate()">
+            <label for="product-name" class="block text-900 font-medium mb-2">Product name</label>
+            <input id="product-name" type="text" [placeholder]="product ? product.name : 'Product name'" pInputText
+              class="w-full mb-3" name="product-name" formControlName="name" />
+
+            <label for="product-description" class="block text-900 font-medium mb-2">Description</label>
+            <input id="product-description" type="text" [placeholder]="product ? product.description : 'Description'"
+              pInputText class="w-full mb-3" name="product-description" formControlName="description" />
+
+            <label for="product-price" class="block text-896 font-medium mb-2">Price</label>
+            <input id="product-price" type="text" [placeholder]="product ? product.price : 'Price'" pInputText
+              class="w-full mb-3" name="product-price" formControlName="price" />
+
+            <label for="product-quantity" class="block text-900 font-medium mb-2">Quantity</label>
+            <input id="product-quantity" type="text" [placeholder]="product ? product.quantity : 'Quantity'" pInputText
+              class="w-full mb-3" name="product-quantity" formControlName="quantity" />
+            <!-- <div class="flex align-items-center justify-content-between mb-6"> -->
+            <div class="upload-container">
+              <label for="image" class="block text-900 font-medium mb-2">Add an image?</label>
+              <input #imageUpload type="file" name="image" id="upload-product-image" (change)="onFileSelected($event)"
+                accept="image/*" />
+            </div>
+
+            <button type="submit" id="submit-button" [disabled]="!formValid" pButton pRipple label="Submit"
+              icon="pi pi-user" (click)="submitProduct()" class="w-full"></button>
+          </form>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Delete" *ngIf="user?.id === product.userId">
+      <ng-template matTabContent>
+        <div class="delete-container">
+          <button *ngIf="!confirm" id="delete-button" pButton pRipple label="Delete product?"
+            (click)="openConfirm()"></button>
+          <div class="confirm-text" *ngIf="confirm">
+            <p>Are you sure?</p>
+          </div>
+          <div class="button-container"> <button *ngIf="confirm" class="confirm-button" pButton pRiple label="Yes"
+              (click)="deleteProduct(product.id!)"></button>
+            <button *ngIf="confirm" class="confirm-button" pButton pRiple label="No" (click)="closeConfirm()"
+              id="no-button"></button>
+          </div>
+        </div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
 </div>
+<dialog #confirmDelete>
+  <div class="confirm-container">
+    <button class="confirm-button" pButton pRiple label="Yes" (click)="deleteProduct(product.id!)"></button>
+    <button class="confirm-button" pButton pRiple label="No" (click)="closeConfirm()"></button>
+  </div>
+</dialog>

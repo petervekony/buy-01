@@ -1,12 +1,13 @@
 .add-product-container {
   height: 80vh;
-  width: 80vw;
+  width: 90vw;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #08101c;
   flex-direction: column;
   border: 1px solid #002d56;
+  border-radius: 10px;
 }
 
 .upload-container {
@@ -20,5 +21,30 @@
 }
 
 #upload-product-image {
+  margin-bottom: 1rem;
+}
+
+.description-textarea {
+  width: 100%;
+  color: azure;
+  background-color: #040e19;
+  border: 1px solid #002d56;
+  resize: none;
+  padding: 7px;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.description-textarea::placeholder{
+  font-size: 1rem;
+  padding-left: 0.4rem;
+  padding-top: 0.4rem;
+}
+
+.description-textarea:focus, .description-textarea:active, .description-textarea:hover {
+  border: 1px solid azure;
+}
+
+#file-upload {
   margin-bottom: 1rem;
 }
