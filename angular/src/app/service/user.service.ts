@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { User } from '../interfaces/user';
 import { LoginRequest } from '../interfaces/login-request';
 import { SignupRequest } from '../interfaces/signup-request';
+import { UserUpdateRequest } from '../interfaces/user-update-request';
 
 @Injectable({
   providedIn: 'root',
@@ -43,7 +44,8 @@ export class UserService {
     });
   }
 
-  // updateUser(){
-  //   constt address = environment.updateUserURL;
-  // }
+  updateUser(request: UserUpdateRequest, id: string) {
+    const address = environment.usersURL + '/' + id;
+    return this.http.put(address, request, { withCredentials: true });
+  }
 }

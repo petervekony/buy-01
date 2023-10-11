@@ -44,6 +44,30 @@
   box-shadow: 1px 1px 5px #8d45ce4d;
 }
 
+.user-info {
+  display: flex;
+  flex-direction: row;
+  gap: 7px;
+  margin-left: 1rem;
+  align-items: center;
+}
+
+#image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#image-container img {
+  background-size: contain;
+  overflow: hidden;
+  border-radius: 50%;
+  height: 3rem;
+  aspect-ratio: 1;
+  border: 1px solid #8d45ce;
+  box-shadow: 1px 1px 5px #8d45ce4d;
+}
+
 #title {
   clear: both;
   margin-left: auto;

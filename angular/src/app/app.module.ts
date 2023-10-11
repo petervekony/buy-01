@@ -68,7 +68,12 @@ import { MediaGalleryComponent } from './media-gallery/media-gallery.component';
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private stateService: StateService) {
+  constructor(
+    private stateService: StateService,
+    private cookieService: CookieService,
+  ) {
+    console.log('check', this.cookieService.check('buy-01'));
+    console.log(this.cookieService.getAll());
     console.log('AppModule constructor is called!');
     this.stateService.initialize();
   }

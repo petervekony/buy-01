@@ -1,4 +1,4 @@
-import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { User } from '../interfaces/user';
 // import { UserService } from '../service/user.service';
 // import { StateService } from '../service/state.service';
@@ -13,6 +13,9 @@ import {
 import { AuthService } from '../service/auth.service';
 import { Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
+import { CookieService } from 'ngx-cookie-service';
+import { UserService } from '../service/user.service';
+import { UserUpdateRequest } from '../interfaces/user-update-request';
 
 @Component({
   selector: 'app-profile-page',
@@ -26,18 +29,23 @@ export class ProfilePageComponent {
     profile: ElementRef | undefined;
   placeholder: string = '../../assets/images/placeholder.png';
   user$ = new Subject<User>();
+  currentUser: User = {} as User;
   formOpen = false;
   formValid = false;
   buttonClicked = false;
 
   constructor(
     private authService: AuthService,
-    private formStateService: FormStateService,
-    private renderer: Renderer2,
+    private formStateService: FormStateService, // private renderer: Renderer2,
+    private cookieService: CookieService,
+    private userService: UserService,
   ) {
+    const cookie = this.cookieService.get('buy-01');
+    if (!cookie) return;
     this.authService.getAuth().subscribe({
       next: (user) => {
         this.user$.next(user);
+        this.currentUser = user;
       },
       error: (error) => {
         console.error(error);
@@ -108,10 +116,10 @@ export class ProfilePageComponent {
   }
 
   userUpdateForm: FormGroup = new FormGroup({
-    name: new FormControl('', [this.usernameValidator()]),
-    email: new FormControl('', [this.emailValidator()]),
-    password: new FormControl('', [this.passwordValidator()]),
-    confirmPassword: new FormControl('', [this.passwordValidator()]),
+    name: new FormControl(null, [this.usernameValidator()]),
+    email: new FormControl(null, [this.emailValidator()]),
+    password: new FormControl(null, [this.passwordValidator()]),
+    confirmPassword: new FormControl(null, [this.passwordValidator()]),
   });
 
   openForm() {
@@ -124,8 +132,19 @@ export class ProfilePageComponent {
   }
 
   onSubmit() {
+    const request = this.userUpdateForm.value;
+    console.log('update', request);
+
+    console.log('profilepage', this.currentUser.id);
     this.formStateService.setFormOpen(false);
-    // this.userService.updateUser(this.user.id);
+    this.userService.updateUser(request, this.currentUser.id).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
     this.formOpen = false;
   }
 }

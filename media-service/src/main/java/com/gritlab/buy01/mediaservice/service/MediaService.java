@@ -102,7 +102,7 @@ public class MediaService {
               media.getMimeType());
       return new ResponseEntity<>(response, HttpStatus.OK);
     } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
   }
 }

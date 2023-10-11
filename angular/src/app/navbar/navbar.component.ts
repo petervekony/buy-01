@@ -24,7 +24,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   home = false;
   user$ = new Subject<User>();
   placeholder = '../../assets/images/placeholder.png';
-  subscription: Subscription = Subscription.EMPTY;
+  routeSubscription: Subscription = Subscription.EMPTY;
+  authSubscription: Subscription = Subscription.EMPTY;
   dash = false;
   profile = false;
   // secondUser$ = new BehaviorSubject<User>({
@@ -41,27 +42,37 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private formStateService: FormStateService,
   ) {
     // this.user = this.stateService.state!;
-    this.authService.getAuth().subscribe({
-      next: (user) => {
-        this.user$.next(user);
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
+    const cookieCheck = this.authService.getAuth();
+    if (cookieCheck) {
+      this.authSubscription = cookieCheck.subscribe({
+        next: (user) => {
+          this.user$.next(user);
+        },
+        error: () => {
+          this.router.navigate(['login']);
+          // console.error(error);
+        },
+      });
+    }
     this.route = '';
   }
 
   ngOnInit(): void {
-    this.subscription = this.router.events.pipe(
-      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-    ).subscribe((event: NavigationEnd) => {
-      console.log('navbar-ROUTE: ', this.route);
-      this.route = event.urlAfterRedirects;
-      this.home = this.route === '/home';
-      this.dash = this.route === '/dashboard';
-      this.profile = this.route === '/profile';
-    });
+    this.authSubscription = this.router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd,
+        ),
+      )
+      .subscribe((event: NavigationEnd) => {
+        console.log('navbar-ROUTE: ', this.route);
+        if (event && event.urlAfterRedirects) {
+          this.route = event.urlAfterRedirects;
+          this.home = this.route === '/home';
+          this.dash = this.route === '/dashboard';
+          this.profile = this.route === '/profile';
+        }
+      });
   }
 
   move(location: string) {
@@ -82,6 +93,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.authSubscription.unsubscribe();
+    this.routeSubscription.unsubscribe();
   }
 }

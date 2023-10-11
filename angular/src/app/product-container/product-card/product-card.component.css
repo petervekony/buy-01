@@ -113,3 +113,13 @@ dialog {
     min-width: 23vw;
   }
 }
+
+dialog {
+  position: absolute;
+  left: 10%;
+  top: 15%;
+  z-index: 7;
+  height: 70vh;
+  width: 80vw;
+  border: none;
+}

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
 import { ProductService } from '../service/product.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-product-container',
@@ -20,6 +21,7 @@ export class ProductContainerComponent implements OnDestroy {
     private router: Router,
     private userService: UserService,
     private productService: ProductService,
+    private cookieService: CookieService,
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation && navigation.extras.state) {
@@ -39,6 +41,8 @@ export class ProductContainerComponent implements OnDestroy {
   }
 
   ngOnInit(): void {
+    const cookie = this.cookieService.get('buy-01');
+    if (!cookie) return;
     this.showProducts();
   }
 

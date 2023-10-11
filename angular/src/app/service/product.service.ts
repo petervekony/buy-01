@@ -5,6 +5,7 @@ import { Product } from '../interfaces/product';
 import { catchError, map, Observable, of } from 'rxjs';
 import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
+import { ProductCreationResponse } from '../interfaces/product-creation-response';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +26,8 @@ export class ProductService {
 
   getProductsById(userId: string): Observable<Product[]> {
     const address = environment.productsURL;
-    return this.http.get<Product[]>(address, { withCredentials: true })
+    return this.http
+      .get<Product[]>(address, { withCredentials: true })
       .pipe(
         map((products) =>
           products?.filter((product) => product.userId == userId)
@@ -41,14 +43,17 @@ export class ProductService {
     });
   }
 
-  addProduct(form: ProductRequest, mediaForm: FormData): Observable<boolean> {
+  addProduct(
+    form: ProductRequest,
+    mediaForm: FormData | null,
+  ): Observable<boolean> {
     const address = environment.productsURL;
     return this.http
-      .post<Product>(address, form, { withCredentials: true })
+      .post<ProductCreationResponse>(address, form, { withCredentials: true })
       .pipe(
-        map((data: Product) => {
-          if (mediaForm.get('image') !== null) {
-            this.addMedia(data.id!, mediaForm);
+        map((data: ProductCreationResponse) => {
+          if (mediaForm && mediaForm.get('image') !== null) {
+            this.addMedia(data.product.id!, mediaForm);
             mediaForm.append('name', '');
             return true;
           }
@@ -82,6 +87,15 @@ export class ProductService {
   }
 
   deleteProduct(id: string): void {
-    console.log(id);
+    const address = environment.productsURL + '/' + id;
+    console.log('address', address, id);
+    this.http.delete(address, { withCredentials: true }).subscribe({
+      next: (data) => {
+        console.log(data);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
   }
 }

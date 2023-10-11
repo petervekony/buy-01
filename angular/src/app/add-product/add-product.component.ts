@@ -44,8 +44,8 @@ export class AddProductComponent implements OnInit {
 
     this.formStateService.formOpen$.subscribe((isOpen) => {
       this.product
-        ? this.showProductForm = true
-        : this.showProductForm = isOpen;
+        ? (this.showProductForm = true)
+        : (this.showProductForm = isOpen);
     });
   }
 
@@ -95,15 +95,18 @@ export class AddProductComponent implements OnInit {
     this.formValid = this.productForm.valid;
   }
 
-  submitImage() {}
+  // submitImage() {}
 
   submitProduct() {
-    const mediaData = new FormData();
-    mediaData.append(
-      'image',
-      this.fileToBlob(this.fileSelected!),
-      this.filename as string,
-    );
+    let mediaData: FormData | null = null;
+    if (this.fileSelected) {
+      mediaData = new FormData();
+      mediaData.append(
+        'image',
+        this.fileToBlob(this.fileSelected!),
+        this.filename as string,
+      );
+    }
 
     let productRequest: ProductRequest;
     if (this.formValid) {

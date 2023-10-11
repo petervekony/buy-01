@@ -53,7 +53,7 @@ public class AuthService {
 
     ResponseCookie jwtCookie =
         ResponseCookie.from("buy-01", jwtToken)
-            .httpOnly(true)
+            .httpOnly(false)
             .sameSite("Lax")
             .domain("localhost")
             .secure(true)

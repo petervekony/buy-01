@@ -8,6 +8,13 @@ import { ProductService } from 'src/app/service/product.service';
 import { UserService } from 'src/app/service/user.service';
 import { MediaService } from 'src/app/service/media.service';
 import { ProductCardModalComponent } from '../product-card-modal/product-card-modal.component';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatIconModule } from '@angular/material/icon';
+import {
+  BrowserAnimationsModule,
+  NoopAnimationsModule,
+} from '@angular/platform-browser/animations';
+import { MediaGalleryComponent } from 'src/app/media-gallery/media-gallery.component';
 
 describe('ProductCardComponent', () => {
   let component: ProductCardComponent;
@@ -16,8 +23,18 @@ describe('ProductCardComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ProductCardComponent, ProductCardModalComponent],
-      imports: [HttpClientTestingModule],
+      declarations: [
+        ProductCardComponent,
+        ProductCardModalComponent,
+        MediaGalleryComponent,
+      ],
+      imports: [
+        HttpClientTestingModule,
+        MatTabsModule,
+        MatIconModule,
+        BrowserAnimationsModule,
+        NoopAnimationsModule,
+      ],
       providers: [ProductService, UserService, MediaService],
     });
     fixture = TestBed.createComponent(ProductCardComponent);
