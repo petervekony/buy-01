@@ -1,7 +1,8 @@
 @import "primeflex/primeflex.css";
 @import "../node_modules/@angular/material/prebuilt-themes/purple-green.css";
 
-html, body {
+html,
+body {
   height: 100vh;
   width: 100vw;
   overflow-x: hidden;
@@ -42,7 +43,7 @@ body {
   top: 0.4rem;
   right: 0.4rem;
   width: 2rem;
-  height:2rem;
+  height: 2rem;
   border-radius: 50%;
   background-color: #08101c;
   color: #c3b5fd;
@@ -52,6 +53,7 @@ body {
   font-size: 1.2rem;
   font-weight: bold;
   cursor: pointer;
+  z-index: 12;
 }
 
 .close-button:hover {

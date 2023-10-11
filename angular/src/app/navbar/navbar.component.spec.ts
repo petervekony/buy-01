@@ -4,7 +4,9 @@ import { AuthService } from '../service/auth.service';
 import { of } from 'rxjs';
 import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { User } from '../interfaces/user';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -13,11 +15,12 @@ describe('NavbarComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [NavbarComponent],
-      imports: [],
+      imports: [MatIconModule],
       providers: [
         {
           provide: Router,
           useValue: {
+            events: of(new NavigationEnd(0, '/home', '/home')),
             navigate: jasmine.createSpy('navigate'),
           },
         },
@@ -38,7 +41,7 @@ describe('NavbarComponent', () => {
                 email: 'taneli@taneli.com',
                 id: '123123123123123',
                 role: 'SELLER',
-              }),
+              } as User),
           },
         },
       ],

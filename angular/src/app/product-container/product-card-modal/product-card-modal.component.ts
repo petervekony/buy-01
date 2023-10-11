@@ -7,13 +7,14 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { MediaResponse } from 'src/app/interfaces/media';
+import { catchError, of, Subscription } from 'rxjs';
+// import { MediaResponse } from 'src/app/interfaces/media';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
+// import { MediaService } from 'src/app/service/media.service';
 import { ProductService } from 'src/app/service/product.service';
 
 @Component({
@@ -27,15 +28,13 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   @Input()
     dialog?: HTMLDialogElement;
   @Input()
-    thumbNail?: string | ArrayBuffer | null | undefined;
-  @Input()
     product!: Product;
   @Input()
     user?: User;
   images: string[] = [];
   subscription: Subscription = Subscription.EMPTY;
   placeholder: string = '../../assets/images/placeholder.png';
-  picture: string | ArrayBuffer | null | undefined;
+  picture: string = this.placeholder;
   formOpen = true;
   requestSent = false;
   productResult: string = '';
@@ -75,21 +74,33 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     private mediaService: MediaService,
     private formStateService: FormStateService,
     private productService: ProductService,
-  ) {
-    console.log(this.thumbNail);
-  }
+  ) {}
 
   ngOnInit(): void {
     this.subscription = this.mediaService
-      .getProductMedia(this.product.id!)
+      .getProductThumbnail(this.product.id!)
+      .pipe(catchError(() => of(null)))
       .subscribe({
-        next: (data) => {
-          this.images = this.convertImages(data);
+        next: (media) => {
+          if (media && media?.image) {
+            this.picture = 'data:' + media.mimeType + ';base64,' + media.image;
+          }
         },
-        error: (error) => {
-          console.error(error);
+        error: (err) => {
+          if (err.status === 404) return of(null);
+          return of(null);
         },
       });
+    // this.subscription = this.mediaService
+    //   .getProductMedia(this.product.id!)
+    //   .subscribe({
+    //     next: (data) => {
+    //       this.images = this.convertImages(data);
+    //     },
+    //     error: (error) => {
+    //       console.error(error);
+    //     },
+    //   });
 
     // this.formStateService.formOpen$.subscribe((isOpen) => {
     //   this.formOpen = isOpen;
@@ -97,11 +108,11 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
 
     // this.dialog?.show();
 
-    if (!this.thumbNail) {
-      this.picture = this.placeholder;
-    } else {
-      this.picture = this.thumbNail;
-    }
+    // if (!this.thumbNail) {
+    //   this.picture = this.placeholder;
+    // } else {
+    //   this.picture = this.thumbNail;
+    // }
   }
 
   hideModal() {
@@ -110,11 +121,11 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     this.confirm = false;
   }
 
-  private convertImages(data: MediaResponse): string[] {
-    return data.media.map((media) =>
-      'data' + media.mimeType + ';base64,' + media.image
-    );
-  }
+  // private convertImages(data: MediaResponse): string[] {
+  //   return data.media.map((media) =>
+  //     'data' + media.mimeType + ';base64,' + media.image
+  //   );
+  // }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
@@ -165,6 +176,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   }
 
   deleteProduct(productId: string): void {
+    console.log('here,' + productId);
     this.productService.deleteProduct(productId);
   }
 

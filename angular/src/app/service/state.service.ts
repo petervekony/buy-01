@@ -20,24 +20,27 @@ export class StateService implements OnDestroy {
   ) {
     this.cookie = this.cookieService.get('buy-01');
     console.log('stateService constructor & cookie is: ', this.cookie);
+    this.state = of({
+      name: '',
+      email: '',
+      password: '',
+      role: '',
+    } as User);
     if (!this.cookie) return;
     this.initialize();
   }
 
   initialize(): void {
-    this.cookie = this.cookieService.get('buy-01');
-    console.log('cookie: ', this.cookie);
-    // if (!this.cookie) return;
-
+    console.log('initializing...');
+    // const cookieCheck = this.authService.getAuth();
     this.subscription = this.authService.getAuth().subscribe({
       next: (user: User) => {
         this.state = of(user);
         console.log(user);
-        // this.router.navigate(['home']);
+        // this.roouter.navigate(['home']);
       },
       error: (error) => {
-        if (error.statusText !== 'OK') console.error(error);
-        this.router.navigate(['login']);
+        if (error.status !== 200) this.router.navigate(['login']);
         // this.resetState();
       },
     });

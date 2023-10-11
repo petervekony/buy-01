@@ -15,7 +15,6 @@
   justify-content: flex-end;
   z-index: 10;
   top: 100px;
-
 }
 
 .add-product {
@@ -34,17 +33,5 @@ dialog {
   margin-left: 3.5vw;
   top: calc(10vw + 100px);
   z-index: 15;
-  border: none;
-}
-
-/* dialog { */
-/*   position: absolute; */
-/*   left: 10%; */
-/*   top: 15%; */
-/*   z-index: 7; */
-/*   height: 70vh; */
-/*   width: 80vw; */
-/*   border: none; */
-/* } */
   border: none;
 }

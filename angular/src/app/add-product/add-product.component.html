@@ -3,49 +3,100 @@
   <div class="created" *ngIf="requestSent">{{ productResult }}</div>
 
   <form [formGroup]="productForm" ngSubmit="onSubmit()" (input)="onValidate()">
-    <label for="product-name" class="block text-900 font-medium mb-2">Product name</label>
-    <input id="product-name" type="text" [placeholder]="product ? product.name : 'Product name'" pInputText
-      class="w-full mb-3" name="product-name" formControlName="name" />
+    <label for="product-name" class="block text-900 font-medium mb-2"
+      >Product name</label
+    >
+    <input
+      id="product-name"
+      type="text"
+      [placeholder]="product ? product.name : 'Product name'"
+      pInputText
+      class="w-full mb-3"
+      name="product-name"
+      formControlName="name"
+    />
 
-    <label for="product-description" class="block text-900 font-medium mb-2">Description</label>
-    <textarea class="description-textarea" rows="5" maxlength="300" formControlName="description"
-      placeholder="Product description"></textarea>
+    <label for="product-description" class="block text-900 font-medium mb-2"
+      >Description</label
+    >
+    <textarea
+      class="description-textarea"
+      rows="5"
+      maxlength="300"
+      formControlName="description"
+      name="description"
+      placeholder="Product description"
+    ></textarea>
     <!-- <input id="product-description" type="text" [placeholder]="product ? product.description : 'Description'" pInputText -->
     <!--   class="w-full mb-3" name="product-description" formControlName="description" /> -->
 
-    <label for="product-price" class="block text-900 font-medium mb-2">Price</label>
-    <input id="product-price" type="text" [placeholder]="product ? product.price : 'Price'" pInputText
-      class="w-full mb-3" name="product-price" formControlName="price" />
+    <label for="product-price" class="block text-900 font-medium mb-2"
+      >Price</label
+    >
+    <input
+      id="product-price"
+      type="text"
+      [placeholder]="product ? product.price : 'Price'"
+      pInputText
+      class="w-full mb-3"
+      name="product-price"
+      formControlName="price"
+    />
 
-    <label for="product-quantity" class="block text-900 font-medium mb-2">Quantity</label>
-    <input id="product-quantity" type="text" [placeholder]="product ? product.quantity : 'Quantity'" pInputText
-      class="w-full mb-3" name="product-quantity" formControlName="quantity" />
+    <label for="product-quantity" class="block text-900 font-medium mb-2"
+      >Quantity</label
+    >
+    <input
+      id="product-quantity"
+      type="text"
+      [placeholder]="product ? product.quantity : 'Quantity'"
+      pInputText
+      class="w-full mb-3"
+      name="product-quantity"
+      formControlName="quantity"
+    />
 
     <!-- THIS IS THE OLD VERSION WITH SINGLE FILE UPLOAD: THIS USED TO WORK -->
-    <!-- <div class="flex align-items-center justify-content-between mb-6"> -->
-    <!-- <div class="upload-container"> -->
-    <!--   <label for="image" class="block text-900 font-medium mb-2">Add an image?</label> -->
-    <!--   <input #imageUpload type="file" name="image" id="upload-product-image" (change)="onFileSelected($event)" -->
-    <!--     accept="image/*" /> -->
-    <!-- </div> -->
+    <div class="flex align-items-center justify-content-between mb-6">
+      <div class="upload-container">
+        <label for="image" class="block text-900 font-medium mb-2"
+          >Add an image?</label
+        >
+        <input
+          #imageUpload
+          type="file"
+          name="image"
+          id="upload-product-image"
+          (change)="onFileSelected($event)"
+          accept="image/*"
+        />
+      </div>
+    </div>
 
     <!-- THIS IS THE NEW MULTIFILE UPLOAD PART: -->
     <!-- this takes the url straight here -->
-    <div class="card flex justify-content-center" id="file-upload">
-      <p-fileUpload name="myfile[]" url="https://localhost/api/media/product" [multiple]="true" accept="image/*"
-        [withCredentials]="true" [fileLimit]="6">
-        <!-- <ng-template pTemplate="toolbar"> -->
-        <!--   <div class="py-3">Upload 3 Files</div> -->
-        <!-- </ng-template> -->
-        <ng-template let-file pTemplate="file">
-          <div>{{ file.name }}</div>
-        </ng-template>
-        <!-- <ng-template pTemplate="content" let-files> -->
-        <!--   <div>Additional content.</div> -->
-        <!-- </ng-template> -->
-      </p-fileUpload>
-    </div>
-
+    <!-- <div class="card flex justify-content-center" id="file-upload"> -->
+    <!--   <p-fileUpload -->
+    <!--     name="myfile[]" -->
+    <!--     url="https://localhost/api/product" -->
+    <!--     [multiple]="true" -->
+    <!--     accept="image/*" -->
+    <!--     [withCredentials]="true" -->
+    <!--     [fileLimit]="6" -->
+    <!--     formControlName="images" -->
+    <!--     (onSelect)="onFileSelected($event)" -->
+    <!--   > -->
+    <!--  <ng-template pTemplate="toolbar"> -->
+    <!--  <div class="py-3">Upload 3 Files</div> -->
+    <!-- </ng-template> -->
+    <!-- <ng-template let-file pTemplate="file"> -->
+    <!--   <div>{{ file.name }}</div> -->
+    <!-- </ng-template> -->
+    <!-- <ng-template pTemplate="content" let-files> -->
+    <!--  <div>Additional content.</div> -->
+    <!--  </ng-template> -->
+    <!--   </p-fileUpload> -->
+    <!-- </div> -->
 
     <!-- <form [formGroup]="imageForm" ngSubmit="onSubmit()" (input)="onValidate()"> -->
     <button
@@ -59,5 +110,4 @@
       class="w-full"
     ></button>
   </form>
-  <!-- </form> -->
 </div>

@@ -1,22 +1,15 @@
 package com.gritlab.buy01.productservice.controller;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.gritlab.buy01.productservice.model.ProductDTO;
 import com.gritlab.buy01.productservice.model.ProductModel;
@@ -38,7 +29,6 @@ import com.gritlab.buy01.productservice.payload.response.ProductCreationResponse
 import com.gritlab.buy01.productservice.security.UserDetailsImpl;
 import com.gritlab.buy01.productservice.service.ProductService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -117,34 +107,34 @@ public class ProductController {
       productCreationResponse.setProduct(_productModel);
       productCreationResponse.setErrors(new ArrayList<>());
 
-      if (productModel.getImages() != null && !productModel.getImages().isEmpty()) {
-        String cookie = getCookieValue(request, "buy-01");
+      // if (productModel.getImages() != null && !productModel.getImages().isEmpty()) {
+      //   String cookie = getCookieValue(request, "buy-01");
 
-        for (MultipartFile image : productModel.getImages()) {
-          HttpHeaders headers = new HttpHeaders();
-          headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-          headers.add("Cookie", "buy-01=" + cookie);
+      //   for (MultipartFile image : productModel.getImages()) {
+      //     HttpHeaders headers = new HttpHeaders();
+      //     headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+      //     headers.add("Cookie", "buy-01=" + cookie);
 
-          MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-          body.add("image", new ByteArrayResource(image.getBytes()));
+      //     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+      //     body.add("image", new ByteArrayResource(image.getBytes()));
 
-          HttpEntity<MultiValueMap<String, Object>> requestEntity =
-              new HttpEntity<MultiValueMap<String, Object>>(body, headers);
+      //     HttpEntity<MultiValueMap<String, Object>> requestEntity =
+      //         new HttpEntity<MultiValueMap<String, Object>>(body, headers);
 
-          URI url =
-              UriComponentsBuilder.fromHttpUrl("http://media-service:8080/api/media")
-                  .queryParam("productId", _productModel.getId())
-                  .build()
-                  .toUri();
+      //     URI url =
+      //         UriComponentsBuilder.fromHttpUrl("http://media-service:8080/api/media")
+      //             .queryParam("productId", _productModel.getId())
+      //             .build()
+      //             .toUri();
 
-          ResponseEntity<String> mediaResponse =
-              restTemplate.postForEntity(url, requestEntity, String.class);
+      //     ResponseEntity<String> mediaResponse =
+      //         restTemplate.postForEntity(url, requestEntity, String.class);
 
-          if (!mediaResponse.getStatusCode().is2xxSuccessful()) {
-            productCreationResponse.addError("Media upload failed: " + mediaResponse.getBody());
-          }
-        }
-      }
+      //     if (!mediaResponse.getStatusCode().is2xxSuccessful()) {
+      //       productCreationResponse.addError("Media upload failed: " + mediaResponse.getBody());
+      //     }
+      //   }
+      // }
 
       return new ResponseEntity<>(productCreationResponse, HttpStatus.CREATED);
     } catch (Exception e) {
@@ -153,16 +143,16 @@ public class ProductController {
     }
   }
 
-  private String getCookieValue(HttpServletRequest request, String cookieName) {
-    if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if (cookie.getName().equals(cookieName)) {
-          return cookie.getValue();
-        }
-      }
-    }
-    return null;
-  }
+  // private String getCookieValue(HttpServletRequest request, String cookieName) {
+  //   if (request.getCookies() != null) {
+  //     for (Cookie cookie : request.getCookies()) {
+  //       if (cookie.getName().equals(cookieName)) {
+  //         return cookie.getValue();
+  //       }
+  //     }
+  //   }
+  //   return null;
+  // }
 
   @PreAuthorize("isAuthenticated()")
   @PutMapping("/products/{id}")

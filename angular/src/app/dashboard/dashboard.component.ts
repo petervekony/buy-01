@@ -5,6 +5,7 @@ import { Observable, of } from 'rxjs';
 import { Product } from '../interfaces/product';
 import { switchMap } from 'rxjs/operators';
 import { AuthService } from '../service/auth.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,6 +24,7 @@ export class DashboardComponent implements OnInit {
     private formStateService: FormStateService,
     private productService: ProductService,
     private authService: AuthService,
+    private cookieService: CookieService,
   ) {
     this.formStateService.formOpen$.subscribe((isOpen) => {
       this.showProductForm = isOpen;
@@ -30,9 +32,11 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userProducts$ = this.authService.getAuth().pipe(
-      switchMap((user) => this.productService.getProductsById(user.id)),
-    );
+    const cookie = this.cookieService.check('buy-01');
+    if (!cookie) return;
+    this.userProducts$ = this.authService
+      .getAuth()
+      .pipe(switchMap((user) => this.productService.getProductsById(user.id)));
   }
 
   manageProducts(event: MouseEvent) {
