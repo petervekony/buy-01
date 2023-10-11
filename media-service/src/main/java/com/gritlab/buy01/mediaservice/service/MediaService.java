@@ -48,8 +48,17 @@ public class MediaService {
   }
 
   public ResponseEntity<?> createMedia(MultipartFile image, String userId, String productId) {
+    ErrorMessage errorMessage;
+    Optional<List<Media>> productMedia = mediaRepository.findAllByProductId(productId);
+    if (productMedia.isPresent() && productMedia.get().size() >= 6) {
+      errorMessage =
+          new ErrorMessage(
+              "Error: product has maximum number of media already",
+              HttpStatus.UNPROCESSABLE_ENTITY.toString());
+      return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
     if (image.getSize() > 2 * 1024 * 1024) {
-      ErrorMessage errorMessage =
+      errorMessage =
           new ErrorMessage(
               "Error: too large file. Maximum filesize 2MB",
               HttpStatus.PAYLOAD_TOO_LARGE.toString());
