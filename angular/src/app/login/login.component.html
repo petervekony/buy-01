@@ -16,6 +16,9 @@
         <label for="login-password" class="block text-900 font-medium mb-2">Password</label>
         <input id="login-password" autocomplete="current-password" type="password" placeholder="Password" pInputText
           class="w-full mb-3" name="password" formControlName="password">
+        <div class="error-message" *ngIf="error">
+          <p>{{ error }} </p>
+        </div>
 
         <div class="flex align-items-center justify-content-between mb-6"></div>
 

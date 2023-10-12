@@ -17,6 +17,7 @@ export class LoginComponent implements OnDestroy {
   formValid: boolean = false;
   subscription: Subscription;
   user: User | undefined;
+  error: string | null = null;
 
   constructor(
     private router: Router,
@@ -58,12 +59,13 @@ export class LoginComponent implements OnDestroy {
     const request: LoginRequest = this.loginForm.value;
     this.subscription = this.userService.sendLoginRequest(request).subscribe({
       next: (data) => {
-        console.log('login response:\n', data);
         const navigationExtras: NavigationExtras = { state: { data: data } };
         this.stateService.refreshState(data.jwtToken!, data);
         this.router.navigate(['home'], navigationExtras);
       },
-      error: (data) => console.log(data),
+      error: (data) => {
+        this.error = data.error.message;
+      },
     });
   }
 

@@ -63,16 +63,17 @@ public class MediaService {
               "Error: too large file. Maximum filesize 2MB", HttpStatus.PAYLOAD_TOO_LARGE.value());
       return new ResponseEntity<>(errorMessage, HttpStatus.PAYLOAD_TOO_LARGE);
     }
+    Media media;
     try {
       byte[] bytes = image.getBytes();
       String contentType = image.getContentType();
-      Media media = new Media(new Binary(bytes), productId, userId);
+      media = new Media(new Binary(bytes), productId, userId);
       media.setMimeType(contentType);
       mediaRepository.save(media);
     } catch (IOException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(media, HttpStatus.CREATED);
   }
 
   public void deleteAllUserAvatars(String userId) {

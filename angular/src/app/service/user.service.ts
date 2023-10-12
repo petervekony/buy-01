@@ -35,6 +35,11 @@ export class UserService {
     return this.http.get<User[]>(address, { withCredentials: true });
   }
 
+  getOwnerInfo(id: string): Observable<User> {
+    const address = environment.usersURL + '/' + id;
+    return this.http.get<User>(address, { withCredentials: true });
+  }
+
   logout() {
     const address = environment.logoutURL;
     this.http.post(address, { withCredentials: true }).subscribe({

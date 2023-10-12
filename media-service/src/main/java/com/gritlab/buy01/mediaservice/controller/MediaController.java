@@ -56,6 +56,10 @@ public class MediaController {
   }
 
   @PreAuthorize("isAuthenticated()")
+  @GetMapping("/")
+  public ResponseEntity<?> getUserAvatar()
+
+  @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/media")
   public ResponseEntity<?> deleteById(@RequestParam String userId, @RequestParam String productId) {
     return mediaService.deleteMediaById(userId, productId);

@@ -16,6 +16,7 @@ import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
 // import { MediaService } from 'src/app/service/media.service';
 import { ProductService } from 'src/app/service/product.service';
+import { UserService } from 'src/app/service/user.service';
 
 @Component({
   selector: 'app-product-card-modal',
@@ -33,6 +34,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     user?: User;
   images: string[] = [];
   subscription: Subscription = Subscription.EMPTY;
+  ownerSubscription: Subscription = Subscription.EMPTY;
   placeholder: string = '../../assets/images/placeholder.png';
   picture: string = this.placeholder;
   formOpen = true;
@@ -43,6 +45,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   fileSelected: File | null = null;
   success = false;
   confirm = false;
+  owner: User = {} as User;
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -74,6 +77,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     private mediaService: MediaService,
     private formStateService: FormStateService,
     private productService: ProductService,
+    private userService: UserService,
   ) {}
 
   ngOnInit(): void {
@@ -91,6 +95,18 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
           return of(null);
         },
       });
+
+    this.ownerSubscription = this.userService.getOwnerInfo(this.product.userId!)
+      .subscribe({
+        next: (user) => {
+          this.owner = user;
+          console.log(user);
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+
     // this.subscription = this.mediaService
     //   .getProductMedia(this.product.id!)
     //   .subscribe({
@@ -129,6 +145,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.ownerSubscription.unsubscribe();
   }
 
   onValidate() {

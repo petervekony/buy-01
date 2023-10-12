@@ -27,7 +27,9 @@ export class DashboardComponent implements OnInit {
     private cookieService: CookieService,
   ) {
     this.formStateService.formOpen$.subscribe((isOpen) => {
-      this.showProductForm = isOpen;
+      if (!isOpen) {
+        this.showProductForm = false;
+      }
     });
   }
 
@@ -40,15 +42,15 @@ export class DashboardComponent implements OnInit {
   }
 
   manageProducts(event: MouseEvent) {
-    this.formStateService.setFormOpen(true);
+    this.showProductForm = true;
     if (this.productDialog) {
       this.productDialog.nativeElement.show();
     }
     event.preventDefault();
   }
 
-  openProfileForm(event: MouseEvent) {
-    console.log('yeah, open the modal');
-    event.preventDefault();
-  }
+  // openProfileForm(event: MouseEvent) {
+  //   console.log('yeah, open the modal');
+  //   event.preventDefault();
+  // }
 }

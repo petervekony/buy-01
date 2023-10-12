@@ -12,6 +12,7 @@ import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
 import { AuthService } from 'src/app/service/auth.service';
+import { FormStateService } from 'src/app/service/form-state.service';
 
 // import { combineLatest, map, Subscription } from 'rxjs';
 // import { ProductService } from '../service/product.service';
@@ -39,6 +40,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   constructor(
     private mediaService: MediaService,
     private authservice: AuthService,
+    private formStateService: FormStateService,
   ) {} // private productService: ProductService, // private userService: UserService,
   // private mediaService: MediaService,
   // this.subscription = combineLatest([
@@ -109,6 +111,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
 
   showModal() {
     if (this.productModal) {
+      this.formStateService.setFormOpen(true);
       this.productModal.nativeElement.show();
       this.modalVisible = true;
     }
@@ -116,6 +119,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
 
   hideModal() {
     if (this.productModal) {
+      this.formStateService.setFormOpen(false);
       this.productModal.nativeElement.close();
       this.modalVisible = false;
     }

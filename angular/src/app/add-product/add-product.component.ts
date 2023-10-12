@@ -4,6 +4,7 @@ import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
 import { FormStateService } from '../service/form-state.service';
 import { Product } from '../interfaces/product';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-add-product',
@@ -32,6 +33,7 @@ export class AddProductComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private formStateService: FormStateService,
+    private location: Location,
   ) {}
 
   ngOnInit(): void {
@@ -95,6 +97,10 @@ export class AddProductComponent implements OnInit {
     this.formValid = this.productForm.valid;
   }
 
+  refresh() {
+    this.location.go(this.location.path());
+  }
+
   // submitImage() {}
 
   submitProduct() {
@@ -135,5 +141,6 @@ export class AddProductComponent implements OnInit {
   closeModal() {
     this.formStateService.setFormOpen(false);
     this.modalRef?.close();
+    this.refresh();
   }
 }

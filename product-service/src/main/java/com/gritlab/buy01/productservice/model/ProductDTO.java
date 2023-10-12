@@ -18,9 +18,9 @@ public class ProductDTO {
   @NotNull
   @Size(min = 3, max = 50, message = "Name has to be between 3 and 50 characters long")
   private String name;
-  
+
   @NotNull
-  @Size(min = 3, max = 150, message = "Description has to be between 3 and 150 characters long")
+  @Size(min = 3, max = 300, message = "Description has to be between 3 and 300 characters long")
   private String description;
 
   @NotNull
@@ -35,7 +35,8 @@ public class ProductDTO {
 
   private List<MultipartFile> images;
 
-  public ProductDTO(String name, String description, Double price, Integer quantity, String userId) {
+  public ProductDTO(
+      String name, String description, Double price, Integer quantity, String userId) {
     this.name = name;
     this.description = description;
     this.price = price;

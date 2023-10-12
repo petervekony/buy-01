@@ -56,6 +56,10 @@ body {
   z-index: 12;
 }
 
+.blur-filter {
+  filter: blur(10px), brightness(0.7);
+}
+
 .close-button:hover {
   box-shadow: 0 0 5px #c3b5fd;
   transform: scale(1.1);

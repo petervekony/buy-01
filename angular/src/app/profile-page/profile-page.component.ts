@@ -1,4 +1,10 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { User } from '../interfaces/user';
 // import { UserService } from '../service/user.service';
 // import { StateService } from '../service/state.service';
@@ -11,50 +17,48 @@ import {
   Validators,
 } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { Subject } from 'rxjs';
+import { of, Subject, Subscription } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../service/user.service';
-import { UserUpdateRequest } from '../interfaces/user-update-request';
+import { MediaService } from '../service/media.service';
+import { StateService } from '../service/state.service';
+
+// import { UserUpdateRequest } from '../interfaces/user-update-request';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.css'],
 })
-export class ProfilePageComponent {
+export class ProfilePageComponent implements OnInit, OnDestroy {
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
   @ViewChild('profile')
     profile: ElementRef | undefined;
+  @ViewChild('avatarForm')
+    avaterForm: ElementRef | undefined;
   placeholder: string = '../../assets/images/placeholder.png';
   user$ = new Subject<User>();
   currentUser: User = {} as User;
   formOpen = false;
   formValid = false;
   buttonClicked = false;
+  avatarFormOpen = false;
+  profileFormOpen = false;
+  filename: string = '';
+  fileSelected: File | null = null;
+  avatarSubscription: Subscription = Subscription.EMPTY;
+  avatar: string = this.placeholder;
 
   constructor(
     private authService: AuthService,
     private formStateService: FormStateService, // private renderer: Renderer2,
     private cookieService: CookieService,
     private userService: UserService,
+    private mediaService: MediaService,
+    private stateService: StateService,
   ) {
-    const cookie = this.cookieService.get('buy-01');
-    if (!cookie) return;
-    this.authService.getAuth().subscribe({
-      next: (user) => {
-        this.user$.next(user);
-        this.currentUser = user;
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
-    this.formValid = true;
-    this.formStateService.formOpen$.subscribe((isOpen) => {
-      this.formOpen = isOpen;
-    });
     //TODO: fix if clicked outside form, close form!
     // this.renderer.listen('window', 'click', (e: Event) => {
     //   if (
@@ -68,6 +72,78 @@ export class ProfilePageComponent {
     //     }
     //   }
     // });
+  }
+  ngOnInit(): void {
+    const cookie = this.cookieService.get('buy-01');
+    if (!cookie) return;
+    this.authService.getAuth().subscribe({
+      next: (user) => {
+        this.user$.next(user);
+        this.currentUser = user;
+        if (user.avatar) {
+          this.avatarSubscription = this.mediaService.getAvatar(
+            this.currentUser.id,
+          )
+            .subscribe({
+              next: (media) => {
+                if (media && media?.image) {
+                  this.avatar = 'data:' + media.mimeType + ';base64,' +
+                    media.image;
+                }
+              },
+              error: (err) => {
+                console.log(err);
+              },
+            });
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+    this.formValid = true;
+    this.formStateService.formOpen$.subscribe((isOpen) => {
+      this.formOpen = isOpen;
+    });
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files?.length > 0) {
+      this.filename = input.files[0].name;
+      this.fileSelected = input.files[0];
+      console.log(this.fileSelected.toString());
+      // this.imageUpload!.nativeElement.value = this.filename;
+    } else {
+      this.fileSelected = null;
+      // this.imageUpload!.nativeElement.value = '';
+    }
+  }
+
+  submitAvatar() {
+    let mediaData: FormData | null = null;
+    if (this.fileSelected) {
+      mediaData = new FormData();
+      mediaData.append(
+        'image',
+        this.fileToBlob(this.fileSelected!),
+        this.filename as string,
+      );
+    }
+    this.mediaService.uploadAvatar(this.currentUser.id, mediaData!).subscribe({
+      next: (data) => {
+        this.currentUser.avatar = data.id;
+        this.stateService.state = of(this.currentUser);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
+  }
+
+  fileToBlob(file: File): Blob {
+    const blob = new Blob([file], { type: file.type });
+    return blob;
   }
 
   private passwordValidator(): ValidatorFn {
@@ -122,9 +198,15 @@ export class ProfilePageComponent {
     confirmPassword: new FormControl(null, [this.passwordValidator()]),
   });
 
-  openForm() {
-    this.buttonClicked = true;
-    this.formStateService.setFormOpen(true);
+  openForm(type: string) {
+    if (type === 'profile') {
+      this.profileFormOpen = true;
+      this.buttonClicked = true;
+      this.formStateService.setFormOpen(true);
+    } else if (type === 'avatar') {
+      this.avatarFormOpen = true;
+      this.formStateService.setFormOpen(true);
+    }
   }
 
   onValidate() {
@@ -146,5 +228,7 @@ export class ProfilePageComponent {
       },
     });
     this.formOpen = false;
+  }
+  ngOnDestroy(): void {
   }
 }
