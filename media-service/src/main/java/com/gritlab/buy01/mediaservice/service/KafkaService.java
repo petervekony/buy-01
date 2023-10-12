@@ -12,6 +12,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.mediaservice.kafka.message.ProductMediaDeleteMessage;
+import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipRequest;
+import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationResponse;
 import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarDeleteMessage;
@@ -23,10 +25,15 @@ public class KafkaService {
   private static final String TOPIC_RESPONSE = "token-validation-response";
   @Autowired private KafkaTemplate<String, TokenValidationRequest> kafkaTemplate;
 
+  @Autowired private KafkaTemplate<String, ProductOwnershipRequest> productOwnerShipKafkaTemplate;
+
   @Autowired private MediaService mediaService;
 
   private ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> responseQueues =
       new ConcurrentHashMap<>();
+
+  private ConcurrentMap<String, BlockingQueue<ProductOwnershipResponse>>
+      productOwnershipResponseQueues = new ConcurrentHashMap<>();
 
   public TokenValidationResponse validateTokenWithUserMicroservice(TokenValidationRequest request) {
     BlockingQueue<TokenValidationResponse> queue = new ArrayBlockingQueue<>(1);
@@ -72,5 +79,45 @@ public class KafkaService {
       containerFactory = "kafkaProductMediaDeletionContainerFactory")
   public void deleteProductMedia(ProductMediaDeleteMessage request) {
     mediaService.deleteAllProductMedia(request.getProductId());
+  }
+
+  public void sendProductOwnershipRequest(String productId, String userId) {
+    ProductOwnershipRequest request = new ProductOwnershipRequest(productId, userId);
+    productOwnerShipKafkaTemplate.send("product-ownership-requests", request);
+  }
+
+  @KafkaListener(
+      topics = "product-ownership-responses",
+      groupId = "media-service-group",
+      containerFactory = "kafkaProductOwnershipResponseListenerContainerFactory")
+  public void handleProductOwnershipResponse(ProductOwnershipResponse response) {
+    // Retrieve the queue using correlation ID from the response
+    BlockingQueue<ProductOwnershipResponse> queue =
+        productOwnershipResponseQueues.get(response.getCorrelationId());
+
+    if (queue != null) {
+      queue.offer(response); // Place the response into the queue
+    }
+  }
+
+  public ProductOwnershipResponse sendProductOwnershipRequestAndWaitForResponse(
+      ProductOwnershipRequest request) {
+    BlockingQueue<ProductOwnershipResponse> responseQueue = new ArrayBlockingQueue<>(1);
+
+    String correlationId = request.getCorrelationId();
+
+    productOwnershipResponseQueues.put(correlationId, responseQueue);
+
+    productOwnerShipKafkaTemplate.send("product-ownership-requests", request);
+
+    try {
+      ProductOwnershipResponse response = responseQueue.poll(5, TimeUnit.SECONDS);
+      return response;
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+      return null;
+    } finally {
+      productOwnershipResponseQueues.remove(correlationId);
+    }
   }
 }

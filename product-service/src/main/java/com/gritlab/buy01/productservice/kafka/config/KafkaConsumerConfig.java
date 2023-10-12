@@ -14,6 +14,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
+import com.gritlab.buy01.productservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationResponse;
 import com.gritlab.buy01.productservice.kafka.message.UserProfileDeleteMessage;
 
@@ -72,6 +73,27 @@ public class KafkaConsumerConfig {
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(userProductDeletionConsumerFactory());
     factory.setConcurrency(3);
+    return factory;
+  }
+
+  @Bean
+  public ConsumerFactory<String, ProductOwnershipRequest> productOwnershipRequestConsumerFactory() {
+    Map<String, Object> configs = consumerConfigs();
+    configs.put(ConsumerConfig.GROUP_ID_CONFIG, "product-ownership-request-group");
+    JsonDeserializer<ProductOwnershipRequest> deserializer =
+        new JsonDeserializer<>(ProductOwnershipRequest.class);
+    deserializer.setUseTypeHeaders(false); // adjust as per your requirements
+
+    return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
+  }
+
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, ProductOwnershipRequest>
+      kafkaProductOwnershipRequestListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, ProductOwnershipRequest> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(productOwnershipRequestConsumerFactory());
+    factory.setConcurrency(3); // adjust as per your requirements
     return factory;
   }
 }

@@ -20,9 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipRequest;
+import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.mediaservice.model.Media;
 import com.gritlab.buy01.mediaservice.payload.response.MediaResponse;
 import com.gritlab.buy01.mediaservice.security.UserDetailsImpl;
+import com.gritlab.buy01.mediaservice.service.KafkaService;
 import com.gritlab.buy01.mediaservice.service.MediaService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +37,8 @@ public class MediaController {
   @Autowired MediaService mediaService;
 
   @Autowired RestTemplate restTemplate;
+
+  @Autowired KafkaService kafkaService;
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/media/{id}")
@@ -76,24 +81,21 @@ public class MediaController {
       }
 
       if (productId != null) {
-        // String cookie = getCookieValue(request, "buy-01");
-        // HttpHeaders headers = new HttpHeaders();
-        // headers.add("Cookie", "buy-01=" + cookie);
 
-        // URI uri = URI.create("http://product-service:8080/api/product/" + productId);
+        ProductOwnershipRequest ownershipRequest =
+            new ProductOwnershipRequest(productId, userDetails.getId());
+        System.out.println("ownershipRequest: " + ownershipRequest);
+        ProductOwnershipResponse ownershipResponse =
+            kafkaService.sendProductOwnershipRequestAndWaitForResponse(ownershipRequest);
 
-        // ResponseEntity<Product> response =
-        //     restTemplate.exchange(uri, HttpMethod.GET, new HttpEntity<>(headers), Product.class);
+        System.out.println("ownershipResponse: " + ownershipResponse);
 
-        // if (!response.getStatusCode().is2xxSuccessful()) {
-        //   return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        // }
+        if (!ownershipResponse.isOwner()) {
+          System.out.println("ownership declined for some reason");
+          return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
-        // Product product = response.getBody();
-
-        // if (product.getUserId().equals(userDetails.getId())) {
         return mediaService.createMedia(image, userId, productId);
-        // }
       }
 
       if (userId != null) {
@@ -109,17 +111,6 @@ public class MediaController {
 
     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
   }
-
-  // private String getCookieValue(HttpServletRequest request, String cookieName) {
-  //   if (request.getCookies() != null) {
-  //     for (Cookie cookie : request.getCookies()) {
-  //       if (cookie.getName().equals(cookieName)) {
-  //         return cookie.getValue();
-  //       }
-  //     }
-  //   }
-  //   return null;
-  // }
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/media/product/{productId}")

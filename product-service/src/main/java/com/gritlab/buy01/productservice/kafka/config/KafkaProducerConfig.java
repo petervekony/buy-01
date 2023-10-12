@@ -14,6 +14,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.gritlab.buy01.productservice.kafka.message.ProductMediaDeleteMessage;
+import com.gritlab.buy01.productservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
 
 @Configuration
@@ -53,5 +54,16 @@ public class KafkaProducerConfig {
   @Bean(name = "productMediaDeleteMessageKafkaTemplate")
   public KafkaTemplate<String, ProductMediaDeleteMessage> productMediaDeleteMessageKafkaTemplate() {
     return new KafkaTemplate<>(producerFactoryForProductMediaDelete());
+  }
+
+  @Bean
+  public ProducerFactory<String, ProductOwnershipResponse>
+      producerFactoryForProductOwnershipResponse() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
+
+  @Bean(name = "productOwnershipResponseKafkaTemplate")
+  public KafkaTemplate<String, ProductOwnershipResponse> productOwnershipResponseKafkaTemplate() {
+    return new KafkaTemplate<>(producerFactoryForProductOwnershipResponse());
   }
 }

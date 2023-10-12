@@ -18,8 +18,10 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.gritlab.buy01.productservice.event.ProductOwnershipValidationEvent;
 import com.gritlab.buy01.productservice.event.UserProductsDeletionEvent;
 import com.gritlab.buy01.productservice.kafka.message.ProductMediaDeleteMessage;
+import com.gritlab.buy01.productservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationResponse;
 import com.gritlab.buy01.productservice.kafka.message.UserProfileDeleteMessage;
@@ -101,5 +103,15 @@ public class KafkaService {
     productMediaDeleteMessageKafkaTemplate.send("product-media-deletion", message);
 
     processedCorrelationIds.add(correlationId);
+  }
+
+  @KafkaListener(
+      topics = "product-ownership-requests",
+      groupId = "product-ownership-request-group",
+      containerFactory = "kafkaProductOwnershipRequestListenerContainerFactory")
+  public void validateOwnership(ProductOwnershipRequest request) {
+    eventPublisher.publishEvent(
+        new ProductOwnershipValidationEvent(
+            this, request.getProductId(), request.getUserId(), request.getCorrelationId()));
   }
 }
