@@ -12,9 +12,6 @@ export class AuthService {
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
   getAuth(): Observable<User> {
-    console.log('authservice cookie:', this.cookieService.check('buy-01'));
-    // const cookie = this.cookieService.get('buy-01');
-    // if (!cookie) return null;
     const address = environment.authCheckURL;
     return this.http.get<User>(address, { withCredentials: true });
   }

@@ -19,7 +19,6 @@ export class StateService implements OnDestroy {
     private router: Router,
   ) {
     this.cookie = this.cookieService.get('buy-01');
-    console.log('stateService constructor & cookie is: ', this.cookie);
     this.state = of({
       name: '',
       email: '',
@@ -31,12 +30,11 @@ export class StateService implements OnDestroy {
   }
 
   initialize(): void {
-    console.log('initializing...');
     // const cookieCheck = this.authService.getAuth();
     this.subscription = this.authService.getAuth().subscribe({
       next: (user: User) => {
         this.state = of(user);
-        console.log(user);
+        // console.log(user);
         // this.roouter.navigate(['home']);
       },
       error: (error) => {

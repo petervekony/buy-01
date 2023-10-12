@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { StateService } from '../service/state.service';
+// import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
 import { AuthService } from '../service/auth.service';
 // import { User } from '../interfaces/user';
@@ -8,7 +8,7 @@ import { AuthService } from '../service/auth.service';
 
 export const authGuard: CanActivateFn = (route) => {
   const authService = inject(AuthService);
-  const stateService = inject(StateService);
+  // const stateService = inject(StateService);
   // const path = route.url.toString();
   const path = route.routeConfig?.path;
   // const currentUser$: Subject<User> | undefined = new Subject<User>();
@@ -24,10 +24,8 @@ export const authGuard: CanActivateFn = (route) => {
   // });
 
   // stateService.initialize();
-  console.log(stateService.state);
   authService.getAuth().subscribe({
     next: (user: User) => {
-      console.log('authguard', user);
       switch (path) {
       case 'register':
       case 'login': {

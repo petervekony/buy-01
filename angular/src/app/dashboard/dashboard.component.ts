@@ -34,8 +34,16 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.productService.productAdded$.subscribe(() => {
+      this.getOwnerProducts();
+    });
+    this.formStateService.setFormOpen(false);
     const cookie = this.cookieService.check('buy-01');
     if (!cookie) return;
+    this.getOwnerProducts();
+  }
+
+  private getOwnerProducts() {
     this.userProducts$ = this.authService
       .getAuth()
       .pipe(switchMap((user) => this.productService.getProductsById(user.id)));

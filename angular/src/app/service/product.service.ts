@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, Subject } from 'rxjs';
 import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 import { ProductCreationResponse } from '../interfaces/product-creation-response';
@@ -11,6 +11,9 @@ import { ProductCreationResponse } from '../interfaces/product-creation-response
   providedIn: 'root',
 })
 export class ProductService {
+  private productAddedSource = new Subject<void>();
+  productAdded$ = this.productAddedSource.asObservable();
+
   constructor(private http: HttpClient) {}
 
   getProducts(): Observable<Product[]> {
@@ -57,6 +60,7 @@ export class ProductService {
             mediaForm.append('name', '');
             return true;
           }
+          this.productAddedSource.next();
           return true;
         }),
         catchError((error) => {

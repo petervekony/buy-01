@@ -55,9 +55,9 @@ public class MediaController {
     return new ResponseEntity<>(mediaResponse, HttpStatus.OK);
   }
 
-  @PreAuthorize("isAuthenticated()")
-  @GetMapping("/")
-  public ResponseEntity<?> getUserAvatar()
+  // @PreAuthorize("isAuthenticated()")
+  // @GetMapping("/")
+  // public ResponseEntity<?> getUserAvatar()
 
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/media")

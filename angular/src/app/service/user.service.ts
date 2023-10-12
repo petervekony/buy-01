@@ -18,8 +18,7 @@ export class UserService {
     return this.http.post<User>(address, request, { withCredentials: true });
   }
 
-  //eslint-disable-next-line
-  sendSignupRequest(request: SignupRequest): Observable<any> {
+  sendSignupRequest(request: SignupRequest): Observable<User> {
     console.log('sendSignupRequest: ', request);
     const address = environment.signupURL;
     return this.http.post<User>(address, request, { withCredentials: true });
@@ -42,11 +41,7 @@ export class UserService {
 
   logout() {
     const address = environment.logoutURL;
-    this.http.post(address, { withCredentials: true }).subscribe({
-      error: (error) => {
-        console.error('ERROR: ', error);
-      },
-    });
+    this.http.post(address, { withCredentials: true });
   }
 
   updateUser(request: UserUpdateRequest, id: string) {
