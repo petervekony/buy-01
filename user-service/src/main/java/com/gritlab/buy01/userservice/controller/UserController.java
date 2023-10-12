@@ -68,16 +68,6 @@ public class UserController {
       return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    // TODO: user update role might not need to be implemented
-    /*
-    if (principalData.isAdmin() && !Objects.isNull(userUpdateRequest.getRole())) {
-        Optional<User> promotedUser = userService.updateUserRole(id, userUpdateRequest.getRole());
-        if (promotedUser.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-    */
-
     return userService.updateUser(id, userUpdateRequest, isSelf);
   }
 
