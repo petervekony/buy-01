@@ -58,12 +58,18 @@ public class ProductController {
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/products/{id}")
-  public ResponseEntity<ProductModel> getProductById(@PathVariable("id") String id) {
+  public ResponseEntity<?> getProductById(@PathVariable("id") String id) {
     Optional<ProductModel> productData = productService.getProductById(id);
 
-    return productData
-        .map(productModel -> new ResponseEntity<>(productModel, HttpStatus.OK))
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    if (productData.isPresent()) {
+      return new ResponseEntity<>(productData.get(), HttpStatus.OK);
+    } else {
+      ErrorMessage error =
+          new ErrorMessage(
+              HttpStatus.NOT_FOUND.value(),
+              String.format("Product by id %s couldn't be found", id));
+      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
   }
 
   @PreAuthorize("isAuthenticated()")
@@ -92,7 +98,7 @@ public class ProductController {
             && !userDetails.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SELLER"))) {
           ErrorMessage errorMessage =
               new ErrorMessage(
-                  HttpStatus.FORBIDDEN.toString(),
+                  HttpStatus.FORBIDDEN.value(),
                   "Error: only admins and sellers can create products.");
           return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
         }
@@ -107,53 +113,12 @@ public class ProductController {
       productCreationResponse.setProduct(_productModel);
       productCreationResponse.setErrors(new ArrayList<>());
 
-      // TODO: figure out if this works, if not, delete these lines
-      // if (productModel.getImages() != null && !productModel.getImages().isEmpty()) {
-      //   String cookie = getCookieValue(request, "buy-01");
-
-      //   for (MultipartFile image : productModel.getImages()) {
-      //     HttpHeaders headers = new HttpHeaders();
-      //     headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-      //     headers.add("Cookie", "buy-01=" + cookie);
-
-      //     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-      //     body.add("image", new ByteArrayResource(image.getBytes()));
-
-      //     HttpEntity<MultiValueMap<String, Object>> requestEntity =
-      //         new HttpEntity<MultiValueMap<String, Object>>(body, headers);
-
-      //     URI url =
-      //         UriComponentsBuilder.fromHttpUrl("http://media-service:8080/api/media")
-      //             .queryParam("productId", _productModel.getId())
-      //             .build()
-      //             .toUri();
-
-      //     ResponseEntity<String> mediaResponse =
-      //         restTemplate.postForEntity(url, requestEntity, String.class);
-
-      //     if (!mediaResponse.getStatusCode().is2xxSuccessful()) {
-      //       productCreationResponse.addError("Media upload failed: " + mediaResponse.getBody());
-      //     }
-      //   }
-      // }
-
       return new ResponseEntity<>(productCreationResponse, HttpStatus.CREATED);
     } catch (Exception e) {
       System.out.println(e.toString());
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
-  // private String getCookieValue(HttpServletRequest request, String cookieName) {
-  //   if (request.getCookies() != null) {
-  //     for (Cookie cookie : request.getCookies()) {
-  //       if (cookie.getName().equals(cookieName)) {
-  //         return cookie.getValue();
-  //       }
-  //     }
-  //   }
-  //   return null;
-  // }
 
   @PreAuthorize("isAuthenticated()")
   @PutMapping("/products/{id}")
@@ -162,7 +127,8 @@ public class ProductController {
     try {
       Optional<ProductModel> existingProduct = productService.getProductById(id);
       if (existingProduct.isEmpty()) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        ErrorMessage error = new ErrorMessage(HttpStatus.NOT_FOUND.value(), "Product not found");
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
       }
       ProductModel productToUpdate = existingProduct.get();
       Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -177,7 +143,7 @@ public class ProductController {
             && !userId.equals(productToUpdate.getUserId())) {
           ErrorMessage errorMessage =
               new ErrorMessage(
-                  HttpStatus.FORBIDDEN.toString(),
+                  HttpStatus.FORBIDDEN.value(),
                   "Error: only admins and the owner can update a product.");
           return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
         }
@@ -187,9 +153,13 @@ public class ProductController {
 
       Optional<ProductModel> updatedProduct = productService.updateProduct(id, productModel);
 
-      return updatedProduct
-          .map(product -> new ResponseEntity<>(product, HttpStatus.OK))
-          .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+      if (updatedProduct.isPresent()) {
+        return new ResponseEntity<>(updatedProduct.get(), HttpStatus.OK);
+      } else {
+        ErrorMessage error =
+            new ErrorMessage(HttpStatus.NOT_FOUND.value(), "Product update failed.");
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+      }
     } catch (Exception e) {
       System.out.println(e);
       return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -202,7 +172,8 @@ public class ProductController {
     try {
       Optional<ProductModel> product = productService.getProductById(id);
       if (product.isEmpty()) {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        ErrorMessage error = new ErrorMessage(HttpStatus.NOT_FOUND.value(), "Product not found");
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
       }
       ProductModel productToDelete = product.get();
 
@@ -218,7 +189,7 @@ public class ProductController {
             && !userId.equals(productToDelete.getUserId())) {
           ErrorMessage errorMessage =
               new ErrorMessage(
-                  HttpStatus.FORBIDDEN.toString(),
+                  HttpStatus.FORBIDDEN.value(),
                   "Error: only admins and the owner can delete a product.");
           return new ResponseEntity<>(errorMessage, HttpStatus.FORBIDDEN);
         }

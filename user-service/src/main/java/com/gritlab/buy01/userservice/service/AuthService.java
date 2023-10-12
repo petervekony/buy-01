@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.userservice.model.User;
+import com.gritlab.buy01.userservice.model.enums.Role;
 import com.gritlab.buy01.userservice.payload.request.LoginRequest;
 import com.gritlab.buy01.userservice.payload.request.SignupRequest;
 import com.gritlab.buy01.userservice.payload.response.ErrorMessage;
@@ -86,6 +87,12 @@ public class AuthService {
   }
 
   public ResponseEntity<?> registerUser(SignupRequest signupRequest) {
+    if (!(signupRequest.getRole().equals(Role.CLIENT)
+        || signupRequest.getRole().equals(Role.SELLER))) {
+      ErrorMessage error =
+          new ErrorMessage("Invalid role in signup request", HttpStatus.BAD_REQUEST.value());
+      return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
     if (userRepository.existsByName(signupRequest.getName())) {
       ErrorMessage error =
           new ErrorMessage("Username is already taken", HttpStatus.BAD_REQUEST.value());

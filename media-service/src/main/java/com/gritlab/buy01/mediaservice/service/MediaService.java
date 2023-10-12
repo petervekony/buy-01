@@ -29,7 +29,7 @@ public class MediaService {
 
   public ResponseEntity<?> deleteMediaById(String userId, String productId) {
     ErrorMessage errorMessage =
-        new ErrorMessage("Error: media not found", HttpStatus.NOT_FOUND.toString());
+        new ErrorMessage("Error: media not found", HttpStatus.NOT_FOUND.value());
     if (userId != null) {
       if (!mediaRepository.findByUserId(userId).isEmpty()) {
         return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
@@ -54,26 +54,22 @@ public class MediaService {
       errorMessage =
           new ErrorMessage(
               "Error: product has maximum number of media already",
-              HttpStatus.UNPROCESSABLE_ENTITY.toString());
+              HttpStatus.UNPROCESSABLE_ENTITY.value());
       return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
     }
     if (image.getSize() > 2 * 1024 * 1024) {
       errorMessage =
           new ErrorMessage(
-              "Error: too large file. Maximum filesize 2MB",
-              HttpStatus.PAYLOAD_TOO_LARGE.toString());
+              "Error: too large file. Maximum filesize 2MB", HttpStatus.PAYLOAD_TOO_LARGE.value());
       return new ResponseEntity<>(errorMessage, HttpStatus.PAYLOAD_TOO_LARGE);
     }
     try {
       byte[] bytes = image.getBytes();
       String contentType = image.getContentType();
-      System.out.println("MEDIATYPE: !!!!!!!!!!!!!!!!!!!!!!!!!!! " + contentType);
       Media media = new Media(new Binary(bytes), productId, userId);
       media.setMimeType(contentType);
       mediaRepository.save(media);
     } catch (IOException e) {
-      System.out.println("THIS IS MESSAGE" + e.getMessage());
-      System.out.println("THIS IS CAUSE" + e.getCause());
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return new ResponseEntity<>(HttpStatus.CREATED);

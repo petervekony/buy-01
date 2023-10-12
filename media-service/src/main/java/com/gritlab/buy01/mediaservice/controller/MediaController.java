@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.mediaservice.model.Media;
+import com.gritlab.buy01.mediaservice.payload.response.ErrorMessage;
 import com.gritlab.buy01.mediaservice.payload.response.MediaResponse;
 import com.gritlab.buy01.mediaservice.security.UserDetailsImpl;
 import com.gritlab.buy01.mediaservice.service.KafkaService;
@@ -46,7 +47,7 @@ public class MediaController {
       @PathVariable("productId") String productId) {
     Optional<List<Media>> media = mediaService.getAllMediaByProductId(productId);
     if (media.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     MediaResponse mediaResponse = new MediaResponse();
     mediaResponse.setProductId(productId);
@@ -84,15 +85,14 @@ public class MediaController {
 
         ProductOwnershipRequest ownershipRequest =
             new ProductOwnershipRequest(productId, userDetails.getId());
-        System.out.println("ownershipRequest: " + ownershipRequest);
         ProductOwnershipResponse ownershipResponse =
             kafkaService.sendProductOwnershipRequestAndWaitForResponse(ownershipRequest);
 
-        System.out.println("ownershipResponse: " + ownershipResponse);
-
         if (!ownershipResponse.isOwner()) {
-          System.out.println("ownership declined for some reason");
-          return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+          ErrorMessage error =
+              new ErrorMessage(
+                  "Media can only be added to your own products", HttpStatus.FORBIDDEN.value());
+          return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
         }
 
         return mediaService.createMedia(image, userId, productId);
@@ -100,13 +100,19 @@ public class MediaController {
 
       if (userId != null) {
         if (!userDetails.getId().equals(userId)) {
-          return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+          ErrorMessage error =
+              new ErrorMessage(
+                  "You can only upload avatar to your user profile", HttpStatus.FORBIDDEN.value());
+          return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
         }
         return mediaService.createMedia(image, userId, productId);
       }
     } catch (Exception e) {
       System.out.println(e.toString());
-      return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+      ErrorMessage error =
+          new ErrorMessage(
+              "An error was encountered during media upload", HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
