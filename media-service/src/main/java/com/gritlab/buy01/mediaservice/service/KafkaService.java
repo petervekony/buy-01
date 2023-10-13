@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -17,15 +18,26 @@ import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationResponse;
 import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarDeleteMessage;
+import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarUpdateRequest;
+import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarUpdateResponse;
 
 @Service
 public class KafkaService {
 
   private static final String TOPIC_REQUEST = "token-validation-request";
   private static final String TOPIC_RESPONSE = "token-validation-response";
-  @Autowired private KafkaTemplate<String, TokenValidationRequest> kafkaTemplate;
 
-  @Autowired private KafkaTemplate<String, ProductOwnershipRequest> productOwnerShipKafkaTemplate;
+  @Autowired
+  @Qualifier("kafkaTemplate")
+  private KafkaTemplate<String, TokenValidationRequest> kafkaTemplate;
+
+  @Autowired
+  @Qualifier("productOwnershipRequestKafkaTemplate")
+  private KafkaTemplate<String, ProductOwnershipRequest> productOwnerShipKafkaTemplate;
+
+  @Autowired
+  @Qualifier("userAvatarUpdateRequestKafkaTemplate")
+  private KafkaTemplate<String, UserAvatarUpdateRequest> userAvatarUpdateRequestKafkaTemplate;
 
   @Autowired private MediaService mediaService;
 
@@ -34,6 +46,9 @@ public class KafkaService {
 
   private ConcurrentMap<String, BlockingQueue<ProductOwnershipResponse>>
       productOwnershipResponseQueues = new ConcurrentHashMap<>();
+
+  private ConcurrentMap<String, BlockingQueue<UserAvatarUpdateResponse>>
+      userAvatarUpdateResponseQueues = new ConcurrentHashMap<>();
 
   public TokenValidationResponse validateTokenWithUserMicroservice(TokenValidationRequest request) {
     BlockingQueue<TokenValidationResponse> queue = new ArrayBlockingQueue<>(1);
@@ -70,7 +85,7 @@ public class KafkaService {
       groupId = "user-avatar-deletion-group",
       containerFactory = "kafkaAvatarDeletionContainerFactory")
   public void deleteUserAvatar(UserAvatarDeleteMessage request) {
-    mediaService.deleteAllUserAvatars(request.getUserId());
+    mediaService.requestDeleteAllUserAvatars(request.getUserId());
   }
 
   @KafkaListener(
@@ -78,7 +93,7 @@ public class KafkaService {
       groupId = "product-media-deletion-group",
       containerFactory = "kafkaProductMediaDeletionContainerFactory")
   public void deleteProductMedia(ProductMediaDeleteMessage request) {
-    mediaService.deleteAllProductMedia(request.getProductId());
+    mediaService.requestDeleteAllProductMedia(request.getProductId());
   }
 
   public void sendProductOwnershipRequest(String productId, String userId) {
@@ -118,6 +133,39 @@ public class KafkaService {
       return null;
     } finally {
       productOwnershipResponseQueues.remove(correlationId);
+    }
+  }
+
+  public UserAvatarUpdateResponse sendUserAvatarUpdateRequestAndWaitForResponse(
+      UserAvatarUpdateRequest request) {
+    BlockingQueue<UserAvatarUpdateResponse> responseQueue = new ArrayBlockingQueue<>(1);
+
+    String correlationId = request.getCorrelationId();
+
+    userAvatarUpdateResponseQueues.put(correlationId, responseQueue);
+
+    userAvatarUpdateRequestKafkaTemplate.send("user-avatar-update-requests", request);
+
+    try {
+      UserAvatarUpdateResponse response = responseQueue.poll(5, TimeUnit.SECONDS);
+      return response;
+    } catch (InterruptedException e) {
+      return null;
+    } finally {
+      userAvatarUpdateResponseQueues.remove(correlationId);
+    }
+  }
+
+  @KafkaListener(
+      topics = "user-avatar-update-responses",
+      groupId = "media-service-group",
+      containerFactory = "kafkaUserAvatarUpdateResponseListenerContainerFactory")
+  public void handleUserAvatarUpdateResponse(UserAvatarUpdateResponse response) {
+    BlockingQueue<UserAvatarUpdateResponse> queue =
+        userAvatarUpdateResponseQueues.get(response.getCorrelationId());
+
+    if (queue != null) {
+      queue.offer(response); // Place the response into the queue
     }
   }
 }

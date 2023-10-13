@@ -26,5 +26,7 @@ public interface MediaRepository extends MongoRepository<Media, String> {
 
   Optional<Media> findFirstByProductId(String productId);
 
+  Optional<Media> findFirstByUserId(String userId);
+
   void deleteAllByUserId(String userId);
 }

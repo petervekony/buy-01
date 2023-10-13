@@ -2,6 +2,7 @@ package com.gritlab.buy01.mediaservice.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipResponse;
+import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarUpdateRequest;
+import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarUpdateResponse;
 import com.gritlab.buy01.mediaservice.model.Media;
 import com.gritlab.buy01.mediaservice.payload.response.ErrorMessage;
 import com.gritlab.buy01.mediaservice.payload.response.MediaResponse;
@@ -82,7 +85,6 @@ public class MediaController {
       }
 
       if (productId != null) {
-
         ProductOwnershipRequest ownershipRequest =
             new ProductOwnershipRequest(productId, userDetails.getId());
         ProductOwnershipResponse ownershipResponse =
@@ -99,21 +101,63 @@ public class MediaController {
       }
 
       if (userId != null) {
+        System.out.println("UserId is not null: " + userId);
         if (!userDetails.getId().equals(userId)) {
           ErrorMessage error =
               new ErrorMessage(
                   "You can only upload avatar to your user profile", HttpStatus.FORBIDDEN.value());
           return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
         }
-        return mediaService.createMedia(image, userId, productId);
+
+        ResponseEntity<?> mediaResponse = mediaService.createMedia(image, userId, productId);
+        System.out.println("Media Response: " + mediaResponse);
+        Object responseBody = mediaResponse.getBody();
+
+        if (responseBody instanceof Media) {
+          Media responseMedia = (Media) responseBody;
+
+          // delete all other images
+          mediaService.deletePreviousUserAvatars(userId, responseMedia.getId());
+
+          String avatarId = responseMedia.getId();
+          UserAvatarUpdateRequest userAvatarUpdateRequest =
+              new UserAvatarUpdateRequest(UUID.randomUUID().toString(), userId, avatarId);
+          UserAvatarUpdateResponse userAvatarUpdateResponse =
+              kafkaService.sendUserAvatarUpdateRequestAndWaitForResponse(userAvatarUpdateRequest);
+
+          if (userAvatarUpdateResponse == null) {
+            ErrorMessage error =
+                new ErrorMessage(
+                    "Timeout while waiting for user avatar update response",
+                    HttpStatus.REQUEST_TIMEOUT.value());
+            mediaService.deleteMediaById(userId, productId);
+            return new ResponseEntity<>(error, HttpStatus.REQUEST_TIMEOUT);
+          }
+
+          if (!userAvatarUpdateResponse.isAllowed()) {
+            ErrorMessage error =
+                new ErrorMessage(
+                    String.format(
+                        "An error was encountered during user avatar update: %s",
+                        userAvatarUpdateResponse.getMessage()),
+                    HttpStatus.FORBIDDEN.value());
+            mediaService.deleteMediaById(userId, productId);
+            return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+          }
+          return new ResponseEntity<>(responseMedia, HttpStatus.CREATED);
+        } else {
+          return mediaResponse;
+        }
       }
     } catch (Exception e) {
+      System.out.println("Exception caught: " + e.toString());
       System.out.println(e.toString());
       ErrorMessage error =
           new ErrorMessage(
               "An error was encountered during media upload", HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
+    System.out.println("Returning 400 Bad Request");
 
     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
   }
@@ -122,5 +166,11 @@ public class MediaController {
   @GetMapping("/media/product/{productId}")
   public ResponseEntity<?> getProductThumbnail(@PathVariable("productId") String productId) {
     return mediaService.getProductThumbnail(productId);
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/media/user/{userId}")
+  public ResponseEntity<?> getUserAvatar(@PathVariable("userId") String userId) {
+    return mediaService.getUserAvatar(userId);
   }
 }
