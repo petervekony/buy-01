@@ -15,7 +15,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
     ).subscribe((event: NavigationEnd) => {
-      console.log('event: ', event.urlAfterRedirects);
       this.loggedIn = this.checkUnauthenticatedRoutes(
         event.urlAfterRedirects,
       );

@@ -1,5 +1,5 @@
-<div class="product-container" #container>
-  <div class="wrapper">
+<div class="product-container">
+  <div class="wrapper" #container>
     <ng-container *ngFor="let product of products">
       <app-product-card [product]="product"></app-product-card>
     </ng-container>

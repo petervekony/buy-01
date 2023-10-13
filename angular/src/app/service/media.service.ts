@@ -2,12 +2,15 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Media, MediaResponse } from '../interfaces/media';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MediaService {
+  private imageAddedSource = new Subject<void>();
+  imageAdded$ = this.imageAddedSource.asObservable();
+
   constructor(private http: HttpClient) {}
 
   getProductThumbnail(productId: string): Observable<Media> {

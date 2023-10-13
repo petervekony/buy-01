@@ -57,7 +57,11 @@ body {
 }
 
 .blur-filter {
-  filter: blur(10px), brightness(0.7);
+  /* opacity: 0.5; */
+  background-color: #000;
+  filter: blur(20), brightness(0.7);
+  /* backdrop-filter: blur(10px), brightness(0.7); */
+  z-index: 10;
 }
 
 .close-button:hover {

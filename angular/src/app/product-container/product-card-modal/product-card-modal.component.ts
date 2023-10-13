@@ -100,7 +100,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (user) => {
           this.owner = user;
-          console.log(user);
+          // console.log(user);
         },
         error: (err) => {
           console.log(err);

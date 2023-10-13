@@ -70,11 +70,11 @@ import { MediaGalleryComponent } from './media-gallery/media-gallery.component';
 export class AppModule {
   constructor(
     private stateService: StateService,
-    private cookieService: CookieService,
+    // private cookieService: CookieService,
   ) {
-    console.log('check', this.cookieService.check('buy-01'));
-    console.log(this.cookieService.getAll());
-    console.log('AppModule constructor is called!');
+    // console.log('check', this.cookieService.check('buy-01'));
+    // console.log(this.cookieService.getAll());
+    // console.log('AppModule constructor is called!');
     this.stateService.initialize();
   }
 }
