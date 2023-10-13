@@ -9,9 +9,10 @@ import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
 import { User } from '../interfaces/user';
 import { AuthService } from '../service/auth.service';
-import { Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { filter } from 'rxjs/operators';
+import { MediaService } from '../service/media.service';
 
 @Component({
   selector: 'app-navbar',
@@ -26,8 +27,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   placeholder = '../../assets/images/placeholder.png';
   routeSubscription: Subscription = Subscription.EMPTY;
   authSubscription: Subscription = Subscription.EMPTY;
+  avatarSubscription: Subscription = Subscription.EMPTY;
   dash = false;
   profile = false;
+  currentUser: User = {} as User;
+  avatar$ = new BehaviorSubject<string>(this.placeholder);
   // secondUser$ = new BehaviorSubject<User>({
   //   name: 'test',
   //   email: 'akkakaka@kakaka.com',
@@ -40,28 +44,64 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private authService: AuthService,
     private formStateService: FormStateService,
+    private mediaService: MediaService,
   ) {
     // this.user = this.stateService.state!;
-    const cookieCheck = this.authService.getAuth();
-    if (cookieCheck) {
-      this.authSubscription = cookieCheck.subscribe({
-        next: (user) => {
-          this.user$.next(user);
-        },
-        error: () => {
-          this.router.navigate(['login']);
-          // console.error(error);
-        },
-      });
-    }
+    this.authSubscription = this.authService.getAuth().subscribe({
+      next: (user) => {
+        this.user$.next(user);
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
     this.route = '';
   }
 
   ngOnInit(): void {
+    this.checkRoutes();
+    this.getAuthAndAvatar();
+  }
+
+  private getAuthAndAvatar() {
+    this.authService.getAuth().subscribe({
+      next: (user) => {
+        this.user$.next(user);
+        this.currentUser = user;
+        if (user.avatar) {
+          this.getAvatar();
+        }
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
+  }
+
+  private getAvatar() {
+    this.avatarSubscription = this.mediaService.getAvatar(
+      this.currentUser.id,
+    )
+      .subscribe({
+        next: (media) => {
+          if (media && media?.image) {
+            console.log(media);
+            this.avatar$.next(
+              'data:' + media.mimeType + ';base64,' + media.image,
+            );
+          }
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+  }
+
+  private checkRoutes() {
     this.authSubscription = this.router.events
       .pipe(
-        filter(
-          (event): event is NavigationEnd => event instanceof NavigationEnd,
+        filter((event): event is NavigationEnd =>
+          event instanceof NavigationEnd
         ),
       )
       .subscribe((event: NavigationEnd) => {

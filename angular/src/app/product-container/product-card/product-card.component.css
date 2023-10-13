@@ -2,7 +2,7 @@
 .card-container {
   min-width: calc(50vw - 40px);
   width: 20vw;
-  min-height: 250px;
+  min-height: 100px !important;
   padding: 10px;
   margin: 10px;
   background-color: #08101c;
@@ -114,12 +114,14 @@ dialog {
   }
 }
 
-dialog {
-  position: absolute;
-  left: 10%;
-  top: 15%;
-  z-index: 7;
-  height: 70vh;
-  width: 80vw;
-  border: none;
+@media screen and (width >= 1200px) {
+  .card-container {
+    min-width: 20vw;
+  }
 }
+
+/* @media screen and (width <= 700px) { */
+/*   .card-container { */
+/*     min-width: 30vw; */
+/*   } */
+/* } */

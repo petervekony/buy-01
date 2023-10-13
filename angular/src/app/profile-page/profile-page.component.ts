@@ -32,6 +32,7 @@ import { StateService } from '../service/state.service';
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit, OnDestroy {
+  deleteFormOpen = false;
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
   @ViewChild('profile')
@@ -76,6 +77,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
+    this.getAuthAndAvatar();
+  }
+
+  private getAuthAndAvatar() {
     this.authService.getAuth().subscribe({
       next: (user) => {
         this.user$.next(user);
@@ -203,8 +208,12 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
       this.profileFormOpen = true;
       this.buttonClicked = true;
       this.formStateService.setFormOpen(true);
-    } else {
+    } else if (type === 'avatar') {
       this.avatarFormOpen = true;
+      this.buttonClicked = true;
+      this.formStateService.setFormOpen(true);
+    } else {
+      this.deleteFormOpen = true;
       this.buttonClicked = true;
       this.formStateService.setFormOpen(true);
     }
@@ -218,6 +227,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     this.formStateService.setFormOpen(false);
     this.profileFormOpen = false;
     this.avatarFormOpen = false;
+    this.deleteFormOpen = false;
   }
 
   onSubmit() {
@@ -236,6 +246,11 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     });
     this.formOpen = false;
   }
+
+  deleteAvatar() {
+    this.mediaService.deleteAvatar(this.currentUser.id);
+  }
+
   ngOnDestroy(): void {
   }
 }

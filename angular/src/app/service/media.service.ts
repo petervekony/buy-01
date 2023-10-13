@@ -28,6 +28,11 @@ export class MediaService {
     return this.http.get<Media>(address, { withCredentials: true });
   }
 
+  deleteAvatar(userId: string): void {
+    const address = environment.mediaURL + userId;
+    this.http.delete(address, { withCredentials: true });
+  }
+
   uploadAvatar(userId: string, image: FormData): Observable<Media> {
     console.log('image', image);
     const address = environment.mediaURL;

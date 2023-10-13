@@ -6,7 +6,7 @@
   width: 100vw;
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: space-between;
   gap: 2rem;
   color: azure;
   background-color: #121212;
@@ -21,11 +21,6 @@
   cursor: pointer;
   color: #c3b5fd;
   font-size: 1.2rem;
-}
-
-#profile-button:hover {
-  transform: scale(1.1);
-  color: #8d45ce;
 }
 
 #image-container {
@@ -70,8 +65,10 @@
 
 #title {
   clear: both;
-  margin-left: auto;
-  margin-right: auto;
+  /* margin-left: auto; */
+  padding-left:1rem;
+  padding-right:1rem;
+  /* margin-right: auto; */
   color: #c3b5fd;
   font-size: 1.2rem;
   font-weight: bold;
@@ -113,6 +110,11 @@
   box-shadow: none;
   color: #c3b5fd;
   cursor: pointer;
+}
+
+#profile-button:hover {
+  transform: scale(1.1);
+  color: #8d45ce;
 }
 
 @media screen and (width <= 600px) {

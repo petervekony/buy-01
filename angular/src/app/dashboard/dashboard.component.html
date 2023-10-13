@@ -5,7 +5,9 @@
 <!-- <button id="add-product" (click)="manageProducts($event)">Add product</button> -->
 <div class="dashboard-container">
   <ng-container *ngFor="let product of (userProducts$ | async)">
-    <app-product-card [product]="product"></app-product-card>
+    <div class="wrapper" #container>
+      <app-product-card [product]="product"></app-product-card>
+    </div>
   </ng-container>
 </div>
 <!-- <div class="manage-products" (click)="manageProducts($event)"> -->

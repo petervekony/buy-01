@@ -1,6 +1,6 @@
 .dashboard-container {
   display: flex;
-  justify-content: space-between;
+  /* flex-flow: row wrap; */
   flex-flow: column wrap;
   height: calc(100vh - 100px);
   width: 100vw;
@@ -34,4 +34,11 @@ dialog {
   top: calc(10vw + 100px);
   z-index: 15;
   border: none;
+}
+
+.wrapper {
+  padding-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }

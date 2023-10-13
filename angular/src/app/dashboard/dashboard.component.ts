@@ -56,9 +56,4 @@ export class DashboardComponent implements OnInit {
     }
     event.preventDefault();
   }
-
-  // openProfileForm(event: MouseEvent) {
-  //   console.log('yeah, open the modal');
-  //   event.preventDefault();
-  // }
 }
