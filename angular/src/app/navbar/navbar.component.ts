@@ -1,9 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
@@ -18,26 +13,20 @@ import { MediaService } from '../service/media.service';
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  route: string;
-  home = false;
-  user$ = new Subject<User>();
   placeholder = '../../assets/images/placeholder.png';
   routeSubscription: Subscription = Subscription.EMPTY;
   authSubscription: Subscription = Subscription.EMPTY;
   avatarSubscription: Subscription = Subscription.EMPTY;
+  route: string;
   dash = false;
+  home = false;
   profile = false;
   currentUser: User = {} as User;
+  user$ = new Subject<User>();
   avatar$ = new BehaviorSubject<string>(this.placeholder);
-  // secondUser$ = new BehaviorSubject<User>({
-  //   name: 'test',
-  //   email: 'akkakaka@kakaka.com',
-  //   id: '12837128738178293',
-  //   role: 'USSER_ROLE',
-  // });
+
   constructor(
     private router: Router,
     private stateService: StateService,
@@ -46,15 +35,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private formStateService: FormStateService,
     private mediaService: MediaService,
   ) {
-    // this.user = this.stateService.state!;
-    this.authSubscription = this.authService.getAuth().subscribe({
-      next: (user) => {
-        this.user$.next(user);
-      },
-      error: (error) => {
-        console.error(error);
-      },
-    });
     this.route = '';
   }
 
@@ -68,33 +48,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
       next: (user) => {
         this.user$.next(user);
         this.currentUser = user;
-        if (user.avatar) {
-          this.getAvatar();
-        }
+        if (user.avatar) this.getAvatar();
       },
-      error: (error) => {
-        console.error(error);
-      },
+      error: (error) => console.error(error),
     });
   }
 
   private getAvatar() {
     this.avatarSubscription = this.mediaService.getAvatar(
       this.currentUser.id,
-    )
-      .subscribe({
-        next: (media) => {
-          if (media && media?.image) {
-            console.log(media);
-            this.avatar$.next(
-              'data:' + media.mimeType + ';base64,' + media.image,
-            );
-          }
-        },
-        error: (err) => {
-          console.log(err);
-        },
-      });
+    ).subscribe({
+      next: (media) => {
+        this.avatar$.next(this.mediaService.formatAvatar(media));
+      },
+      error: (err) => console.log(err),
+    });
   }
 
   private checkRoutes() {
@@ -105,7 +73,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
         ),
       )
       .subscribe((event: NavigationEnd) => {
-        console.log('navbar-ROUTE: ', this.route);
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
           this.home = this.route === '/home';
@@ -135,5 +102,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.authSubscription.unsubscribe();
     this.routeSubscription.unsubscribe();
+    this.avatarSubscription.unsubscribe();
   }
 }

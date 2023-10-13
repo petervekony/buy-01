@@ -1,16 +1,11 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
 import { FormStateService } from '../service/form-state.service';
 import { Product } from '../interfaces/product';
 import { Location } from '@angular/common';
+import { ValidatorService } from '../service/validator.service';
 
 @Component({
   selector: 'app-add-product',
@@ -40,6 +35,7 @@ export class AddProductComponent implements OnInit {
     private productService: ProductService,
     private formStateService: FormStateService,
     private location: Location,
+    private validatorService: ValidatorService,
   ) {}
 
   ngOnInit(): void {
@@ -57,17 +53,6 @@ export class AddProductComponent implements OnInit {
     });
   }
 
-  numberValidator(): ValidatorFn {
-    //eslint-disable-next-line
-    return (control: AbstractControl): { [key: string]: any } | null => {
-      const value = control.value;
-      if (value && isNaN(Number(value))) {
-        return { 'invalidNumber': { value: control.value } };
-      }
-      return null;
-    };
-  }
-
   productForm: FormGroup = new FormGroup({
     name: new FormControl('', [
       Validators.required,
@@ -83,13 +68,13 @@ export class AddProductComponent implements OnInit {
       Validators.required,
       Validators.min(0),
       Validators.max(99999999999),
-      this.numberValidator(),
+      this.validatorService.numberValidator(),
     ]),
     quantity: new FormControl(0, [
       Validators.required,
       Validators.min(0),
       Validators.max(99999999999),
-      this.numberValidator(),
+      this.validatorService.numberValidator(),
     ]),
     image: new FormControl(),
   });
@@ -99,11 +84,8 @@ export class AddProductComponent implements OnInit {
     if (input.files && input.files?.length > 0) {
       this.filename = input.files[0].name;
       this.fileSelected = input.files[0];
-      console.log(this.fileSelected.toString());
-      // this.imageUpload!.nativeElement.value = this.filename;
     } else {
       this.fileSelected = null;
-      // this.imageUpload!.nativeElement.value = '';
     }
   }
 
@@ -119,8 +101,6 @@ export class AddProductComponent implements OnInit {
   refresh() {
     this.location.go(this.location.path());
   }
-
-  // submitImage() {}
 
   submitProduct() {
     let mediaData: FormData | null = null;
@@ -154,7 +134,6 @@ export class AddProductComponent implements OnInit {
       });
     }
     this.productForm.reset();
-    // this.imageUpload!.nativeElement.files[0].name = '';
   }
 
   closeModal() {

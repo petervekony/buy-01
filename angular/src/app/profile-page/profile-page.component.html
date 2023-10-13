@@ -1,7 +1,7 @@
 <div class="profile-container">
   <ng-container *ngIf="user$ | async as user">
     <div class="profile-page" *ngIf="!formOpen" #profile>
-      <img id="profile-picture" [src]="avatar" alt="profile-picture" />
+      <img id="profile-picture" [src]="avatar$ | async" alt="profile-picture" />
       <h3>{{ user.name }}</h3>
       <p>{{ user.email }}</p>
       <p>{{ user.role }}</p>

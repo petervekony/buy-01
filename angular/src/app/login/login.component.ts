@@ -24,17 +24,6 @@ export class LoginComponent implements OnDestroy {
     private stateService: StateService,
   ) {
     this.subscription = Subscription.EMPTY;
-    // this.stateService.state?.subscribe({
-    //   next: (user: User) => {
-    //     this.user = user;
-    //     // this.router.navigate(['home']);
-    //     console.log(user);
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //     // this.router.navigate(['login']);
-    //   },
-    // });
   }
 
   loginForm: FormGroup = new FormGroup({

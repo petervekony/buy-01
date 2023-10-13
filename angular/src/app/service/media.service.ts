@@ -53,4 +53,8 @@ export class MediaService {
     //   },
     // });
   }
+
+  formatAvatar(media: Media): string {
+    return 'data:' + media.mimeType + ';base64,' + media.image;
+  }
 }

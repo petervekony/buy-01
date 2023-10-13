@@ -6,25 +6,15 @@ import {
   ViewChild,
 } from '@angular/core';
 import { User } from '../interfaces/user';
-// import { UserService } from '../service/user.service';
-// import { StateService } from '../service/state.service';
-import {
-  AbstractControl,
-  FormControl,
-  FormGroup,
-  ValidationErrors,
-  ValidatorFn,
-  Validators,
-} from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { of, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, of, Subject, Subscription } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../service/user.service';
 import { MediaService } from '../service/media.service';
 import { StateService } from '../service/state.service';
-
-// import { UserUpdateRequest } from '../interfaces/user-update-request';
+import { ValidatorService } from '../service/validator.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -50,15 +40,16 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   filename: string = '';
   fileSelected: File | null = null;
   avatarSubscription: Subscription = Subscription.EMPTY;
-  avatar: string = this.placeholder;
+  avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
   constructor(
     private authService: AuthService,
-    private formStateService: FormStateService, // private renderer: Renderer2,
+    private formStateService: FormStateService,
     private cookieService: CookieService,
     private userService: UserService,
     private mediaService: MediaService,
     private stateService: StateService,
+    private validatorServie: ValidatorService,
   ) {
     //TODO: fix if clicked outside form, close form!
     // this.renderer.listen('window', 'click', (e: Event) => {
@@ -92,19 +83,14 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
             .subscribe({
               next: (media) => {
                 if (media && media?.image) {
-                  this.avatar = 'data:' + media.mimeType + ';base64,' +
-                    media.image;
+                  this.avatar$.next(this.mediaService.formatAvatar(media));
                 }
               },
-              error: (err) => {
-                console.log(err);
-              },
+              error: (err) => console.log(err),
             });
         }
       },
-      error: (error) => {
-        console.error(error);
-      },
+      error: (error) => console.error(error),
     });
     this.formValid = true;
     this.formStateService.formOpen$.subscribe((isOpen) => {
@@ -118,10 +104,8 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
       this.filename = input.files[0].name;
       this.fileSelected = input.files[0];
       console.log(this.fileSelected.toString());
-      // this.imageUpload!.nativeElement.value = this.filename;
     } else {
       this.fileSelected = null;
-      // this.imageUpload!.nativeElement.value = '';
     }
   }
 
@@ -140,9 +124,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
       },
-      error: (err) => {
-        console.log(err);
-      },
+      error: (err) => console.log(err),
     });
   }
 
@@ -151,72 +133,34 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     return blob;
   }
 
-  private passwordValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const passwordsMatch = control.get('password')?.value ===
-        control?.get('confirmPassword')?.value;
-      const confirmPassword = control.get('confirmPassword')?.value;
-      const password = control.value;
-      if (!password && !confirmPassword) {
-        return null;
-      }
-
-      return Validators.minLength(4)(control) ||
-          Validators.maxLength(30)(control) ||
-          !passwordsMatch
-        ? { invalidPassword: true }
-        : null;
-    };
-  }
-  private usernameValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const username = control.value;
-      if (!username) {
-        return null;
-      }
-
-      return Validators.minLength(4)(control) ||
-          Validators.maxLength(30)(control)
-        ? { invalidName: true }
-        : null;
-    };
-  }
-  private emailValidator(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const email = control.value;
-      if (!email) {
-        return null;
-      }
-
-      return Validators.minLength(4)(control) ||
-          Validators.maxLength(30)(control) ||
-          Validators.email(control)
-        ? { invalidEmail: true }
-        : null;
-    };
-  }
-
   userUpdateForm: FormGroup = new FormGroup({
-    name: new FormControl(null, [this.usernameValidator()]),
-    email: new FormControl(null, [this.emailValidator()]),
-    password: new FormControl(null, [this.passwordValidator()]),
-    confirmPassword: new FormControl(null, [this.passwordValidator()]),
+    name: new FormControl(null, [this.validatorServie.usernameValidator()]),
+    email: new FormControl(null, [this.validatorServie.emailValidator()]),
+    password: new FormControl(null, [this.validatorServie.passwordValidator()]),
+    confirmPassword: new FormControl(null, [
+      this.validatorServie.passwordValidator(),
+    ]),
   });
 
   openForm(type: string) {
-    if (type === 'profile') {
+    switch (type) {
+    case 'profile':
       this.profileFormOpen = true;
-      this.buttonClicked = true;
-      this.formStateService.setFormOpen(true);
-    } else if (type === 'avatar') {
+      this.setToTrue();
+      break;
+    case 'avatar':
       this.avatarFormOpen = true;
-      this.buttonClicked = true;
-      this.formStateService.setFormOpen(true);
-    } else {
+      this.setToTrue();
+      break;
+    default:
       this.deleteFormOpen = true;
-      this.buttonClicked = true;
-      this.formStateService.setFormOpen(true);
+      this.setToTrue();
     }
+  }
+
+  private setToTrue() {
+    this.buttonClicked = true;
+    this.formStateService.setFormOpen(true);
   }
 
   onValidate() {
@@ -232,17 +176,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     const request = this.userUpdateForm.value;
-    console.log('update', request);
-
-    console.log('profilepage', this.currentUser.id);
     this.formStateService.setFormOpen(false);
     this.userService.updateUser(request, this.currentUser.id).subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-      error: (err) => {
-        console.log(err);
-      },
+      next: (data) => console.log(data),
+      error: (err) => console.log(err),
     });
     this.formOpen = false;
   }

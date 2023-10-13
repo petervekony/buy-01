@@ -1,7 +1,7 @@
 <div class="nav-bar">
   <div class="user-info" (click)="goToProfile()">
     <div id="image-container">
-      <img [src]="avatar$ | async" alt="" />
+      <img [src]="avatar$ | async" alt="profile picture" />
     </div>
     <button *ngIf="user$ | async as user" aria-hidden="false" aria-label="user profile" id="profile-button">{{ user.name
       }}</button>
