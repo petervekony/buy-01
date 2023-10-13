@@ -6,7 +6,13 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  // AbstractControl,
+  FormControl,
+  FormGroup,
+  // ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { catchError, of, Subscription } from 'rxjs';
 // import { MediaResponse } from 'src/app/interfaces/media';
 import { Product } from 'src/app/interfaces/product';
@@ -46,6 +52,20 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   success = false;
   confirm = false;
   owner: User = {} as User;
+  price: number = 0;
+  quantity: number = 0;
+  // quantity: string = '';
+  // price: string = '';
+  // numberValidator(): ValidatorFn {
+  //   //eslint-disable-next-line
+  //   return (control: AbstractControl): { [key: string]: any } | null => {
+  //     const value = control.value;
+  //     if (value && isNaN(Number(value))) {
+  //       return { 'invalidNumber': { value: control.value } };
+  //     }
+  //     return null;
+  //   };
+  // }
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -58,29 +78,32 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       Validators.minLength(4),
       Validators.maxLength(30),
     ]),
-    price: new FormControl('', [
+    price: new FormControl(this.price, [
       Validators.required,
       Validators.min(0),
       Validators.max(99999999999),
+      // this.numberValidator(),
     ]),
-    quantity: new FormControl('', [
+    quantity: new FormControl(this.quantity, [
       Validators.required,
       Validators.min(0),
       Validators.max(99999999999),
+      // this.numberValidator(),
     ]),
     image: new FormControl(),
   });
-
-  // this.imageSrc = 'data:' + media.mimeType + ';base64,' + media.image;
 
   constructor(
     private mediaService: MediaService,
     private formStateService: FormStateService,
     private productService: ProductService,
     private userService: UserService,
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
+    this.productForm.get('price')?.setValue(this.product.price);
+    this.productForm.get('quantity')?.setValue(this.product.quantity);
     this.subscription = this.mediaService
       .getProductThumbnail(this.product.id!)
       .pipe(catchError(() => of(null)))

@@ -16,7 +16,6 @@ import { StateService } from '../service/state.service';
 @Component({
   selector: 'signup',
   templateUrl: './signup.component.html',
-  styleUrls: ['./signup.component.css'],
 })
 export class SignupComponent implements OnDestroy {
   private checkPassword: ValidatorFn = (
@@ -28,6 +27,7 @@ export class SignupComponent implements OnDestroy {
   };
   formValid: boolean = false;
   subscription: Subscription = Subscription.EMPTY;
+  error: string | null = null;
 
   constructor(
     private router: Router,
@@ -53,7 +53,11 @@ export class SignupComponent implements OnDestroy {
         Validators.minLength(4),
         Validators.maxLength(30),
       ]),
-      confirmPassword: new FormControl('', [Validators.required]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        Validators.minLength(4),
+        Validators.maxLength(30),
+      ]),
       role: new FormControl(false),
     },
     { validators: this.checkPassword },
@@ -74,7 +78,7 @@ export class SignupComponent implements OnDestroy {
     console.log('sending out the reg form:\n', request);
     this.subscription = this.userService.sendSignupRequest(request).subscribe({
       error: (error) => {
-        console.log('error: ', error);
+        this.error = error.error.message;
       },
       complete: () => {
         this.autoLogin(request);

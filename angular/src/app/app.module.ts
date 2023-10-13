@@ -29,6 +29,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { FileUploadModule } from 'primeng/fileupload';
 import { GalleriaModule } from 'primeng/galleria';
 import { MediaGalleryComponent } from './media-gallery/media-gallery.component';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 @NgModule({
   declarations: [
@@ -63,6 +65,8 @@ import { MediaGalleryComponent } from './media-gallery/media-gallery.component';
     MatTabsModule,
     FileUploadModule,
     GalleriaModule,
+    InputTextareaModule,
+    InputNumberModule,
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

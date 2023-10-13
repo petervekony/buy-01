@@ -92,6 +92,33 @@
   margin-top: 3rem;
 }
 
+.description-textarea {
+  width: 100%;
+  color: azure;
+  background-color: #040e19;
+  border: 1px solid #002d56;
+  resize: none;
+  padding: 7px;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+#product-price, #product-quantity {
+  width: 100%;
+}
+
+
+
+/* .description-textarea::placeholder{ */
+/*   font-size: 1rem; */
+/*   padding-left: 0.4rem; */
+/*   padding-top: 0.4rem; */
+/* } */
+
+/* .description-textarea:focus, .description-textarea:active, .description-textarea:hover { */
+/*   border: 1px solid azure; */
+/* } */
+
 .add-product-container {
   margin-top: 1rem;
   width: 100%;

@@ -1,5 +1,11 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
 import { FormStateService } from '../service/form-state.service';
@@ -51,6 +57,17 @@ export class AddProductComponent implements OnInit {
     });
   }
 
+  numberValidator(): ValidatorFn {
+    //eslint-disable-next-line
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const value = control.value;
+      if (value && isNaN(Number(value))) {
+        return { 'invalidNumber': { value: control.value } };
+      }
+      return null;
+    };
+  }
+
   productForm: FormGroup = new FormGroup({
     name: new FormControl('', [
       Validators.required,
@@ -62,15 +79,17 @@ export class AddProductComponent implements OnInit {
       Validators.minLength(4),
       Validators.maxLength(300),
     ]),
-    price: new FormControl('', [
+    price: new FormControl(0, [
       Validators.required,
       Validators.min(0),
       Validators.max(99999999999),
+      this.numberValidator(),
     ]),
-    quantity: new FormControl('', [
+    quantity: new FormControl(0, [
       Validators.required,
       Validators.min(0),
       Validators.max(99999999999),
+      this.numberValidator(),
     ]),
     image: new FormControl(),
   });

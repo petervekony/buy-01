@@ -16,15 +16,19 @@
 
 .footer {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  /* justify-content: space-evenly; */
   margin-top: 5rem;
   width: 100%;
+  gap: 1rem;
+
 }
 
 
 .footer button {
   width: 50%;
-  margin-left: 10px;
+  margin-left: 25%;
+  justify-self: center;
 }
 
 
@@ -43,4 +47,27 @@
 .profile-container p {
   margin: 1rem;
   font-size: 1rem;
+}
+
+.profile-close {
+  position: relative;
+  float: right;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background-color: #08101c;
+  color: #c3b5fd;
+  border: 1px solid #c3b5fd;
+  box-shadow: none;
+  outline: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 12;
+}
+
+
+.profile-close:hover {
+  box-shadow: 0 0 5px #c3b5fd;
+  transform: scale(1.1);
 }

@@ -203,14 +203,21 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
       this.profileFormOpen = true;
       this.buttonClicked = true;
       this.formStateService.setFormOpen(true);
-    } else if (type === 'avatar') {
+    } else {
       this.avatarFormOpen = true;
+      this.buttonClicked = true;
       this.formStateService.setFormOpen(true);
     }
   }
 
   onValidate() {
     this.formValid = this.userUpdateForm.valid;
+  }
+
+  hideModal(): void {
+    this.formStateService.setFormOpen(false);
+    this.profileFormOpen = false;
+    this.avatarFormOpen = false;
   }
 
   onSubmit() {

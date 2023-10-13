@@ -48,16 +48,18 @@
               class="w-full mb-3" name="product-name" formControlName="name" />
 
             <label for="product-description" class="block text-900 font-medium mb-2">Description</label>
-            <input id="product-description" type="text" [placeholder]="product ? product.description : 'Description'"
-              pInputText class="w-full mb-3" name="product-description" formControlName="description" />
+            <textarea class="description-textarea" rows="5" maxlength="300" formControlName="description"
+              name="description" [placeholder]="product.description" pInputTextarea></textarea>
 
-            <label for="product-price" class="block text-896 font-medium mb-2">Price</label>
-            <input id="product-price" type="text" [placeholder]="product ? product.price : 'Price'" pInputText
-              class="w-full mb-3" name="product-price" formControlName="price" />
+            <div class="flex-auto">
+              <label for="product-price" class="block text-900 font-medium mb-2">Price</label>
+              <p-inputNumber mode="currency" currency="USD" locale="en-US" id="product-price" class="mb-3"
+                name="product-price" formControlName="price"></p-inputNumber>
+            </div>
 
             <label for="product-quantity" class="block text-900 font-medium mb-2">Quantity</label>
-            <input id="product-quantity" type="text" [placeholder]="product ? product.quantity : 'Quantity'" pInputText
-              class="w-full mb-3" name="product-quantity" formControlName="quantity" />
+            <p-inputNumber id="product-quantity" value="product.price" class="mb-3" name="product-quantity"
+              formControlName="quantity"></p-inputNumber>
             <!-- <div class="flex align-items-center justify-content-between mb-6"> -->
             <div class="upload-container">
               <label for="image" class="block text-900 font-medium mb-2">Add an image?</label>

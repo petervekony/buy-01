@@ -11,7 +11,6 @@ import { User } from '../interfaces/user';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnDestroy {
   formValid: boolean = false;

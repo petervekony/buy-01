@@ -77,7 +77,6 @@ implements OnInit, OnDestroy, AfterViewInit {
               document.body,
               'blur-filter',
             );
-            console.log(document.body.classList);
           }
         } else if (!isOpen) {
           if (this.container) {

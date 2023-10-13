@@ -41,9 +41,10 @@
   padding-top: 0.4rem;
 }
 
-.description-textarea:focus, .description-textarea:active, .description-textarea:hover {
-  border: 1px solid azure;
-}
+/* .description-textarea:focus, .description-textarea:active, .description-textarea:hover { */
+/*   border: 1px solid #002d56; */
+/*   outline: 1px solid #002d56; */
+/* } */
 
 #file-upload {
   margin-bottom: 1rem;

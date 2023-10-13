@@ -7,12 +7,13 @@
       <p>{{ user.role }}</p>
       <div class="footer">
         <button pButton pRipple label="EDIT PROFILE" icon="pi pi-user" (click)="openForm('profile')"></button>
-        <!-- <button pButton pRipple label="UPDATE AVATAR" icon="pi pi-user" (click)="openForm('avatar')"></button> -->
+        <button pButton pRipple label="UPDATE AVATAR" icon="pi pi-user" (click)="openForm('avatar')"></button>
       </div>
     </div>
 
-    <div class="container flex justify-content-center mt-5" *ngIf="formOpen">
-      <div class="surface-card p-4 shadow-2 border-round lg:w-5" #profileForm>
+    <div class="container flex justify-content-center mt-5" *ngIf="profileFormOpen">
+      <div class="surface-card p-4 shadow-2 border-round lg:w-5 form" #profileForm>
+        <button class="profile-close" (click)="hideModal()">X</button>
         <div class="text-900 text-3xl font-medium mb-3">Edit information</div>
         <div>
           <form [formGroup]="userUpdateForm" (input)="onValidate()" (ngSubmit)="onSubmit()">
@@ -37,19 +38,23 @@
           </form>
         </div>
       </div>
-      <div class="surface-card p-4 shadow-2 border-round lg:w-5" #avatarForm>
-        <div class="text-900 text-3xl font-medium mb-3">Upload image</div>
-        <form (ngSubmit)="submitAvatar()">
-          <div class="flex align-items-center justify-content-between mb-6">
-            <div class="upload-container">
-              <label for="image" class="block text-900 font-medium mb-2">Add an image?</label>
-              <input #imageUpload type="file" name="image" id="upload-product-image" (change)="onFileSelected($event)"
-                accept="image/*" />
-            </div>
+    </div>
+    <div class="surface-card p-4 shadow-2 border-round lg:w-5 form half" #avatarForm *ngIf="avatarFormOpen">
+      <button class="profile-close" (click)="hideModal()">X</button>
+      <div class="text-900 text-3xl font-medium mb-6">Upload image</div>
+      <form (ngSubmit)="submitAvatar()">
+        <div class="flex align-items-center justify-content-between mb-6">
+          <div class="upload-container">
+            <label for="image" class="block text-900 font-medium mb-2">Add an image?</label>
+
+            <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" name="image" accept="image/*"
+              (change)="onFileSelected($event)" class="w-full half"></p-fileUpload>
+            <!-- <input pButton #imageUpload type="file" name="image" id="upload-product-image" class="mt-7" -->
+            <!--   (change)="onFileSelected($event)" accept="image/*" /> -->
           </div>
-          <button type="submit" pButton pRipple label="Update" icon="pi pi-user" class="w-full"></button>
-        </form>
-      </div>
+        </div>
+        <button type="submit" pButton pRipple label="Update" icon="pi pi-user" class="w-full bottom"></button>
+      </form>
     </div>
   </ng-container>
 </div>
