@@ -7,11 +7,13 @@ import java.util.Optional;
 
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.gritlab.buy01.mediaservice.event.DeleteMediaEvent;
 import com.gritlab.buy01.mediaservice.model.Media;
 import com.gritlab.buy01.mediaservice.payload.response.ErrorMessage;
 import com.gritlab.buy01.mediaservice.payload.response.SingleMediaResponse;
@@ -21,6 +23,16 @@ import com.gritlab.buy01.mediaservice.repository.MediaRepository;
 public class MediaService {
 
   @Autowired MediaRepository mediaRepository;
+
+  @Autowired private ApplicationEventPublisher eventPublisher;
+
+  public void requestDeleteAllUserAvatars(String userId) {
+    eventPublisher.publishEvent(new DeleteMediaEvent(this, userId, null));
+  }
+
+  public void requestDeleteAllProductMedia(String productId) {
+    eventPublisher.publishEvent(new DeleteMediaEvent(this, null, productId));
+  }
 
   public Optional<List<Media>> getAllMediaByProductId(String productId) {
     Optional<List<Media>> media = mediaRepository.findAllByProductId(productId);
@@ -69,7 +81,7 @@ public class MediaService {
       String contentType = image.getContentType();
       media = new Media(new Binary(bytes), productId, userId);
       media.setMimeType(contentType);
-      mediaRepository.save(media);
+      media = mediaRepository.save(media);
     } catch (IOException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -86,6 +98,15 @@ public class MediaService {
 
   public ResponseEntity<?> getProductThumbnail(String productId) {
     Optional<Media> mediaOpt = mediaRepository.findFirstByProductId(productId);
+    return convertAndReturnMedia(mediaOpt);
+  }
+
+  public ResponseEntity<?> getUserAvatar(String userId) {
+    Optional<Media> mediaOpt = mediaRepository.findFirstByUserId(userId);
+    return convertAndReturnMedia(mediaOpt);
+  }
+
+  private ResponseEntity<?> convertAndReturnMedia(Optional<Media> mediaOpt) {
     if (mediaOpt.isPresent()) {
       Media media = mediaOpt.get();
       String base64Image = Base64.getEncoder().encodeToString(media.getImage().getData());
@@ -100,6 +121,18 @@ public class MediaService {
       return new ResponseEntity<>(response, HttpStatus.OK);
     } else {
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+  }
+
+  public void deletePreviousUserAvatars(String userId, String id) {
+    Optional<List<Media>> fetched = mediaRepository.findAllByUserId(userId);
+    if (fetched.isPresent()) {
+      List<Media> allMedia = fetched.get();
+      for (Media media : allMedia) {
+        if (!media.getId().equals(id)) {
+          mediaRepository.deleteById(media.getId());
+        }
+      }
     }
   }
 }

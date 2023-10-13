@@ -128,6 +128,7 @@ public class AuthService {
   public User getUserDetailsFromToken(String token) {
     try {
       String userId = jwtUtils.getUserIdFromJwtToken(token);
+      System.out.println("THIS IS THE USER ID ON AUTH: " + userId);
 
       return userRepository.findById(userId).orElse(null);
     } catch (Exception e) {

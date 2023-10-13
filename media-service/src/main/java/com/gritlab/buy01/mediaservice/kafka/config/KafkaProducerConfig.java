@@ -15,6 +15,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationRequest;
+import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarUpdateRequest;
 
 @Configuration
 public class KafkaProducerConfig {
@@ -51,5 +52,17 @@ public class KafkaProducerConfig {
   @Bean
   public KafkaTemplate<String, ProductOwnershipRequest> productOwnershipRequestKafkaTemplate() {
     return new KafkaTemplate<>(producerFactoryForProductOwnershipRequest());
+  }
+
+  // user avatar update message
+  @Bean
+  public ProducerFactory<String, UserAvatarUpdateRequest>
+      producerFactoryForUserAvatarUpdateRequest() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
+
+  @Bean
+  public KafkaTemplate<String, UserAvatarUpdateRequest> userAvatarUpdateRequestKafkaTemplate() {
+    return new KafkaTemplate<>(producerFactoryForUserAvatarUpdateRequest());
   }
 }

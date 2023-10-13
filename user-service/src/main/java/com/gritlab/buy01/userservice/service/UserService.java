@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.gritlab.buy01.userservice.event.UserDeletionEvent;
 import com.gritlab.buy01.userservice.model.User;
 import com.gritlab.buy01.userservice.model.enums.Role;
 import com.gritlab.buy01.userservice.payload.response.MessageResponse;
@@ -29,7 +31,7 @@ import jakarta.annotation.PostConstruct;
 public class UserService {
   @Autowired public UserRepository userRepository;
 
-  @Autowired private KafkaService kafkaService;
+  @Autowired private ApplicationEventPublisher eventPublisher;
   // @Autowired
   // public ProductRepository productRepository;
 
@@ -114,6 +116,18 @@ public class UserService {
     }
   }
 
+  public boolean updateAvatar(String userId, String avatarId) {
+    Optional<User> user = userRepository.findById(userId);
+    if (user.isPresent()) {
+      User _user = user.get();
+      _user.setAvatar(avatarId);
+      userRepository.save(_user);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public Optional<User> updateUserRole(String id, Role role) {
     Optional<User> userData = userRepository.findById(id);
     if (userData.isPresent()) {
@@ -142,7 +156,7 @@ public class UserService {
   public void deleteUser(String id) {
     Optional<User> user = userRepository.findById(id);
     if (user.isPresent()) {
-      kafkaService.deleteUserItems(user.get());
+      eventPublisher.publishEvent(new UserDeletionEvent(this, user.get()));
       userRepository.deleteById(id);
     }
   }

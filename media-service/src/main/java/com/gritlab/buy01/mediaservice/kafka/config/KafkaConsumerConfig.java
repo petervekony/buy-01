@@ -18,6 +18,7 @@ import com.gritlab.buy01.mediaservice.kafka.message.ProductMediaDeleteMessage;
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.mediaservice.kafka.message.TokenValidationResponse;
 import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarDeleteMessage;
+import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarUpdateResponse;
 
 @Configuration
 @EnableKafka
@@ -116,6 +117,27 @@ public class KafkaConsumerConfig {
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(productOwnershipResponseConsumerFactory());
     factory.setConcurrency(3); // adjust as per your requirements
+    return factory;
+  }
+
+  @Bean
+  public ConsumerFactory<String, UserAvatarUpdateResponse>
+      userAvatarUpdateResponseConsumerFactory() {
+    JsonDeserializer<UserAvatarUpdateResponse> deserializer =
+        new JsonDeserializer<>(UserAvatarUpdateResponse.class);
+    deserializer.setUseTypeHeaders(false);
+
+    return new DefaultKafkaConsumerFactory<>(
+        consumerConfigs(), new StringDeserializer(), deserializer);
+  }
+
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, UserAvatarUpdateResponse>
+      kafkaUserAvatarUpdateResponseListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, UserAvatarUpdateResponse> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(userAvatarUpdateResponseConsumerFactory());
+    factory.setConcurrency(3);
     return factory;
   }
 }
