@@ -19,7 +19,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   routeSubscription: Subscription = Subscription.EMPTY;
   authSubscription: Subscription = Subscription.EMPTY;
   avatarSubscription: Subscription = Subscription.EMPTY;
-  route: string;
+  route: string = '';
   dash = false;
   home = false;
   profile = false;
@@ -35,16 +35,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private formStateService: FormStateService,
     private mediaService: MediaService,
   ) {
-    this.route = '';
   }
 
   ngOnInit(): void {
+    this.mediaService.imageAdded$.subscribe(() => {
+      this.getAuthAndAvatar();
+    });
     this.checkRoutes();
-    this.getAuthAndAvatar();
   }
 
   private getAuthAndAvatar() {
-    this.authService.getAuth().subscribe({
+    this.authSubscription = this.authService.getAuth().subscribe({
       next: (user) => {
         this.user$.next(user);
         this.currentUser = user;
@@ -66,7 +67,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private checkRoutes() {
-    this.authSubscription = this.router.events
+    this.routeSubscription = this.router.events
       .pipe(
         filter((event): event is NavigationEnd =>
           event instanceof NavigationEnd

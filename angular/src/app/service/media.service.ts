@@ -2,13 +2,13 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Media, MediaResponse } from '../interfaces/media';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MediaService {
-  private imageAddedSource = new Subject<void>();
+  imageAddedSource = new BehaviorSubject<Media>({} as Media);
   imageAdded$ = this.imageAddedSource.asObservable();
 
   constructor(private http: HttpClient) {}
@@ -43,7 +43,12 @@ export class MediaService {
         params: { userId: userId },
         headers: headers,
         withCredentials: true,
-      });
+      }).pipe(
+        map((data: Media) => {
+          this.imageAddedSource.next(data);
+          return data;
+        }),
+      );
     // .subscribe({
     //   next: (data) => {
     //     console.log(data);

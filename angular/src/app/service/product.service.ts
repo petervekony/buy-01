@@ -2,19 +2,31 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
-import { catchError, map, Observable, of, Subject } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from 'rxjs';
 import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 import { ProductCreationResponse } from '../interfaces/product-creation-response';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  private productAddedSource = new Subject<void>();
+  productAddedSource = new BehaviorSubject<Product | null>(
+    {} as Product,
+  );
   productAdded$ = this.productAddedSource.asObservable();
+  private userProductsSource = new BehaviorSubject<Product[]>([]);
+  userProducts$ = this.userProductsSource.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   getProducts(): Observable<Product[]> {
     const address = environment.productsURL;
@@ -46,10 +58,16 @@ export class ProductService {
     });
   }
 
+  getOwnerProducts() {
+    this.userProducts$ = this.authService
+      .getAuth()
+      .pipe(switchMap((user) => this.getProductsById(user.id)));
+  }
+
   addProduct(
     form: ProductRequest,
     mediaForm: FormData | null,
-  ): Observable<boolean> {
+  ): Observable<Product | null> {
     const address = environment.productsURL;
     return this.http
       .post<ProductCreationResponse>(address, form, { withCredentials: true })
@@ -58,14 +76,14 @@ export class ProductService {
           if (mediaForm && mediaForm.get('image') !== null) {
             this.addMedia(data.product.id!, mediaForm);
             mediaForm.append('name', '');
-            return true;
+            return data.product;
           }
-          this.productAddedSource.next();
-          return true;
+          this.productAddedSource.next(data.product);
+          return data.product;
         }),
         catchError((error) => {
           console.log(error);
-          return of(false);
+          return of(null);
         }),
       );
   }

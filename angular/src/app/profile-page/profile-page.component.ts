@@ -15,6 +15,7 @@ import { UserService } from '../service/user.service';
 import { MediaService } from '../service/media.service';
 import { StateService } from '../service/state.service';
 import { ValidatorService } from '../service/validator.service';
+import { FileSelectEvent } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-profile-page',
@@ -39,7 +40,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   profileFormOpen = false;
   filename: string = '';
   fileSelected: File | null = null;
+  authSubscription: Subscription = Subscription.EMPTY;
   avatarSubscription: Subscription = Subscription.EMPTY;
+  userSubscription: Subscription = Subscription.EMPTY;
+  mediaSubscription: Subscription = Subscription.EMPTY;
   avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
   constructor(
@@ -68,11 +72,13 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
-    this.getAuthAndAvatar();
+    this.mediaService.imageAdded$.subscribe(() => {
+      this.getAuthAndAvatar();
+    });
   }
 
   private getAuthAndAvatar() {
-    this.authService.getAuth().subscribe({
+    this.authSubscription = this.authService.getAuth().subscribe({
       next: (user) => {
         this.user$.next(user);
         this.currentUser = user;
@@ -98,11 +104,11 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files?.length > 0) {
-      this.filename = input.files[0].name;
-      this.fileSelected = input.files[0];
+  onFileSelected(event: FileSelectEvent) {
+    const file = event.files[0];
+    if (file) {
+      this.filename = file.name;
+      this.fileSelected = file;
       console.log(this.fileSelected.toString());
     } else {
       this.fileSelected = null;
@@ -119,10 +125,15 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
         this.filename as string,
       );
     }
-    this.mediaService.uploadAvatar(this.currentUser.id, mediaData!).subscribe({
+    this.mediaSubscription = this.mediaService.uploadAvatar(
+      this.currentUser.id,
+      mediaData!,
+    ).subscribe({
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
+        this.mediaService.imageAddedSource.next(data);
+        this.hideModal();
       },
       error: (err) => console.log(err),
     });
@@ -175,13 +186,18 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    const request = this.userUpdateForm.value;
+    const request = { ...this.userUpdateForm.value };
+    delete request.confirmPassword;
+    console.log(request);
     this.formStateService.setFormOpen(false);
-    this.userService.updateUser(request, this.currentUser.id).subscribe({
+    this.userSubscription = this.userService.updateUser(
+      request,
+      this.currentUser.id,
+    ).subscribe({
       next: (data) => console.log(data),
       error: (err) => console.log(err),
     });
-    this.formOpen = false;
+    this.hideModal();
   }
 
   deleteAvatar() {
@@ -189,5 +205,9 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.userSubscription.unsubscribe();
+    this.authSubscription.unsubscribe();
+    this.avatarSubscription.unsubscribe();
+    this.mediaSubscription.unsubscribe();
   }
 }

@@ -39,6 +39,6 @@ dialog {
 .wrapper {
   padding-top: 10px;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: column-wrap;
   justify-content: center;
 }

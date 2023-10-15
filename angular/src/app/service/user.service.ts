@@ -11,6 +11,9 @@ import { UserUpdateRequest } from '../interfaces/user-update-request';
   providedIn: 'root',
 })
 export class UserService {
+  //
+  //TODO: add the update username live!
+
   constructor(private http: HttpClient) {}
 
   sendLoginRequest(request: LoginRequest): Observable<User> {

@@ -7,6 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FileSelectEvent } from 'primeng/fileupload';
 import { catchError, of, Subscription } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
@@ -126,8 +127,15 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     return blob;
   }
 
-  onFileSelected(event: Event) {
-    event.preventDefault();
+  onFileSelected(event: FileSelectEvent) {
+    const input = event.files[0];
+    if (input) {
+      this.filename = input.name;
+      this.fileSelected = input;
+      console.log('filename: ', this.filename);
+    } else {
+      this.fileSelected = null;
+    }
   }
 
   submitProduct() {
@@ -147,10 +155,11 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
         quantity: this.productForm.value.quantity,
       } as ProductRequest;
       this.productService.addProduct(productRequest, mediaData).subscribe({
-        next: (success: boolean) => {
-          this.success = success;
+        next: (data: Product | null) => {
+          this.success = data !== null;
           this.requestSent = true;
           this.productResult = 'Product added successfully';
+          this.productService.productAddedSource.next(data);
         },
         error: () => {
           this.success = false;

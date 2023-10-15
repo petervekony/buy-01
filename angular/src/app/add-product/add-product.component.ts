@@ -4,8 +4,8 @@ import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
 import { FormStateService } from '../service/form-state.service';
 import { Product } from '../interfaces/product';
-import { Location } from '@angular/common';
 import { ValidatorService } from '../service/validator.service';
+import { FileSelectEvent } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-add-product',
@@ -34,7 +34,6 @@ export class AddProductComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private formStateService: FormStateService,
-    private location: Location,
     private validatorService: ValidatorService,
   ) {}
 
@@ -79,11 +78,12 @@ export class AddProductComponent implements OnInit {
     image: new FormControl(),
   });
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files?.length > 0) {
-      this.filename = input.files[0].name;
-      this.fileSelected = input.files[0];
+  onFileSelected(event: FileSelectEvent) {
+    const input = event.files[0];
+    if (input) {
+      this.filename = input.name;
+      this.fileSelected = input;
+      console.log('filename: ', this.filename);
     } else {
       this.fileSelected = null;
     }
@@ -96,10 +96,6 @@ export class AddProductComponent implements OnInit {
 
   onValidate() {
     this.formValid = this.productForm.valid;
-  }
-
-  refresh() {
-    this.location.go(this.location.path());
   }
 
   submitProduct() {
@@ -122,10 +118,12 @@ export class AddProductComponent implements OnInit {
         quantity: this.productForm.value.quantity,
       } as ProductRequest;
       this.productService.addProduct(productRequest, mediaData).subscribe({
-        next: (success: boolean) => {
-          this.success = success;
+        next: (data: Product | null) => {
+          this.success = data !== null;
           this.requestSent = true;
           this.productResult = 'Product added successfully';
+          this.productService.productAddedSource.next(data);
+          this.closeModal();
         },
         error: () => {
           this.success = false;
@@ -139,6 +137,6 @@ export class AddProductComponent implements OnInit {
   closeModal() {
     this.formStateService.setFormOpen(false);
     this.modalRef?.close();
-    this.refresh();
+    // this.refresh();
   }
 }

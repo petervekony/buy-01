@@ -49,7 +49,7 @@
             <label for="image" class="block text-900 font-medium mb-2">Add an image?</label>
 
             <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" name="image" accept="image/*"
-              (change)="onFileSelected($event)" class="w-full half"></p-fileUpload>
+              (onSelect)="onFileSelected($event)" class="w-full half"></p-fileUpload>
             <!-- <input pButton #imageUpload type="file" name="image" id="upload-product-image" class="mt-7" -->
             <!--   (change)="onFileSelected($event)" accept="image/*" /> -->
           </div>
