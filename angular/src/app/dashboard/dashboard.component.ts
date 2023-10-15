@@ -3,7 +3,7 @@ import { FormStateService } from '../service/form-state.service';
 import { ProductService } from '../service/product.service';
 import { Observable, of } from 'rxjs';
 import { Product } from '../interfaces/product';
-import { switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../service/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 
@@ -20,6 +20,7 @@ export class DashboardComponent implements OnInit {
   showProductForm = false;
   showUserForm = false;
   userProducts$: Observable<Product[]> = of([]);
+  products: Product[] = [];
   constructor(
     private formStateService: FormStateService,
     private productService: ProductService,
@@ -40,13 +41,15 @@ export class DashboardComponent implements OnInit {
     this.formStateService.setFormOpen(false);
     const cookie = this.cookieService.check('buy-01');
     if (!cookie) return;
-    this.getOwnerProducts();
   }
 
   private getOwnerProducts() {
     this.userProducts$ = this.authService
       .getAuth()
-      .pipe(switchMap((user) => this.productService.getProductsById(user.id)));
+      .pipe(
+        switchMap((user) => this.productService.getProductsById(user.id)),
+        map((products: Product[]) => products.reverse()),
+      );
   }
 
   manageProducts(event: MouseEvent) {

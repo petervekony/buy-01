@@ -92,12 +92,10 @@ implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  //TODO: only for testing purposes
   showProducts() {
     this.subscription = this.productService.getProducts().subscribe({
-      next: (product) => {
-        // console.log('products: ', product);
-        this.products = product;
+      next: (products) => {
+        this.products = products.reverse();
       },
       error: (error) => {
         console.log(error);

@@ -3,7 +3,8 @@ import {
   Component,
   // Renderer2,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+
+// import { Subscription } from 'rxjs';
 
 // import { FormStateService } from '../service/form-state.service';
 
@@ -13,7 +14,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent {
-  filterSubscription: Subscription = Subscription.EMPTY;
+  // filterSubscription: Subscription = Subscription.EMPTY;
   constructor(
     // private formStateService: FormStateService,
     // private renderer: Renderer2,

@@ -15,6 +15,7 @@ import { UserService } from '../service/user.service';
 import { MediaService } from '../service/media.service';
 import { StateService } from '../service/state.service';
 import { ValidatorService } from '../service/validator.service';
+import { FileSelectEvent } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-profile-page',
@@ -68,7 +69,9 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
-    this.getAuthAndAvatar();
+    this.mediaService.imageAdded$.subscribe(() => {
+      this.getAuthAndAvatar();
+    });
   }
 
   private getAuthAndAvatar() {
@@ -98,11 +101,11 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files?.length > 0) {
-      this.filename = input.files[0].name;
-      this.fileSelected = input.files[0];
+  onFileSelected(event: FileSelectEvent) {
+    const file = event.files[0];
+    if (file) {
+      this.filename = file.name;
+      this.fileSelected = file;
       console.log(this.fileSelected.toString());
     } else {
       this.fileSelected = null;
@@ -123,6 +126,8 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
+        this.mediaService.imageAddedSource.next(data);
+        this.hideModal();
       },
       error: (err) => console.log(err),
     });
@@ -175,13 +180,15 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   onSubmit() {
-    const request = this.userUpdateForm.value;
+    const request = { ...this.userUpdateForm.value };
+    delete request.confirmPassword;
+    console.log(request);
     this.formStateService.setFormOpen(false);
     this.userService.updateUser(request, this.currentUser.id).subscribe({
       next: (data) => console.log(data),
       error: (err) => console.log(err),
     });
-    this.formOpen = false;
+    this.hideModal();
   }
 
   deleteAvatar() {
@@ -189,5 +196,6 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.avatarSubscription.unsubscribe();
   }
 }

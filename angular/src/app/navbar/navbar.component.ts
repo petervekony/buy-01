@@ -39,8 +39,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.mediaService.imageAdded$.subscribe(() => {
+      this.getAuthAndAvatar();
+    });
     this.checkRoutes();
-    this.getAuthAndAvatar();
   }
 
   private getAuthAndAvatar() {
