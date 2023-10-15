@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http/testing';
 import { UserService } from './user.service';
 import { environment } from 'src/environments/environment';
-import { of } from 'rxjs';
+// import { of } from 'rxjs';
 import { LoginRequest } from '../interfaces/login-request';
 import { SignupRequest } from '../interfaces/signup-request';
 import { User } from '../interfaces/user';
@@ -63,9 +63,13 @@ describe('UserService', () => {
       confirmPassword: 'test123',
       role: 'SELLER',
     };
-    const expectedResponse = of({
-      message: 'User registered successfully',
-    });
+    const expectedResponse = {
+      name: 'peter',
+      email: 'peter@peter.com',
+      confirmPassword: 'test123',
+      role: 'SELLER',
+      id: '123123123',
+    } as User;
 
     service.sendSignupRequest(signupRequest).subscribe((response) => {
       expect(response).toEqual(expectedResponse);

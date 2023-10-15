@@ -7,19 +7,27 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { UserService } from '../service/user.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
+import { User } from '../interfaces/user';
 
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
   const userServiceMock = {
-    sendSignupRequest: () => of({ message: 'User registered successfully' }),
+    sendSignupRequest: () =>
+      of({
+        name: 'taneli',
+        email: 'taneli@gmail.com',
+        confirmPassword: 'test123',
+        role: 'SELLER',
+        id: '123123123',
+      }),
     sendLoginRequest: () =>
       of({
         name: 'taneli',
         email: 'taneli@gmail.com',
-        password: 'test123',
         confirmPassword: 'test123',
         role: 'SELLER',
+        id: '123123123',
       }),
   };
 
@@ -97,14 +105,12 @@ describe('SignupComponent', () => {
 
     spyOn(userService, 'sendSignupRequest').and.returnValue(
       of({
-        data: {
-          name: 'taneli',
-          password: 'test123',
-          confirmPassword: 'test123',
-          email: 'email@gmail.com',
-          role: 'SELLER',
-        },
-      }),
+        name: 'taneli',
+        email: 'email@gmail.com',
+        role: 'SELLER',
+        jwtToken: '123123123',
+        id: '123123123',
+      } as User),
     );
 
     component.registerForm.setValue({
@@ -210,7 +216,11 @@ describe('SignupComponent', () => {
     });
 
     spyOn(userService, 'sendSignupRequest').and.returnValue(
-      of({ message: 'User registered succesfully' }),
+      of({
+        name: 'test',
+        email: 'email@gmail.com',
+        role: 'CLIENT',
+      } as User),
     );
 
     component.onSubmit();
@@ -234,7 +244,11 @@ describe('SignupComponent', () => {
     });
 
     spyOn(userService, 'sendSignupRequest').and.returnValue(
-      of({ message: 'User registered succesfully' }),
+      of({
+        name: 'seller',
+        email: 'email@gmail.com',
+        role: 'SELLER',
+      } as User),
     );
 
     component.onSubmit();

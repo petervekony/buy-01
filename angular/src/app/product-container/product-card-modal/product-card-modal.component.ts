@@ -139,12 +139,17 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   }
 
   submitProduct() {
-    const mediaData = new FormData();
-    mediaData.append(
-      'image',
-      this.fileToBlob(this.fileSelected!),
-      this.filename as string,
-    );
+    let mediaData;
+    if (this.fileSelected) {
+      mediaData = new FormData();
+      mediaData.append(
+        'image',
+        this.fileToBlob(this.fileSelected),
+        this.filename as string,
+      );
+    } else {
+      mediaData = null;
+    }
 
     let productRequest: ProductRequest;
     if (this.formValid) {
