@@ -11,13 +11,14 @@ import { UserUpdateRequest } from '../interfaces/user-update-request';
   providedIn: 'root',
 })
 export class UserService {
-  //
-  //TODO: add the update username live!
-
-  usernameAddedSource = new BehaviorSubject<User>({} as User);
+  private usernameAddedSource = new BehaviorSubject<User>({} as User);
   usernameAdded$ = this.usernameAddedSource.asObservable();
 
   constructor(private http: HttpClient) {}
+
+  updateUsernameAdded(data: User): void {
+    this.usernameAddedSource.next(data);
+  }
 
   sendLoginRequest(request: LoginRequest): Observable<User> {
     const address = environment.loginURL;

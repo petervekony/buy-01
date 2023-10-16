@@ -8,6 +8,7 @@ import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { filter } from 'rxjs/operators';
 import { MediaService } from '../service/media.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +16,7 @@ import { MediaService } from '../service/media.service';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  placeholder = '../../assets/images/placeholder.png';
+  placeholder = environment.placeholder;
   routeSubscription: Subscription = Subscription.EMPTY;
   authSubscription: Subscription = Subscription.EMPTY;
   avatarSubscription: Subscription = Subscription.EMPTY;

@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
@@ -14,14 +14,13 @@ import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 import { ProductCreationResponse } from '../interfaces/product-creation-response';
 import { AuthService } from './auth.service';
-import { Media } from '../interfaces/media';
 import { MediaService } from './media.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
-  productAddedSource = new BehaviorSubject<Product | null>(
+  private productAddedSource = new BehaviorSubject<Product | null>(
     {} as Product,
   );
   productAdded$ = this.productAddedSource.asObservable();
@@ -33,6 +32,11 @@ export class ProductService {
     private authService: AuthService,
     private mediaService: MediaService,
   ) {}
+
+  updateProductAdded(product: Product): void {
+    this.productAddedSource.next(product);
+  }
+
   getProducts(): Observable<Product[]> {
     const address = environment.productsURL;
     return this.http.get<Product[]>(address, { withCredentials: true });
@@ -83,7 +87,7 @@ export class ProductService {
             mediaForm.append('name', '');
             return data.product;
           }
-          this.productAddedSource.next(data.product);
+          this.updateProductAdded(data.product);
           return data.product;
         }),
         catchError((error) => {

@@ -17,6 +17,7 @@ import { StateService } from '../service/state.service';
 import { ValidatorService } from '../service/validator.service';
 import { FileSelectEvent } from 'primeng/fileupload';
 import { Media } from '../interfaces/media';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-profile-page',
@@ -31,16 +32,16 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     profile: ElementRef | undefined;
   @ViewChild('avatarForm')
     avaterForm: ElementRef | undefined;
-  placeholder: string = '../../assets/images/placeholder.png';
-  user$ = new Subject<User>();
-  currentUser: User = {} as User;
   formOpen = false;
   formValid = false;
   buttonClicked = false;
   avatarFormOpen = false;
   profileFormOpen = false;
   filename: string = '';
+  user$ = new Subject<User>();
+  currentUser: User = {} as User;
   fileSelected: File | null = null;
+  placeholder: string = environment.placeholder;
   avatarSubscription: Subscription = Subscription.EMPTY;
   avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
@@ -130,7 +131,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
-        this.mediaService.imageAddedSource.next(data);
+        this.mediaService.updateImageAdded(data);
         this.hideModal();
       },
       error: (err) => console.log(err),
@@ -194,7 +195,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     this.userService.updateUser(request, this.currentUser.id).subscribe({
       next: (data) => {
         console.log(data);
-        this.userService.usernameAddedSource.next(data);
+        this.userService.updateUsernameAdded(data);
       },
       error: (err) => console.log(err),
     });
@@ -212,7 +213,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
       //eslint-disable-next-line
       next: (data: any) => console.log(data),
     });
-    this.mediaService.imageAddedSource.next({} as Media);
+    this.mediaService.updateImageAdded({} as Media);
     this.avatar$.next(this.placeholder);
     this.hideModal();
   }

@@ -122,7 +122,7 @@ export class AddProductComponent implements OnInit {
           this.success = data !== null;
           this.requestSent = true;
           this.productResult = 'Product added successfully';
-          this.productService.productAddedSource.next(data);
+          this.productService.updateProductAdded(data!);
           this.closeModal();
         },
         error: () => {

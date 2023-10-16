@@ -13,11 +13,13 @@ import { of, Subscription } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
+import { DataService } from 'src/app/service/data.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
 import { ProductService } from 'src/app/service/product.service';
 import { UserService } from 'src/app/service/user.service';
 import { ValidatorService } from 'src/app/service/validator.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-product-card-modal',
@@ -37,17 +39,15 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     product!: Product;
   @Input()
     user?: User;
-  // images$: Subject<string> = new Subject<string>();
   images: string[] = [];
   imageIds: string[] = [];
-  currentImageIndex = 0;
   mediaSubscription: Subscription = Subscription.EMPTY;
   tumbnailSubscription: Subscription = Subscription.EMPTY;
   ownerSubscription: Subscription = Subscription.EMPTY;
   mediaUpdateSubscription: Subscription = Subscription.EMPTY;
-  placeholder: string = '../../assets/images/placeholder.png';
+  placeholder: string = environment.placeholder;
   picture: string = this.placeholder;
-  formOpen = true;
+  formOpen = false;
   formValid = true;
   success = false;
   confirm = false;
@@ -60,6 +60,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   owner: User = {} as User;
   price: number = 0;
   quantity: number = 0;
+  currentImageIndex = 0;
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl(null, [this.validatorService.productNameValidator()]),
@@ -80,6 +81,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     private productService: ProductService,
     private userService: UserService,
     private validatorService: ValidatorService,
+    private dataService: DataService,
   ) {
   }
 
@@ -94,25 +96,30 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.mediaSubscription = this.mediaService
-      .getProductMedia(this.product.id!)
-      .subscribe({
-        next: (data) => {
-          if (data && data.media && data.media.length > 0) {
-            this.images = data.media.map((item) => {
-              this.imageIds.push(item.id);
-              return this.mediaService.formatMultipleMedia(item);
-            });
-          }
-        },
-        error: () => of(null),
-      });
+    this.formStateService.formOpen$.subscribe((isOpen) => {
+      if (!isOpen) return;
+      this.mediaSubscription = this.mediaService
+        .getProductMedia(this.product.id!)
+        .subscribe({
+          next: (data) => {
+            if (data && data.media && data.media.length > 0) {
+              this.images = data.media.map((item) => {
+                this.imageIds.push(item.id);
+                return this.mediaService.formatMultipleMedia(item);
+              });
+            }
+          },
+          error: () => of(null),
+        });
 
-    this.ownerSubscription = this.userService.getOwnerInfo(this.product.userId!)
-      .subscribe({
-        next: (user) => this.owner = user,
-        error: (err) => console.log(err),
-      });
+      this.ownerSubscription = this.userService.getOwnerInfo(
+        this.product.userId!,
+      )
+        .subscribe({
+          next: (user) => this.owner = user,
+          error: (err) => console.log(err),
+        });
+    });
   }
 
   nextImage() {
@@ -129,6 +136,8 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     this.imageIds.splice(index, 1);
     this.mediaService.deleteProductImage(id);
     this.currentImageIndex--;
+    //HACK
+    this.dataService.sendData('doit');
     if (this.currentImageIndex < 0) this.currentImageIndex = 0;
     if (this.images.length === 0) this.picture = this.placeholder;
   }
@@ -142,12 +151,6 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     this.formStateService.setFormOpen(false);
     this.dialog?.close();
     this.confirm = false;
-  }
-
-  ngOnDestroy(): void {
-    this.mediaSubscription.unsubscribe();
-    this.ownerSubscription.unsubscribe();
-    this.tumbnailSubscription.unsubscribe();
   }
 
   onValidate() {
@@ -199,7 +202,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
           this.success = data !== null;
           this.requestSent = true;
           this.productResult = 'Product added successfully';
-          this.productService.productAddedSource.next(data);
+          this.productService.updateProductAdded(data!);
         },
         error: () => {
           this.success = false;
@@ -244,5 +247,12 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
 
   closeConfirm() {
     this.confirm = false;
+  }
+
+  ngOnDestroy(): void {
+    this.mediaSubscription.unsubscribe();
+    this.ownerSubscription.unsubscribe();
+    this.tumbnailSubscription.unsubscribe();
+    this.mediaUpdateSubscription.unsubscribe();
   }
 }
