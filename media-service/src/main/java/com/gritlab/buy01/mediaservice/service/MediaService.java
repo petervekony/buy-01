@@ -39,24 +39,23 @@ public class MediaService {
     return media;
   }
 
+  public ResponseEntity<?> deleteById(String id) {
+    mediaRepository.deleteById(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
   public ResponseEntity<?> deleteMediaById(String userId, String productId) {
     ErrorMessage errorMessage =
-        new ErrorMessage("Error: media not found", HttpStatus.NOT_FOUND.value());
+        new ErrorMessage("Error: bad request to delete media", HttpStatus.BAD_REQUEST.value());
     if (userId != null) {
-      if (!mediaRepository.findByUserId(userId).isEmpty()) {
-        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
-      }
-      mediaRepository.deleteByUserId(userId);
+      mediaRepository.deleteAllByUserId(userId);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     if (productId != null) {
-      if (!mediaRepository.findAllByProductId(productId).isEmpty()) {
-        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
-      }
       mediaRepository.deleteAllByProductId(productId);
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
   }
 
   public ResponseEntity<?> createMedia(MultipartFile image, String userId, String productId) {

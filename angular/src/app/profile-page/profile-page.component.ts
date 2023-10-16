@@ -16,6 +16,7 @@ import { MediaService } from '../service/media.service';
 import { StateService } from '../service/state.service';
 import { ValidatorService } from '../service/validator.service';
 import { FileSelectEvent } from 'primeng/fileupload';
+import { Media } from '../interfaces/media';
 
 @Component({
   selector: 'app-profile-page',
@@ -40,10 +41,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   profileFormOpen = false;
   filename: string = '';
   fileSelected: File | null = null;
-  authSubscription: Subscription = Subscription.EMPTY;
   avatarSubscription: Subscription = Subscription.EMPTY;
-  userSubscription: Subscription = Subscription.EMPTY;
-  mediaSubscription: Subscription = Subscription.EMPTY;
   avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
   constructor(
@@ -53,7 +51,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private mediaService: MediaService,
     private stateService: StateService,
-    private validatorServie: ValidatorService,
+    private validatorService: ValidatorService,
   ) {
     //TODO: fix if clicked outside form, close form!
     // this.renderer.listen('window', 'click', (e: Event) => {
@@ -75,10 +73,13 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     this.mediaService.imageAdded$.subscribe(() => {
       this.getAuthAndAvatar();
     });
+    this.userService.usernameAdded$.subscribe((data) => {
+      this.user$.next(data);
+    });
   }
 
   private getAuthAndAvatar() {
-    this.authSubscription = this.authService.getAuth().subscribe({
+    this.authService.getAuth().subscribe({
       next: (user) => {
         this.user$.next(user);
         this.currentUser = user;
@@ -89,7 +90,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
             .subscribe({
               next: (media) => {
                 if (media && media?.image) {
-                  this.avatar$.next(this.mediaService.formatAvatar(media));
+                  this.avatar$.next(this.mediaService.formatMedia(media));
                 }
               },
               error: (err) => console.log(err),
@@ -125,10 +126,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
         this.filename as string,
       );
     }
-    this.mediaSubscription = this.mediaService.uploadAvatar(
-      this.currentUser.id,
-      mediaData!,
-    ).subscribe({
+    this.mediaService.uploadAvatar(this.currentUser.id, mediaData!).subscribe({
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
@@ -145,11 +143,13 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   userUpdateForm: FormGroup = new FormGroup({
-    name: new FormControl(null, [this.validatorServie.usernameValidator()]),
-    email: new FormControl(null, [this.validatorServie.emailValidator()]),
-    password: new FormControl(null, [this.validatorServie.passwordValidator()]),
+    name: new FormControl(null, [this.validatorService.usernameValidator()]),
+    email: new FormControl(null, [this.validatorService.emailValidator()]),
+    password: new FormControl(null, [
+      this.validatorService.passwordValidator(),
+    ]),
     confirmPassword: new FormControl(null, [
-      this.validatorServie.passwordValidator(),
+      this.validatorService.passwordValidator(),
     ]),
   });
 
@@ -189,25 +189,35 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     const request = { ...this.userUpdateForm.value };
     delete request.confirmPassword;
     console.log(request);
+    formatForm();
     this.formStateService.setFormOpen(false);
-    this.userSubscription = this.userService.updateUser(
-      request,
-      this.currentUser.id,
-    ).subscribe({
-      next: (data) => console.log(data),
+    this.userService.updateUser(request, this.currentUser.id).subscribe({
+      next: (data) => {
+        console.log(data);
+        this.userService.usernameAddedSource.next(data);
+      },
       error: (err) => console.log(err),
     });
     this.hideModal();
+
+    function formatForm() {
+      if (!request.password) request.password = null;
+      if (!request.name) request.name = null;
+      if (!request.email) request.email = null;
+    }
   }
 
   deleteAvatar() {
-    this.mediaService.deleteAvatar(this.currentUser.id);
+    this.mediaService.deleteAvatar(this.currentUser.id).subscribe({
+      //eslint-disable-next-line
+      next: (data: any) => console.log(data),
+    });
+    this.mediaService.imageAddedSource.next({} as Media);
+    this.avatar$.next(this.placeholder);
+    this.hideModal();
   }
 
   ngOnDestroy(): void {
-    this.userSubscription.unsubscribe();
-    this.authSubscription.unsubscribe();
     this.avatarSubscription.unsubscribe();
-    this.mediaSubscription.unsubscribe();
   }
 }

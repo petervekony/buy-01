@@ -8,6 +8,7 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MediaService {
+  placeholder: string = '../../assets/images/placeholder.png';
   imageAddedSource = new BehaviorSubject<Media>({} as Media);
   imageAdded$ = this.imageAddedSource.asObservable();
 
@@ -19,7 +20,7 @@ export class MediaService {
   }
 
   getProductMedia(productId: string): Observable<MediaResponse> {
-    const address = environment.productMediaURL + productId;
+    const address = environment.mediaURL + '/' + productId;
     return this.http.get<MediaResponse>(address, { withCredentials: true });
   }
 
@@ -28,9 +29,31 @@ export class MediaService {
     return this.http.get<Media>(address, { withCredentials: true });
   }
 
-  deleteAvatar(userId: string): void {
-    const address = environment.mediaURL + userId;
-    this.http.delete(address, { withCredentials: true });
+  addMedia(id: string, image: FormData): Observable<Media> {
+    const address = environment.mediaURL;
+    const headers = new HttpHeaders();
+    headers.append('Content-Type', 'multipart/form-data');
+    return this.http
+      .post<Media>(address, image, {
+        params: { productId: id },
+        headers: headers,
+        withCredentials: true,
+      });
+  }
+  //eslint-disable-next-line
+  deleteAvatar(userId: string): any {
+    const address = environment.mediaURL;
+    return this.http.delete(address, {
+      params: { userId: userId },
+      withCredentials: true,
+    });
+  }
+
+  deleteProductImage(mediaId: string): void {
+    const address = environment.mediaURL + '/' + mediaId;
+    this.http.delete(address, { withCredentials: true }).subscribe((item) =>
+      console.log(item)
+    );
   }
 
   uploadAvatar(userId: string, image: FormData): Observable<Media> {
@@ -49,17 +72,15 @@ export class MediaService {
           return data;
         }),
       );
-    // .subscribe({
-    //   next: (data) => {
-    //     console.log(data);
-    //   },
-    //   error: (error) => {
-    //     console.log(error);
-    //   },
-    // });
   }
 
-  formatAvatar(media: Media): string {
+  formatMedia(media: Media): string {
+    if (!media) return this.placeholder;
     return 'data:' + media.mimeType + ';base64,' + media.image;
+  }
+
+  formatMultipleMedia(media: Media): string {
+    if (!media || !media.image.data) return this.placeholder;
+    return 'data:' + media.mimeType + ';base64,' + media.image.data;
   }
 }

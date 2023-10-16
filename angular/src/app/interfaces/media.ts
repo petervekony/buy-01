@@ -1,6 +1,7 @@
 export interface Media {
   id: string;
-  image: string;
+  //eslint-disable-next-line
+  image: any;
   productId: string;
   userId: string;
   mimeType: string;
