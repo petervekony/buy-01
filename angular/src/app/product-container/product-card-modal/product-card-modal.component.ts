@@ -6,9 +6,10 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { FileSelectEvent } from 'primeng/fileupload';
-import { catchError, of, Subscription } from 'rxjs';
+import { FormControl, FormGroup } from '@angular/forms';
+import { MatTabGroup } from '@angular/material/tabs';
+import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
+import { of, Subscription } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
@@ -16,6 +17,7 @@ import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
 import { ProductService } from 'src/app/service/product.service';
 import { UserService } from 'src/app/service/user.service';
+import { ValidatorService } from 'src/app/service/validator.service';
 
 @Component({
   selector: 'app-product-card-modal',
@@ -23,17 +25,26 @@ import { UserService } from 'src/app/service/user.service';
   styleUrls: ['./product-card-modal.component.css'],
 })
 export class ProductCardModalComponent implements OnInit, OnDestroy {
+  @ViewChild('tabGroup')
+    tabGroup!: MatTabGroup;
   @ViewChild('productModal')
     productModal?: ElementRef;
+  @ViewChild('imageUpload')
+    imageUploadButton: FileUpload | undefined;
   @Input()
     dialog?: HTMLDialogElement;
   @Input()
     product!: Product;
   @Input()
     user?: User;
+  // images$: Subject<string> = new Subject<string>();
   images: string[] = [];
-  subscription: Subscription = Subscription.EMPTY;
+  imageIds: string[] = [];
+  currentImageIndex = 0;
+  mediaSubscription: Subscription = Subscription.EMPTY;
+  tumbnailSubscription: Subscription = Subscription.EMPTY;
   ownerSubscription: Subscription = Subscription.EMPTY;
+  mediaUpdateSubscription: Subscription = Subscription.EMPTY;
   placeholder: string = '../../assets/images/placeholder.png';
   picture: string = this.placeholder;
   formOpen = true;
@@ -41,7 +52,9 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   success = false;
   confirm = false;
   requestSent = false;
+  imageValid = false;
   productResult: string = '';
+  errorMessage: string = '';
   filename: string = '';
   fileSelected: File | null = null;
   owner: User = {} as User;
@@ -49,27 +62,16 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   quantity: number = 0;
 
   productForm: FormGroup = new FormGroup({
-    name: new FormControl('', [
-      Validators.required,
-      Validators.minLength(4),
-      Validators.maxLength(300),
+    name: new FormControl(null, [this.validatorService.productNameValidator()]),
+    description: new FormControl(null, [
+      this.validatorService.productDescriptionValidator(),
     ]),
-    description: new FormControl('', [
-      Validators.required,
-      Validators.minLength(4),
-      Validators.maxLength(30),
+    price: new FormControl(null, [
+      this.validatorService.productPriceValidator(),
     ]),
-    price: new FormControl(this.price, [
-      Validators.required,
-      Validators.min(0),
-      Validators.max(99999999999),
+    quantity: new FormControl(null, [
+      this.validatorService.productQuantityValidator(),
     ]),
-    quantity: new FormControl(this.quantity, [
-      Validators.required,
-      Validators.min(0),
-      Validators.max(99999999999),
-    ]),
-    image: new FormControl(),
   });
 
   constructor(
@@ -77,19 +79,30 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     private formStateService: FormStateService,
     private productService: ProductService,
     private userService: UserService,
+    private validatorService: ValidatorService,
   ) {
   }
 
   ngOnInit(): void {
     this.initFormValues();
 
-    this.subscription = this.mediaService
-      .getProductThumbnail(this.product.id!)
-      .pipe(catchError(() => of(null)))
+    this.tumbnailSubscription = this.mediaService.getProductThumbnail(
+      this.product.id!,
+    ).subscribe((media) => {
+      if (media) {
+        this.picture = this.mediaService.formatMedia(media);
+      }
+    });
+
+    this.mediaSubscription = this.mediaService
+      .getProductMedia(this.product.id!)
       .subscribe({
-        next: (media) => {
-          if (media && media?.image) {
-            this.picture = this.mediaService.formatAvatar(media);
+        next: (data) => {
+          if (data && data.media && data.media.length > 0) {
+            this.images = data.media.map((item) => {
+              this.imageIds.push(item.id);
+              return this.mediaService.formatMultipleMedia(item);
+            });
           }
         },
         error: () => of(null),
@@ -100,6 +113,24 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
         next: (user) => this.owner = user,
         error: (err) => console.log(err),
       });
+  }
+
+  nextImage() {
+    this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
+  }
+
+  prevImage() {
+    this.currentImageIndex = (this.currentImageIndex - 1) % this.images.length;
+  }
+
+  deleteImage(index: number) {
+    const id = this.imageIds[index];
+    this.images.splice(index, 1);
+    this.imageIds.splice(index, 1);
+    this.mediaService.deleteProductImage(id);
+    this.currentImageIndex--;
+    if (this.currentImageIndex < 0) this.currentImageIndex = 0;
+    if (this.images.length === 0) this.picture = this.placeholder;
   }
 
   private initFormValues() {
@@ -114,8 +145,9 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.mediaSubscription.unsubscribe();
     this.ownerSubscription.unsubscribe();
+    this.tumbnailSubscription.unsubscribe();
   }
 
   onValidate() {
@@ -128,13 +160,16 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: FileSelectEvent) {
+    console.log(event, event.files);
     const input = event.files[0];
     if (input) {
       this.filename = input.name;
       this.fileSelected = input;
       console.log('filename: ', this.filename);
+      this.imageValid = true;
     } else {
       this.fileSelected = null;
+      this.imageValid = false;
     }
   }
 
@@ -173,6 +208,30 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       });
     }
     this.productForm.reset();
+    this.imageUploadButton!.clear();
+    this.tabGroup.selectedIndex = 0;
+  }
+
+  submitImage() {
+    if (!this.fileSelected) return;
+    const mediaForm = new FormData();
+    mediaForm.append(
+      'image',
+      this.fileToBlob(this.fileSelected),
+      this.filename,
+    );
+    this.mediaUpdateSubscription = this.mediaService.addMedia(
+      this.product.id!,
+      mediaForm,
+    ).subscribe({
+      next: (data) => {
+        this.images.push(this.mediaService.formatMultipleMedia(data));
+        this.fileSelected = null;
+        this.filename = '';
+      },
+      error: (err) => this.errorMessage = err.error.message,
+    });
+    this.tabGroup.selectedIndex = 0;
   }
 
   deleteProduct(productId: string): void {

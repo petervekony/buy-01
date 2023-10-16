@@ -14,6 +14,8 @@ import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 import { ProductCreationResponse } from '../interfaces/product-creation-response';
 import { AuthService } from './auth.service';
+import { Media } from '../interfaces/media';
+import { MediaService } from './media.service';
 
 @Injectable({
   providedIn: 'root',
@@ -26,8 +28,11 @@ export class ProductService {
   private userProductsSource = new BehaviorSubject<Product[]>([]);
   userProducts$ = this.userProductsSource.asObservable();
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
-
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private mediaService: MediaService,
+  ) {}
   getProducts(): Observable<Product[]> {
     const address = environment.productsURL;
     return this.http.get<Product[]>(address, { withCredentials: true });
@@ -74,7 +79,7 @@ export class ProductService {
       .pipe(
         map((data: ProductCreationResponse) => {
           if (mediaForm && mediaForm.get('image') !== null) {
-            this.addMedia(data.product.id!, mediaForm);
+            this.mediaService.addMedia(data.product.id!, mediaForm);
             mediaForm.append('name', '');
             return data.product;
           }
@@ -86,26 +91,6 @@ export class ProductService {
           return of(null);
         }),
       );
-  }
-
-  addMedia(id: string, image: FormData): void {
-    const address = environment.mediaURL;
-    const headers = new HttpHeaders();
-    headers.append('Content-Type', 'multipart/form-data');
-    this.http
-      .post(address, image, {
-        params: { productId: id },
-        headers: headers,
-        withCredentials: true,
-      })
-      .subscribe({
-        next: (data) => {
-          console.log(data);
-        },
-        error: (error) => {
-          console.log(error);
-        },
-      });
   }
 
   deleteProduct(id: string): void {

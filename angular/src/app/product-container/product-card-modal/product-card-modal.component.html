@@ -1,21 +1,21 @@
 <div class="modal-container">
   <button class="close-button" (click)="hideModal()">X</button>
-  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center">
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" #tabGroup>
     <mat-tab label="Info">
       <ng-template matTabContent>
         <div class="product-tab-container">
           <div class="product-image-container">
-            <!-- new approach -->
-            <!-- <ng-container *ngIf="images"> -->
-            <!--   <app-media-gallery [images]="images"> -->
-            <!--   </app-media-gallery> -->
-            <!-- </ng-container> -->
-
-            <ng-container *ngIf="!picture">
-              <img [src]="placeholder" alt="" class="product-modal-image" />
+            <ng-container *ngIf="images.length < 1">
+              <img [src]="picture" alt="" class="product-modal-image" />
             </ng-container>
-            <ng-container *ngIf="picture">
-              <img [src]="picture" alt="product picture" class="product-modal-image" />
+            <ng-container *ngIf="images && images.length > 0">
+              <img [src]="images[currentImageIndex]" alt="product picture" class="product-modal-image" />
+              <div class="image-navigation">
+                <button (click)="prevImage()" [disabled]="currentImageIndex === 0">Previous</button>
+                <span>{{ currentImageIndex + 1 }} / {{ images.length }}</span>
+                <button (click)="nextImage()" [disabled]="currentImageIndex === images.length - 1">Next</button>
+              </div>
+              <button (click)="deleteImage(currentImageIndex)">DELETE IMAGE</button>
             </ng-container>
           </div>
           <div class="product-details-body">
@@ -60,20 +60,43 @@
             <label for="product-quantity" class="block text-900 font-medium mb-2">Quantity</label>
             <p-inputNumber id="product-quantity" value="product.price" class="mb-3" name="product-quantity"
               formControlName="quantity"></p-inputNumber>
-            <!-- <div class="flex align-items-center justify-content-between mb-6"> -->
-            <div class="upload-container">
-              <label for="image" class="block text-900 font-medium mb-2">Add an image?</label>
-              <!-- <input #imageUpload type="file" name="image" id="upload-product-image" (change)="onFileSelected($event)" -->
-              <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" id="image" accept="image/*"
-                (onSelect)="onFileSelected($event)" class="w-full half"></p-fileUpload>
-              <!--   accept="image/*" /> -->
-            </div>
+            <!-- <div crlass="flex align-items-center justify-content-between mb-6"> -->
+            <!-- <div class="upload-container"> -->
+            <!--   <label for="image" class="block text-900 font-medium mb-2">Add an image?</label> -->
+            <!--   <!-- <input #imageUpload type="file" name="image" id="upload-product-image" (change)="onFileSelected($event)" -->
+            <!--   <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" id="image" accept="image/*" -->
+            <!--     (onSelect)="onFileSelected($event)" class="w-full half"></p-fileUpload> -->
+            <!--   <!--   accept="image/*" /> -->
+            <!-- </div> -->
 
             <button type="submit" id="submit-button" [disabled]="!formValid" pButton pRipple label="Submit"
               icon="pi pi-user" (click)="submitProduct()" class="w-full"></button>
           </form>
         </div>
       </ng-template>
+    </mat-tab>
+
+    <mat-tab label="Add images" *ngIf="user?.id === product.userId">
+      <ng-template matTabContent>
+        <form (ngSubmit)="submitImage()">
+          <div class="edit-product-container">
+            <div class="flex align-items-center justify-content-between mb-6">
+              <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+              <div class="upload-container">
+                <label for="image" class="block text-900 font-medium mb-2">Upload image</label>
+
+                <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" name="image" accept="image/*"
+                  (onSelect)="onFileSelected($event)" class="w-full half"></p-fileUpload>
+                <input type="file" #fileInput style="display:none" />
+              </div>
+            </div>
+            <button type="submit" [disabled]="!imageValid" pButton pRipple label="Add" icon="pi pi-user"
+              class="w-5 bottom"></button>
+          </div>
+        </form>
+      </ng-template>
+
+
     </mat-tab>
     <mat-tab label="Delete" *ngIf="user?.id === product.userId">
       <ng-template matTabContent>

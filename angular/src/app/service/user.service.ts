@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from '../interfaces/user';
 import { LoginRequest } from '../interfaces/login-request';
@@ -13,6 +13,9 @@ import { UserUpdateRequest } from '../interfaces/user-update-request';
 export class UserService {
   //
   //TODO: add the update username live!
+
+  usernameAddedSource = new BehaviorSubject<User>({} as User);
+  usernameAdded$ = this.usernameAddedSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -47,8 +50,8 @@ export class UserService {
     this.http.post(address, { withCredentials: true });
   }
 
-  updateUser(request: UserUpdateRequest, id: string) {
+  updateUser(request: UserUpdateRequest, id: string): Observable<User> {
     const address = environment.usersURL + '/' + id;
-    return this.http.put(address, request, { withCredentials: true });
+    return this.http.put<User>(address, request, { withCredentials: true });
   }
 }

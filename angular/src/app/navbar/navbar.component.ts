@@ -41,6 +41,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.mediaService.imageAdded$.subscribe(() => {
       this.getAuthAndAvatar();
     });
+    this.userService.usernameAdded$.subscribe((data) => {
+      this.user$.next(data);
+    });
     this.checkRoutes();
   }
 
@@ -49,7 +52,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
       next: (user) => {
         this.user$.next(user);
         this.currentUser = user;
-        if (user.avatar) this.getAvatar();
+        if (user.avatar) {
+          this.getAvatar();
+        }
       },
       error: (error) => console.error(error),
     });
@@ -60,7 +65,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.currentUser.id,
     ).subscribe({
       next: (media) => {
-        this.avatar$.next(this.mediaService.formatAvatar(media));
+        console.log(media);
+        const image = this.mediaService.formatMedia(media);
+        this.avatar$.next(image);
       },
       error: (err) => console.log(err),
     });

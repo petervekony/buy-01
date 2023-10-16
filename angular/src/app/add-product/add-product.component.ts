@@ -56,7 +56,7 @@ export class AddProductComponent implements OnInit {
     name: new FormControl('', [
       Validators.required,
       Validators.minLength(4),
-      Validators.maxLength(100),
+      Validators.maxLength(50),
     ]),
     description: new FormControl('', [
       Validators.required,

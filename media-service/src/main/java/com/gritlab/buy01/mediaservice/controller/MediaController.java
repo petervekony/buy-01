@@ -45,7 +45,7 @@ public class MediaController {
   @Autowired KafkaService kafkaService;
 
   @PreAuthorize("isAuthenticated()")
-  @GetMapping("/media/{id}")
+  @GetMapping("/media/{productId}")
   public ResponseEntity<MediaResponse> getMediaByProductId(
       @PathVariable("productId") String productId) {
     Optional<List<Media>> media = mediaService.getAllMediaByProductId(productId);
@@ -59,8 +59,16 @@ public class MediaController {
   }
 
   @PreAuthorize("isAuthenticated()")
+  @DeleteMapping("/media/{id}")
+  public ResponseEntity<?> deleteById(@PathVariable String id) {
+    return mediaService.deleteById(id);
+  }
+
+  @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/media")
-  public ResponseEntity<?> deleteById(@RequestParam String userId, @RequestParam String productId) {
+  public ResponseEntity<?> deleteByUserOrProductId(
+      @RequestParam(required = false) String userId,
+      @RequestParam(required = false) String productId) {
     return mediaService.deleteMediaById(userId, productId);
   }
 

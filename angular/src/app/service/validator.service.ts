@@ -61,4 +61,52 @@ export class ValidatorService {
         : null;
     };
   }
+
+  productNameValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const name = control.value;
+      if (!name) return null;
+
+      return Validators.minLength(4)(control) ||
+          Validators.maxLength(50)(control)
+        ? { nameInvalid: true }
+        : null;
+    };
+  }
+
+  productDescriptionValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const description = control.value;
+      if (!description) return null;
+
+      return Validators.minLength(4)(control) ||
+          Validators.maxLength(300)(control)
+        ? { descriptionInvalid: true }
+        : null;
+    };
+  }
+
+  productPriceValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const price = control.value;
+      if (!price) return null;
+
+      return Validators.min(0)(control) ||
+          Validators.max(99999999999)(control)
+        ? { priceInvalid: true }
+        : null;
+    };
+  }
+
+  productQuantityValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const quantity = control.value;
+      if (!quantity) return null;
+
+      return Validators.min(0)(control) ||
+          Validators.max(99999999999)(control)
+        ? { quantityInvalid: true }
+        : null;
+    };
+  }
 }
