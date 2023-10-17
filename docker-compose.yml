@@ -1,27 +1,28 @@
 services:
-  mongodb:
-    image: 'mongo:latest'
-    environment:
-      - 'MONGO_INITDB_DATABASE=buy01-db'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
-      - 'MONGO_INITDB_ROOT_USERNAME=root'
-    command: [--auth]
-    ports:
-      - '27017:27017'
-    restart: always
-    volumes:
-      - mongodb_data:/data/db
+  # mongodb:
+  #   image: 'mongo:latest'
+  #   environment:
+  #     - 'MONGO_INITDB_DATABASE=buy01-db'
+  #     - 'MONGO_INITDB_ROOT_PASSWORD=secret'
+  #     - 'MONGO_INITDB_ROOT_USERNAME=root'
+  #   command: [--auth]
+  #   ports:
+  #     - '27017:27017'
+  #   restart: always
+  #   volumes:
+  #     - mongodb_data:/data/db
 
   user-service:
     build:
       context: ./user-service
       dockerfile: Dockerfile
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/buy01-db?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
+      SPRING_DATA_MONGODB_DB: buy-01-users
     ports:
-      - '8080:8080'
+      - "8080:8080"
     depends_on:
-      - mongodb
+      # - mongodb
       - zookeeper
       - kafka
 
@@ -30,11 +31,12 @@ services:
       context: ./product-service
       dockerfile: Dockerfile
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/buy01-db?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
+      SPRING_DATA_MONGODB_DB: buy-01-products
     ports:
-      - '8081:8080'
+      - "8081:8080"
     depends_on:
-      - mongodb
+      # - mongodb
       - zookeeper
       - kafka
 
@@ -43,11 +45,12 @@ services:
       context: ./media-service
       dockerfile: Dockerfile
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:secret@mongodb:27017/buy01-db?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
+      SPRING_DATA_MONGODB_DB: buy-01-media
     ports:
-      - '8082:8080'
+      - "8082:8080"
     depends_on:
-      - mongodb
+      # - mongodb
       - zookeeper
       - kafka
 
@@ -56,8 +59,8 @@ services:
       context: ./angular
       dockerfile: Dockerfile
     ports:
-      - '80:80'
-      - '443:443'
+      - "80:80"
+      - "443:443"
     volumes:
       - ./angular/cert:/etc/nginx/ssl:ro
     depends_on:
@@ -68,20 +71,20 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper:latest
     ports:
-      - '2181:2181'
+      - "2181:2181"
     volumes:
-      - './zookeeper-data:/data'
-      - './wait-for-it.sh:/wait-for-it.sh'
-    depends_on:
-      - mongodb
-    command: ["/bin/sh", "-c", "/wait-for-it.sh mongodb:27017 -- /usr/sbin/sshd && bash /usr/bin/start-zk.sh"]
+      - "./zookeeper-data:/data"
+      - "./wait-for-it.sh:/wait-for-it.sh"
+    # depends_on:
+    #   - mongodb
+    # command: ["/bin/sh", "-c", "/wait-for-it.sh mongodb:27017 -- /usr/sbin/sshd && bash /usr/bin/start-zk.sh"]
 
   kafka:
     image: wurstmeister/kafka:latest
     ports:
-      - '9092:9092'
+      - "9092:9092"
     expose:
-      - '9093'
+      - "9093"
     environment:
       KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
@@ -94,10 +97,9 @@ services:
     depends_on:
       - zookeeper
     volumes:
-      - './wait-for-it.sh:/wait-for-it.sh'
-      - './kafka-entrypoint.sh:/kafka-entrypoint.sh'
+      - "./wait-for-it.sh:/wait-for-it.sh"
+      - "./kafka-entrypoint.sh:/kafka-entrypoint.sh"
     entrypoint: ["/bin/bash", "/kafka-entrypoint.sh"]
     # command: ["/wait-for-it.sh", "zookeeper:2181", "--", "/start-kafka.sh"]
-
-volumes:
-  mongodb_data:
+# volumes:
+#   mongodb_data:
