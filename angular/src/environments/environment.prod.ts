@@ -2,6 +2,7 @@ const baseURL = '/api';
 
 export const environment = {
   production: true,
+  placeholder: '../../assets/images/placeholder.png',
   authCheckURL: `${baseURL}/auth/check`,
   loginURL: `${baseURL}/auth/signin`,
   signupURL: `${baseURL}/auth/signup`,

@@ -8,11 +8,16 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MediaService {
-  placeholder: string = '../../assets/images/placeholder.png';
   imageAddedSource = new BehaviorSubject<Media>({} as Media);
+  placeholder: string = environment.placeholder;
   imageAdded$ = this.imageAddedSource.asObservable();
 
   constructor(private http: HttpClient) {}
+
+  //eslint-disable-next-line
+  updateImageAdded(data: any): void {
+    this.imageAddedSource.next(data);
+  }
 
   getProductThumbnail(productId: string): Observable<Media> {
     const address = environment.productMediaURL + productId;
@@ -68,7 +73,7 @@ export class MediaService {
         withCredentials: true,
       }).pipe(
         map((data: Media) => {
-          this.imageAddedSource.next(data);
+          this.updateImageAdded(data);
           return data;
         }),
       );

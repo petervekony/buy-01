@@ -13,11 +13,8 @@ import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
 import { AuthService } from 'src/app/service/auth.service';
 import { FormStateService } from 'src/app/service/form-state.service';
-
-// import { combineLatest, map, Subscription } from 'rxjs';
-// import { ProductService } from '../service/product.service';
-// import { UserService } from '../service/user.service';
-// import { MediaService } from '../service/media.service';
+import { environment } from 'src/environments/environment';
+import { DataService } from 'src/app/service/data.service';
 
 @Component({
   selector: 'app-product-card',
@@ -29,19 +26,19 @@ export class ProductCardComponent implements OnInit, OnDestroy {
     productModal: ElementRef | undefined;
   @Input()
     product: Product = {} as Product;
-  subscription: Subscription = Subscription.EMPTY;
-  modalVisible = false;
-  placeholder: string = '../../assets/images/placeholder.png';
+  placeholder: string = environment.placeholder;
   imageSrc: string = this.placeholder;
   userSubscription: Subscription = Subscription.EMPTY;
+  subscription: Subscription = Subscription.EMPTY;
   currentUser?: User;
-  // owner: string = '';
+  modalVisible = false;
 
   constructor(
     private mediaService: MediaService,
     private authservice: AuthService,
     private formStateService: FormStateService,
-  ) {} // private productService: ProductService, // private userService: UserService,
+    private dataService: DataService,
+  ) {}
   // private mediaService: MediaService,
   // this.subscription = combineLatest([
   //   this.productService.getProducts(),
@@ -68,21 +65,10 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   //     },
   //   });
   ngOnInit(): void {
-    this.subscription = this.mediaService
-      .getProductThumbnail(this.product.id!)
-      .subscribe({
-        next: (media) => {
-          if (media && media?.image) {
-            this.imageSrc = 'data:' + media.mimeType + ';base64,' + media.image;
-          } else {
-            this.imageSrc = '../../assets/images/placeholder.png';
-          }
-        },
-        error: (err) => {
-          if (err.status === 404) return of(null);
-          return of(null);
-        },
-      });
+    this.getProductThumbnail();
+    this.dataService.data$.subscribe(() => {
+      this.getProductThumbnail();
+    });
 
     const cookieCheck = this.authservice.getAuth();
     if (cookieCheck) {
@@ -90,6 +76,25 @@ export class ProductCardComponent implements OnInit, OnDestroy {
         this.currentUser = user;
       });
     }
+  }
+
+  private getProductThumbnail() {
+    this.subscription = this.mediaService
+      .getProductThumbnail(this.product.id!)
+      .subscribe({
+        next: (media) => {
+          if (media && media?.image) {
+            this.imageSrc = 'data:' + media.mimeType + ';base64,' +
+              media.image;
+          } else {
+            this.imageSrc = environment.placeholder;
+          }
+        },
+        error: (err) => {
+          if (err.status === 404) return of(null);
+          return of(null);
+        },
+      });
   }
 
   ngOnDestroy(): void {

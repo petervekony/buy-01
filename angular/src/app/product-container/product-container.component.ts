@@ -23,7 +23,6 @@ export class ProductContainerComponent
 implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild('container')
     container: ElementRef | undefined;
-  //eslint-disable-next-line
   products: Product[] = [];
   subscription: Subscription = Subscription.EMPTY;
   filterSubscription: Subscription = Subscription.EMPTY;
@@ -48,16 +47,7 @@ implements OnInit, OnDestroy, AfterViewInit {
     //     }
     //   },
     // );
-    // this.subscription = this.productService.getProducts().subscribe({
-    //   next: (products) => {
-    //     this.products = products;
-    //   },
-    //   error: (error) => {
-    //     console.log('error: ', error);
-    //   },
-    // });
   }
-
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
@@ -67,29 +57,6 @@ implements OnInit, OnDestroy, AfterViewInit {
     this.productService.productAdded$.subscribe(() => {
       this.showProducts();
     });
-
-    //TODO: fix the filter part!
-    this.filterSubscription = this.formStateService.formOpen$.subscribe(
-      (isOpen) => {
-        if (isOpen) {
-          if (this.container) {
-            this.renderer.addClass(
-              document.body,
-              'blur-filter',
-            );
-          }
-        } else if (!isOpen) {
-          if (this.container) {
-            this.renderer.removeClass(
-              document.body,
-              'blur-filter',
-            );
-          }
-        } else {
-          return;
-        }
-      },
-    );
   }
 
   showProducts() {
