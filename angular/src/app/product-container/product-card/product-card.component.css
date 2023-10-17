@@ -94,17 +94,22 @@
 
 dialog {
   position: absolute;
-  left: 10%;
   top: 15%;
   z-index: 7;
   height: 80vh;
   width: 80vw;
   border: none;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 @media screen and (width >= 700px) {
   .card-container {
     min-width: 30vw;
+  }
+
+  dialog {
+    width: 60vw;
   }
 }
 
@@ -112,11 +117,19 @@ dialog {
   .card-container {
     min-width: 23vw;
   }
+
+  dialog {
+    width: 50vw;
+  }
 }
 
 @media screen and (width >= 1200px) {
   .card-container {
     min-width: 20vw;
+  }
+
+  dialog {
+    width: 40vw;
   }
 }
 
