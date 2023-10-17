@@ -16,8 +16,10 @@
   </div>
 </div>
 <dialog #productModal>
-  <app-product-card-modal [user]="currentUser" [dialog]="productModal" [product]="product"
-    (id)="('productCardModal' + product.id)"></app-product-card-modal>
+  <ng-container class="modal-container">
+    <app-product-card-modal [user]="currentUser" [dialog]="productModal" [product]="product"
+      (id)="('productCardModal' + product.id)"></app-product-card-modal>
+  </ng-container>
 </dialog>
 <!-- <div class="card-container"> -->
 <!--   <div class="picture-container"> -->

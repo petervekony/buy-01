@@ -11,14 +11,19 @@
   border-radius: 10px;
   box-shadow: 0 0 7px #8d45ce80;
   backdrop-filter: blur(20px);
+  overflow-x:hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .product-tab-container {
   width: 100%;
   height: calc(70vh - 4rem);
+  overflow-x: hidden;
 }
 
 .product-image-container {
+  width: 100% !important;
   position: relative;
   height: 30%;
 }
@@ -30,12 +35,15 @@
   object-fit: cover;
   object-position: center center;
   overflow: hidden;
+  display: block;
 }
 
 .product-details-body {
   width: 100%;
   text-align: left;
-  margin-top: 2rem;
+  margin-top: 4rem;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
   color: #c3b5fd;
   justify-content: space-between;
 }
@@ -107,18 +115,6 @@
   width: 100%;
 }
 
-
-
-/* .description-textarea::placeholder{ */
-/*   font-size: 1rem; */
-/*   padding-left: 0.4rem; */
-/*   padding-top: 0.4rem; */
-/* } */
-
-/* .description-textarea:focus, .description-textarea:active, .description-textarea:hover { */
-/*   border: 1px solid azure; */
-/* } */
-
 .add-product-container {
   margin-top: 1rem;
   width: 100%;
@@ -159,4 +155,59 @@
 
 #no-button {
   background-color: #ff739a;
+}
+
+.image-navigation {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  width: 100%;
+  bottom: -20%;
+}
+
+.image-navigation button {
+  background-color: transparent;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.image-navigation span {
+  color: white;
+}
+
+#delete-image-button {
+  background: #08101ce6;
+  border:1px solid #c22800;
+  cursor: pointer;
+  position: absolute;
+  top: -100%;
+  right: 5px;
+  color: #c22800;
+  border-radius: 50%;
+}
+
+#delete-image-button:hover {
+  transform: scale(1.05);
+}
+
+.confirm-image-container {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  position: relative;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+}
+
+.confirm-image-container div {
+  flex-direction: row;
+  gap: 1rem;
 }

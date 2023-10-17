@@ -42,12 +42,6 @@ export class ProductService {
     return this.http.get<Product[]>(address, { withCredentials: true });
   }
 
-  // TODO: create the endpoint to get products by userId
-  // getProductsByUserId(userId: string): Observable<Product[]> {
-  //   const address = environment.userProductsURL+userId;
-  //   return this.http.get<Product[]>(address, { withCredentials: true });
-  // }
-
   getProductsById(userId: string): Observable<Product[]> {
     const address = environment.productsURL;
     return this.http

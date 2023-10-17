@@ -5,17 +5,36 @@
       <ng-template matTabContent>
         <div class="product-tab-container">
           <div class="product-image-container">
-            <ng-container *ngIf="images.length < 1">
+            <ng-container *ngIf="images.length < 1 && !imageDeleteConfirm">
               <img [src]="picture" alt="" class="product-modal-image" />
             </ng-container>
-            <ng-container *ngIf="images && images.length > 0">
-              <img [src]="images[currentImageIndex]" alt="product picture" class="product-modal-image" />
-              <div class="image-navigation">
-                <button (click)="prevImage()" [disabled]="currentImageIndex === 0">Previous</button>
-                <span>{{ currentImageIndex + 1 }} / {{ images.length }}</span>
-                <button (click)="nextImage()" [disabled]="currentImageIndex === images.length - 1">Next</button>
+            <ng-container *ngIf="images && images.length > 0 && !imageDeleteConfirm">
+              <div class="image-container">
+                <img [src]="images[currentImageIndex]" alt="product picture" class="product-modal-image" />
+                <div class="image-navigation">
+                  <button id="delete-image-button" (click)="openConfirm('image')">
+                    <mat-icon aria-hidden="false" aria-label="delete icon" fontIcon="delete"></mat-icon>
+                  </button>
+                  <button (click)="prevImage()" [disabled]="currentImageIndex === 0">
+                    <mat-icon aria-hidden="false" aria-label="arrow left" fontIcon="arrow_back_ios_new_icon"></mat-icon>
+                  </button>
+                  <span>{{ currentImageIndex + 1 }} / {{ images.length }}</span>
+                  <button (click)="nextImage()" [disabled]="currentImageIndex === images.length - 1">
+                    <mat-icon aria-hidden="false" aria-label="arrow right" fontIcon="arrow_forward_ios_icon"></mat-icon>
+                  </button>
+                </div>
               </div>
-              <button (click)="deleteImage(currentImageIndex)">DELETE IMAGE</button>
+            </ng-container>
+            <ng-container *ngIf="imageDeleteConfirm">
+              <div class="confirm-image-container">
+                <p>Are you sure?</p>
+                <div>
+                  <button class="confirm-button" pButton pRiple label="Yes"
+                    (click)="deleteImage(currentDeleteIndex)"></button>
+                  <button class="confirm-button" id="no-button" pButton pRiple label="No"
+                    (click)="closeConfirm()"></button>
+                </div>
+              </div>
             </ng-container>
           </div>
           <div class="product-details-body">
@@ -102,7 +121,7 @@
       <ng-template matTabContent>
         <div class="delete-container">
           <button *ngIf="!confirm" id="delete-button" pButton pRipple label="Delete product?"
-            (click)="openConfirm()"></button>
+            (click)="openConfirm('product')"></button>
           <div class="confirm-text" *ngIf="confirm">
             <p>Are you sure?</p>
           </div>
@@ -122,4 +141,6 @@
     <button class="confirm-button" pButton pRiple label="Yes" (click)="deleteProduct(product.id!)"></button>
     <button class="confirm-button" pButton pRiple label="No" (click)="closeConfirm()"></button>
   </div>
+</dialog>
+<dialog #confirmImageDelete>
 </dialog>

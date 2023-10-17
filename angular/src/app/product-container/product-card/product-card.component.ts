@@ -79,7 +79,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   }
 
   private updateThumbnailIfEmpty(id: string) {
-    if (id === this.product.id && this.imageSrc === environment.placeholder) {
+    if (id === this.product.id) {
       this.getProductThumbnail();
     }
   }

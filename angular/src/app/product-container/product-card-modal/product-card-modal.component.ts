@@ -53,6 +53,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   confirm = false;
   requestSent = false;
   imageValid = false;
+  imageDeleteConfirm = false;
   productResult: string = '';
   errorMessage: string = '';
   filename: string = '';
@@ -61,6 +62,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   price: number = 0;
   quantity: number = 0;
   currentImageIndex = 0;
+  currentDeleteIndex = 0;
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl(null, [this.validatorService.productNameValidator()]),
@@ -96,9 +98,11 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.dataService.deleteImage$.subscribe((index) => {
+      this.currentDeleteIndex = index;
+    });
+
     this.dataService.ids$.subscribe((id) => {
-      console.log(id);
-      console.log(this.product.id === id);
       if (id !== this.product.id) return;
       this.mediaSubscription = this.mediaService
         .getProductMedia(this.product.id!)
@@ -126,10 +130,12 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
 
   nextImage() {
     this.currentImageIndex = (this.currentImageIndex + 1) % this.images.length;
+    this.dataService.changeDeleteIndex(this.currentImageIndex);
   }
 
   prevImage() {
     this.currentImageIndex = (this.currentImageIndex - 1) % this.images.length;
+    this.dataService.changeDeleteIndex(this.currentImageIndex);
   }
 
   deleteImage(index: number) {
@@ -139,7 +145,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     this.mediaService.deleteProductImage(id);
     this.currentImageIndex--;
     //HACK
-    this.dataService.sendData('doit');
+    this.dataService.sendProductId(this.product.id!);
     if (this.currentImageIndex < 0) this.currentImageIndex = 0;
     if (this.images.length === 0) this.picture = this.placeholder;
   }
@@ -152,7 +158,7 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   hideModal() {
     this.formStateService.setFormOpen(false);
     this.dialog?.close();
-    this.confirm = false;
+    this.closeConfirm();
   }
 
   onValidate() {
@@ -243,12 +249,15 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     this.productService.deleteProduct(productId);
   }
 
-  openConfirm() {
-    this.confirm = true;
+  openConfirm(form: string) {
+    if (form === 'product') {
+      this.confirm = true;
+    } else this.imageDeleteConfirm = true;
   }
 
   closeConfirm() {
     this.confirm = false;
+    this.imageDeleteConfirm = false;
   }
 
   ngOnDestroy(): void {

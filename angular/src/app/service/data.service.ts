@@ -12,6 +12,9 @@ export class DataService {
   private idStream = new BehaviorSubject<string>('');
   ids$ = this.idStream.asObservable();
 
+  private deleteImageSource = new BehaviorSubject<number>(0);
+  deleteImage$ = this.deleteImageSource.asObservable();
+
   //eslint-disable-next-line
   sendData(data: any): void {
     this.dataSubject.next(data);
@@ -19,5 +22,9 @@ export class DataService {
 
   sendProductId(data: string): void {
     this.idStream.next(data);
+  }
+
+  changeDeleteIndex(data: number): void {
+    this.deleteImageSource.next(data);
   }
 }
