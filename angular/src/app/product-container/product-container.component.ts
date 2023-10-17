@@ -95,7 +95,7 @@ implements OnInit, OnDestroy, AfterViewInit {
   showProducts() {
     this.subscription = this.productService.getProducts().subscribe({
       next: (products) => {
-        this.products = products.reverse();
+        if (products) this.products = products.reverse();
       },
       error: (error) => {
         console.log(error);
