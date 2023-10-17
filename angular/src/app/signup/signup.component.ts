@@ -75,7 +75,6 @@ export class SignupComponent implements OnDestroy {
     this.formValid = false;
     const request: SignupRequest = this.registerForm.value;
     request.role ? (request.role = 'SELLER') : (request.role = 'CLIENT');
-    console.log('sending out the reg form:\n', request);
     this.subscription = this.userService.sendSignupRequest(request).subscribe({
       error: (error) => {
         this.error = error.error.message;
@@ -87,10 +86,8 @@ export class SignupComponent implements OnDestroy {
   }
 
   autoLogin(request: SignupRequest): void {
-    console.log('loginRequest', request);
     this.subscription = this.userService.sendLoginRequest(request).subscribe({
       next: (data) => {
-        console.log('login response:\n', data);
         const navigationExtras: NavigationExtras = { state: { data: data } };
         this.stateService.refreshState(data.jwtToken!, data);
         this.router.navigate(['home'], navigationExtras);

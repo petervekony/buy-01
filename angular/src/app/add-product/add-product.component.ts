@@ -45,11 +45,11 @@ export class AddProductComponent implements OnInit {
       this.formStateService.setFormOpen(true);
     }
 
-    this.formStateService.formOpen$.subscribe((isOpen) => {
-      this.product
-        ? (this.showProductForm = true)
-        : (this.showProductForm = isOpen);
-    });
+    // this.formStateService.formOpen$.subscribe((isOpen) => {
+    //   this.product
+    //     ? (this.showProductForm = true)
+    //     : (this.showProductForm = isOpen);
+    // });
   }
 
   productForm: FormGroup = new FormGroup({
@@ -75,7 +75,6 @@ export class AddProductComponent implements OnInit {
       Validators.max(99999999999),
       this.validatorService.numberValidator(),
     ]),
-    image: new FormControl(),
   });
 
   onFileSelected(event: FileSelectEvent) {
@@ -83,7 +82,6 @@ export class AddProductComponent implements OnInit {
     if (input) {
       this.filename = input.name;
       this.fileSelected = input;
-      console.log('filename: ', this.filename);
     } else {
       this.fileSelected = null;
     }
@@ -99,14 +97,16 @@ export class AddProductComponent implements OnInit {
   }
 
   submitProduct() {
-    let mediaData: FormData | null = null;
+    let mediaData;
     if (this.fileSelected) {
       mediaData = new FormData();
       mediaData.append(
         'image',
-        this.fileToBlob(this.fileSelected!),
+        this.fileToBlob(this.fileSelected),
         this.filename as string,
       );
+    } else {
+      mediaData = null;
     }
 
     let productRequest: ProductRequest;

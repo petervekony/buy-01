@@ -96,22 +96,10 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.mediaSubscription = this.mediaService
-      .getProductMedia(this.product.id!)
-      .subscribe({
-        next: (data) => {
-          if (data && data.media && data.media.length > 0) {
-            this.images = data.media.map((item) => {
-              this.imageIds.push(item.id);
-              return this.mediaService.formatMultipleMedia(item);
-            });
-          }
-        },
-        error: () => of(null),
-      });
-
-    this.formStateService.formOpen$.subscribe((isOpen) => {
-      if (!isOpen) return;
+    this.dataService.ids$.subscribe((id) => {
+      console.log(id);
+      console.log(this.product.id === id);
+      if (id !== this.product.id) return;
       this.mediaSubscription = this.mediaService
         .getProductMedia(this.product.id!)
         .subscribe({
@@ -177,12 +165,10 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   }
 
   onFileSelected(event: FileSelectEvent) {
-    console.log(event, event.files);
     const input = event.files[0];
     if (input) {
       this.filename = input.name;
       this.fileSelected = input;
-      console.log('filename: ', this.filename);
       this.imageValid = true;
     } else {
       this.fileSelected = null;
@@ -245,10 +231,12 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
         this.images.push(this.mediaService.formatMultipleMedia(data));
         this.fileSelected = null;
         this.filename = '';
+        this.dataService.sendProductId(this.product.id!);
       },
       error: (err) => this.errorMessage = err.error.message,
     });
     this.tabGroup.selectedIndex = 0;
+    this.dataService.sendProductId(this.product.id!);
   }
 
   deleteProduct(productId: string): void {

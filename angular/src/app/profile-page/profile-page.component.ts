@@ -111,7 +111,6 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     if (file) {
       this.filename = file.name;
       this.fileSelected = file;
-      console.log(this.fileSelected.toString());
     } else {
       this.fileSelected = null;
     }
@@ -189,12 +188,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   onSubmit() {
     const request = { ...this.userUpdateForm.value };
     delete request.confirmPassword;
-    console.log(request);
     formatForm();
     this.formStateService.setFormOpen(false);
     this.userService.updateUser(request, this.currentUser.id).subscribe({
       next: (data) => {
-        console.log(data);
         this.userService.updateUsernameAdded(data);
       },
       error: (err) => console.log(err),

@@ -66,8 +66,8 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   //   });
   ngOnInit(): void {
     this.getProductThumbnail();
-    this.dataService.data$.subscribe(() => {
-      this.getProductThumbnail();
+    this.dataService.ids$.subscribe((id) => {
+      this.updateThumbnailIfEmpty(id);
     });
 
     const cookieCheck = this.authservice.getAuth();
@@ -75,6 +75,12 @@ export class ProductCardComponent implements OnInit, OnDestroy {
       this.userSubscription = cookieCheck.subscribe((user) => {
         this.currentUser = user;
       });
+    }
+  }
+
+  private updateThumbnailIfEmpty(id: string) {
+    if (id === this.product.id && this.imageSrc === environment.placeholder) {
+      this.getProductThumbnail();
     }
   }
 
@@ -116,6 +122,7 @@ export class ProductCardComponent implements OnInit, OnDestroy {
 
   showModal() {
     if (this.productModal) {
+      this.dataService.sendProductId(this.product.id!);
       this.formStateService.setFormOpen(true);
       this.productModal.nativeElement.show();
       this.modalVisible = true;

@@ -9,8 +9,15 @@ export class DataService {
   private dataSubject = new BehaviorSubject<any>(null);
   data$ = this.dataSubject.asObservable();
 
+  private idStream = new BehaviorSubject<string>('');
+  ids$ = this.idStream.asObservable();
+
   //eslint-disable-next-line
-  sendData(data: any) {
+  sendData(data: any): void {
     this.dataSubject.next(data);
+  }
+
+  sendProductId(data: string): void {
+    this.idStream.next(data);
   }
 }

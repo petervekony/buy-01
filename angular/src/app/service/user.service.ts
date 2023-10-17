@@ -14,9 +14,6 @@ export class UserService {
   private usernameAddedSource = new BehaviorSubject<User>({} as User);
   usernameAdded$ = this.usernameAddedSource.asObservable();
 
-  usernameAddedSource = new BehaviorSubject<User>({} as User);
-  usernameAdded$ = this.usernameAddedSource.asObservable();
-
   constructor(private http: HttpClient) {}
 
   updateUsernameAdded(data: User): void {
@@ -29,7 +26,6 @@ export class UserService {
   }
 
   sendSignupRequest(request: SignupRequest): Observable<User> {
-    console.log('sendSignupRequest: ', request);
     const address = environment.signupURL;
     return this.http.post<User>(address, request, { withCredentials: true });
   }

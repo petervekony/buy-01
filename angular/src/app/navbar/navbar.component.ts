@@ -66,7 +66,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.currentUser.id,
     ).subscribe({
       next: (media) => {
-        console.log(media);
         const image = this.mediaService.formatMedia(media);
         this.avatar$.next(image);
       },

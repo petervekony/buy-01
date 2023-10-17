@@ -62,7 +62,6 @@ export class MediaService {
   }
 
   uploadAvatar(userId: string, image: FormData): Observable<Media> {
-    console.log('image', image);
     const address = environment.mediaURL;
     const headers = new HttpHeaders();
     headers.append('Content-Type', 'multipart/form-data');

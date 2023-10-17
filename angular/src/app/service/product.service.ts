@@ -83,23 +83,21 @@ export class ProductService {
       .pipe(
         map((data: ProductCreationResponse) => {
           if (mediaForm && mediaForm.get('image') !== null) {
-            this.mediaService.addMedia(data.product.id!, mediaForm);
+            this.mediaService.addMedia(data.product.id!, mediaForm).subscribe({
+              error: ((err) => console.log(err)),
+            });
             mediaForm.append('name', '');
             return data.product;
           }
           this.updateProductAdded(data.product);
           return data.product;
         }),
-        catchError((error) => {
-          console.log(error);
-          return of(null);
-        }),
+        catchError(() => of(null)),
       );
   }
 
   deleteProduct(id: string): void {
     const address = environment.productsURL + '/' + id;
-    console.log('address', address, id);
     this.http.delete(address, { withCredentials: true }).subscribe({
       next: (data) => {
         console.log(data);
