@@ -19,28 +19,28 @@ export class DashboardComponent implements OnInit {
     userDialog: ElementRef | undefined;
   showProductForm = false;
   showUserForm = false;
-  userProducts$: Observable<Product[]> = of([]);
   products: Product[] = [];
+  userProducts$: Observable<Product[]> = of([]);
   constructor(
     private formStateService: FormStateService,
     private productService: ProductService,
     private authService: AuthService,
     private cookieService: CookieService,
-  ) {
-    this.formStateService.formOpen$.subscribe((isOpen) => {
-      if (!isOpen) {
-        this.showProductForm = false;
-      }
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
+    const cookie = this.cookieService.check('buy-01');
+    if (!cookie) return;
+
+    this.formStateService.formOpen$.subscribe((isOpen) => {
+      if (!isOpen) this.showProductForm = false;
+    });
+
     this.productService.productAdded$.subscribe(() => {
       this.getOwnerProducts();
     });
+
     this.formStateService.setFormOpen(false);
-    const cookie = this.cookieService.check('buy-01');
-    if (!cookie) return;
   }
 
   private getOwnerProducts() {
