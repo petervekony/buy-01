@@ -3,11 +3,10 @@ import {
   ElementRef,
   // HostListener,
   Input,
-  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { of, Subscription } from 'rxjs';
+import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
@@ -15,13 +14,14 @@ import { AuthService } from 'src/app/service/auth.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { environment } from 'src/environments/environment';
 import { DataService } from 'src/app/service/data.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css'],
 })
-export class ProductCardComponent implements OnInit, OnDestroy {
+export class ProductCardComponent implements OnInit {
   @ViewChild('container')
     container: ElementRef | undefined;
   @ViewChild('productModal')
@@ -30,8 +30,6 @@ export class ProductCardComponent implements OnInit, OnDestroy {
     product: Product = {} as Product;
   placeholder: string = environment.placeholder;
   imageSrc: string = this.placeholder;
-  userSubscription: Subscription = Subscription.EMPTY;
-  subscription: Subscription = Subscription.EMPTY;
   currentUser?: User;
   modalVisible = false;
 
@@ -41,47 +39,25 @@ export class ProductCardComponent implements OnInit, OnDestroy {
     private formStateService: FormStateService,
     private dataService: DataService,
   ) {}
-  // private mediaService: MediaService,
-  // this.subscription = combineLatest([
-  //   this.productService.getProducts(),
-  //   this.userService.getUserInfo(),
-  //   this.mediaService.getProductMedia(),
-  // ])
-  //   .pipe(
-  //     map(([products, users, media]) => {
-  //       return products.map((product) => {
-  //         const owner = users.find((user) => user.id === product.userId);
-  //         const productMedia = media.find(
-  //           (mediaItem) => mediaItem.productId === product.id,
-  //         );
-  //         return { ...product, owner, productMedia };
-  //       });
-  //     }),
-  //   )
-  //   .subscribe({
-  //     next: (products) => {
-  //       this.products = products;
-  //     },
-  //     error: (error) => {
-  //       console.log('error: ', error);
-  //     },
-  //   });
+
   ngOnInit(): void {
-    this.formStateService.formOpen$.subscribe((isOpen) => {
-      if (isOpen) {
-        this.container?.nativeElement.classList.add('blur-filter');
-      } else {
-        this.container?.nativeElement.classList.remove('blur-filter');
-      }
-    });
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed()).subscribe(
+      (isOpen) => {
+        if (isOpen) {
+          this.container?.nativeElement.classList.add('blur-filter');
+        } else {
+          this.container?.nativeElement.classList.remove('blur-filter');
+        }
+      },
+    );
     this.getProductThumbnail();
-    this.dataService.ids$.subscribe((id) => {
+    this.dataService.ids$.pipe(takeUntilDestroyed()).subscribe((id) => {
       this.updateThumbnailIfEmpty(id);
     });
 
     const cookieCheck = this.authservice.getAuth();
     if (cookieCheck) {
-      this.userSubscription = cookieCheck.subscribe((user) => {
+      cookieCheck.pipe(takeUntilDestroyed()).subscribe((user) => {
         this.currentUser = user;
       });
     }
@@ -94,8 +70,8 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   }
 
   private getProductThumbnail() {
-    this.subscription = this.mediaService
-      .getProductThumbnail(this.product.id!)
+    this.mediaService
+      .getProductThumbnail(this.product.id!).pipe(takeUntilDestroyed())
       .subscribe({
         next: (media) => {
           if (media && media?.image) {
@@ -110,11 +86,6 @@ export class ProductCardComponent implements OnInit, OnDestroy {
           return of(null);
         },
       });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    this.userSubscription.unsubscribe();
   }
 
   // TODO: FIX THE CLICK LISTENER!

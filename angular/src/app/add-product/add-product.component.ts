@@ -6,6 +6,7 @@ import { FormStateService } from '../service/form-state.service';
 import { Product } from '../interfaces/product';
 import { ValidatorService } from '../service/validator.service';
 import { FileSelectEvent } from 'primeng/fileupload';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-add-product',
@@ -111,7 +112,9 @@ export class AddProductComponent implements OnInit {
         price: this.productForm.value.price,
         quantity: this.productForm.value.quantity,
       } as ProductRequest;
-      this.productService.addProduct(productRequest, mediaData).subscribe({
+      this.productService.addProduct(productRequest, mediaData).pipe(
+        takeUntilDestroyed(),
+      ).subscribe({
         next: (data: Product | null) => {
           this.success = data !== null;
           this.requestSent = true;

@@ -2,37 +2,34 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  OnDestroy,
   OnInit,
-  Renderer2,
+  // Renderer2,
   ViewChild,
 } from '@angular/core';
 import { Product } from '../interfaces/product';
-import { Subscription } from 'rxjs';
 import { UserService } from '../service/user.service';
 import { ProductService } from '../service/product.service';
 import { CookieService } from 'ngx-cookie-service';
-import { FormStateService } from '../service/form-state.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+// import { FormStateService } from '../service/form-state.service';
 
 @Component({
   selector: 'app-product-container',
   templateUrl: './product-container.component.html',
   styleUrls: ['./product-container.component.css'],
 })
-export class ProductContainerComponent
-implements OnInit, OnDestroy, AfterViewInit {
+export class ProductContainerComponent implements OnInit, AfterViewInit {
   @ViewChild('container')
     container: ElementRef | undefined;
   products: Product[] = [];
-  subscription: Subscription = Subscription.EMPTY;
-  filterSubscription: Subscription = Subscription.EMPTY;
 
   constructor(
     private userService: UserService,
     private productService: ProductService,
     private cookieService: CookieService,
-    private formStateService: FormStateService,
-    private renderer: Renderer2,
+    // private formStateService: FormStateService,
+    // private renderer: Renderer2,
   ) {
     //TODO: for testing
     // this.filterSubscription = this.formStateService.formOpen$.subscribe(
@@ -54,13 +51,15 @@ implements OnInit, OnDestroy, AfterViewInit {
     this.showProducts();
   }
   ngAfterViewInit(): void {
-    this.productService.productAdded$.subscribe(() => {
-      this.showProducts();
-    });
+    this.productService.productAdded$.pipe(takeUntilDestroyed()).subscribe(
+      () => {
+        this.showProducts();
+      },
+    );
   }
 
   showProducts() {
-    this.subscription = this.productService.getProducts().subscribe({
+    this.productService.getProducts().pipe(takeUntilDestroyed()).subscribe({
       next: (products) => {
         if (products) this.products = products.reverse();
       },
@@ -79,10 +78,5 @@ implements OnInit, OnDestroy, AfterViewInit {
         console.log('error', error);
       },
     });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    this.filterSubscription.unsubscribe();
   }
 }

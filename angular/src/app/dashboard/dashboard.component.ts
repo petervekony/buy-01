@@ -1,7 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormStateService } from '../service/form-state.service';
 import { ProductService } from '../service/product.service';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Product } from '../interfaces/product';
 import { map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../service/auth.service';
@@ -21,8 +22,6 @@ export class DashboardComponent implements OnInit {
   showAddButton = true;
   products: Product[] = [];
   userProducts$: Observable<Product[]> = of([]);
-  formSubscription: Subscription = Subscription.EMPTY;
-  productSubscription: Subscription = Subscription.EMPTY;
   constructor(
     private formStateService: FormStateService,
     private productService: ProductService,
@@ -34,7 +33,7 @@ export class DashboardComponent implements OnInit {
     const cookie = this.cookieService.check('buy-01');
     if (!cookie) return;
 
-    this.formSubscription = this.formStateService.formOpen$.subscribe(
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed()).subscribe(
       (isOpen) => {
         if (!isOpen) {
           this.showProductForm = false;
@@ -45,7 +44,7 @@ export class DashboardComponent implements OnInit {
       },
     );
 
-    this.productSubscription = this.productService.productAdded$.subscribe(
+    this.productService.productAdded$.pipe(takeUntilDestroyed()).subscribe(
       () => {
         this.getOwnerProducts();
       },

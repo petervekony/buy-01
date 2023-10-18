@@ -1,33 +1,25 @@
-import {
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
 import { User } from '../interfaces/user';
 import { AuthService } from '../service/auth.service';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { filter } from 'rxjs/operators';
 import { MediaService } from '../service/media.service';
 import { environment } from 'src/environments/environment';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarComponent implements OnInit {
   @ViewChild('navbar')
     navbar: ElementRef | undefined;
   placeholder = environment.placeholder;
-  routeSubscription: Subscription = Subscription.EMPTY;
-  authSubscription: Subscription = Subscription.EMPTY;
-  avatarSubscription: Subscription = Subscription.EMPTY;
   route: string = '';
   dash = false;
   home = false;
@@ -47,15 +39,17 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.formStateService.formOpen$.subscribe((isOpen) => {
-      if (isOpen) {
-        this.navbar?.nativeElement.classList.add('blur-filter');
-      } else {
-        this.navbar?.nativeElement.classList.remove('blur-filter');
-      }
-    });
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed()).subscribe(
+      (isOpen) => {
+        if (isOpen) {
+          this.navbar?.nativeElement.classList.add('blur-filter');
+        } else {
+          this.navbar?.nativeElement.classList.remove('blur-filter');
+        }
+      },
+    );
 
-    this.mediaService.imageAdded$.subscribe(() => {
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed()).subscribe(() => {
       this.getAuthAndAvatar();
     });
     this.userService.usernameAdded$.subscribe((data) => {
@@ -65,7 +59,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private getAuthAndAvatar() {
-    this.authSubscription = this.authService.getAuth().subscribe({
+    this.authService.getAuth().pipe(takeUntilDestroyed()).subscribe({
       next: (user) => {
         this.user$.next(user);
         this.currentUser = user;
@@ -78,9 +72,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private getAvatar() {
-    this.avatarSubscription = this.mediaService.getAvatar(
+    this.mediaService.getAvatar(
       this.currentUser.id,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed()).subscribe({
       next: (media) => {
         const image = this.mediaService.formatMedia(media);
         this.avatar$.next(image);
@@ -90,12 +84,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private checkRoutes() {
-    this.routeSubscription = this.router.events
+    this.router.events
       .pipe(
         filter((event): event is NavigationEnd =>
           event instanceof NavigationEnd
         ),
-      )
+      ).pipe(takeUntilDestroyed())
       .subscribe((event: NavigationEnd) => {
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
@@ -121,11 +115,5 @@ export class NavbarComponent implements OnInit, OnDestroy {
   goToProfile() {
     this.formStateService.setFormOpen(false);
     this.move('profile');
-  }
-
-  ngOnDestroy(): void {
-    this.authSubscription.unsubscribe();
-    this.routeSubscription.unsubscribe();
-    this.avatarSubscription.unsubscribe();
   }
 }

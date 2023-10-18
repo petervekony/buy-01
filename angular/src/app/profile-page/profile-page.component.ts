@@ -1,14 +1,8 @@
-import {
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { User } from '../interfaces/user';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { BehaviorSubject, of, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../service/user.service';
@@ -18,13 +12,14 @@ import { ValidatorService } from '../service/validator.service';
 import { FileSelectEvent } from 'primeng/fileupload';
 import { Media } from '../interfaces/media';
 import { environment } from 'src/environments/environment';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.css'],
 })
-export class ProfilePageComponent implements OnInit, OnDestroy {
+export class ProfilePageComponent implements OnInit {
   deleteFormOpen = false;
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
@@ -42,14 +37,6 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   currentUser: User = {} as User;
   fileSelected: File | null = null;
   placeholder: string = environment.placeholder;
-  deleteSubscription: Subscription = Subscription.EMPTY;
-  imageSubscription: Subscription = Subscription.EMPTY;
-  usernameSubscription: Subscription = Subscription.EMPTY;
-  userSubscription: Subscription = Subscription.EMPTY;
-  avatarSubscription: Subscription = Subscription.EMPTY;
-  authSubscription: Subscription = Subscription.EMPTY;
-  formSubscription: Subscription = Subscription.EMPTY;
-  uploadSubscription: Subscription = Subscription.EMPTY;
   avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
   constructor(
@@ -78,23 +65,23 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
-    this.imageSubscription = this.mediaService.imageAdded$.subscribe(() => {
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed()).subscribe(() => {
       this.getAuthAndAvatar();
     });
-    this.usernameSubscription = this.userService.usernameAdded$.subscribe(
+    this.userService.usernameAdded$.pipe(takeUntilDestroyed()).subscribe(
       (data) => this.user$.next(data),
     );
   }
 
   private getAuthAndAvatar() {
-    this.authSubscription = this.authService.getAuth().subscribe({
+    this.authService.getAuth().pipe(takeUntilDestroyed()).subscribe({
       next: (user) => {
         this.user$.next(user);
         this.currentUser = user;
         if (user.avatar) {
-          this.avatarSubscription = this.mediaService.getAvatar(
+          this.mediaService.getAvatar(
             this.currentUser.id,
-          )
+          ).pipe(takeUntilDestroyed())
             .subscribe({
               next: (media) => {
                 if (media && media?.image) {
@@ -108,7 +95,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
       error: (error) => console.error(error),
     });
     this.formValid = true;
-    this.formSubscription = this.formStateService.formOpen$.subscribe(
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed()).subscribe(
       (isOpen) => {
         this.formOpen = isOpen;
       },
@@ -135,10 +122,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
         this.filename as string,
       );
     }
-    this.uploadSubscription = this.mediaService.uploadAvatar(
+    this.mediaService.uploadAvatar(
       this.currentUser.id,
       mediaData!,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed()).subscribe({
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
@@ -202,10 +189,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     delete request.confirmPassword;
     formatForm();
     this.formStateService.setFormOpen(false);
-    this.userSubscription = this.userService.updateUser(
+    this.userService.updateUser(
       request,
       this.currentUser.id,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed()).subscribe({
       next: (data) => {
         this.userService.updateUsernameAdded(data);
       },
@@ -221,26 +208,14 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   deleteAvatar() {
-    this.deleteSubscription = this.mediaService.deleteAvatar(
+    this.mediaService.deleteAvatar(
       this.currentUser.id,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed()).subscribe({
       //eslint-disable-next-line
       next: (data: any) => console.log(data),
     });
     this.mediaService.updateImageAdded({} as Media);
     this.avatar$.next(this.placeholder);
     this.hideModal();
-  }
-
-  ngOnDestroy(): void {
-    this.avatarSubscription.unsubscribe();
-    this.deleteSubscription.unsubscribe();
-    this.imageSubscription.unsubscribe();
-    this.usernameSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.avatarSubscription.unsubscribe();
-    this.authSubscription.unsubscribe();
-    this.formSubscription.unsubscribe();
-    this.uploadSubscription.unsubscribe();
   }
 }

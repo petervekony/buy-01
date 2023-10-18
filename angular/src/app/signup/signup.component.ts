@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import {
   AbstractControl,
@@ -10,14 +10,14 @@ import {
 } from '@angular/forms';
 import { UserService } from '../service/user.service';
 import { SignupRequest } from '../interfaces/signup-request';
-import { Subscription } from 'rxjs';
 import { StateService } from '../service/state.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'signup',
   templateUrl: './signup.component.html',
 })
-export class SignupComponent implements OnDestroy {
+export class SignupComponent {
   private checkPassword: ValidatorFn = (
     form: AbstractControl,
   ): ValidationErrors | null => {
@@ -26,7 +26,6 @@ export class SignupComponent implements OnDestroy {
       : { notSame: true };
   };
   formValid: boolean = false;
-  subscription: Subscription = Subscription.EMPTY;
   error: string | null = null;
 
   constructor(
@@ -75,28 +74,26 @@ export class SignupComponent implements OnDestroy {
     this.formValid = false;
     const request: SignupRequest = this.registerForm.value;
     request.role ? (request.role = 'SELLER') : (request.role = 'CLIENT');
-    this.subscription = this.userService.sendSignupRequest(request).subscribe({
-      error: (error) => {
-        this.error = error.error.message;
-      },
-      complete: () => {
-        this.autoLogin(request);
-      },
-    });
+    this.userService.sendSignupRequest(request).pipe(takeUntilDestroyed())
+      .subscribe({
+        error: (error) => {
+          this.error = error.error.message;
+        },
+        complete: () => {
+          this.autoLogin(request);
+        },
+      });
   }
 
   autoLogin(request: SignupRequest): void {
-    this.subscription = this.userService.sendLoginRequest(request).subscribe({
-      next: (data) => {
-        const navigationExtras: NavigationExtras = { state: { data: data } };
-        this.stateService.refreshState(data.jwtToken!, data);
-        this.router.navigate(['home'], navigationExtras);
-      },
-      error: (data) => console.log(data),
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.userService.sendLoginRequest(request).pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (data) => {
+          const navigationExtras: NavigationExtras = { state: { data: data } };
+          this.stateService.refreshState(data.jwtToken!, data);
+          this.router.navigate(['home'], navigationExtras);
+        },
+        error: (data) => console.log(data),
+      });
   }
 }

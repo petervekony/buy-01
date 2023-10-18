@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
@@ -7,12 +7,13 @@ import { Subscription } from 'rxjs';
 import { LoginRequest } from '../interfaces/login-request';
 import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent {
   formValid: boolean = false;
   subscription: Subscription;
   user: User | undefined;
@@ -45,23 +46,20 @@ export class LoginComponent implements OnDestroy {
 
   onSubmit() {
     const request: LoginRequest = this.loginForm.value;
-    this.subscription = this.userService.sendLoginRequest(request).subscribe({
-      next: (data) => {
-        const navigationExtras: NavigationExtras = { state: { data: data } };
-        this.stateService.refreshState(data.jwtToken!, data);
-        this.router.navigate(['home'], navigationExtras);
-      },
-      error: (data) => {
-        this.error = data.error.message;
-      },
-    });
+    this.userService.sendLoginRequest(request).pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (data) => {
+          const navigationExtras: NavigationExtras = { state: { data: data } };
+          this.stateService.refreshState(data.jwtToken!, data);
+          this.router.navigate(['home'], navigationExtras);
+        },
+        error: (data) => {
+          this.error = data.error.message;
+        },
+      });
   }
 
   onValidate() {
     this.formValid = this.loginForm.valid;
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }
