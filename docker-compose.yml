@@ -14,8 +14,8 @@ services:
 
   user-service:
     build:
-      context: ./user-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: user-service/Dockerfile
     environment:
       SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
       SPRING_DATA_MONGODB_DB: buy-01-users
