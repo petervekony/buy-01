@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
@@ -16,6 +22,8 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
+  @ViewChild('navbar')
+    navbar: ElementRef | undefined;
   placeholder = environment.placeholder;
   routeSubscription: Subscription = Subscription.EMPTY;
   authSubscription: Subscription = Subscription.EMPTY;
@@ -39,6 +47,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.formStateService.formOpen$.subscribe((isOpen) => {
+      if (isOpen) {
+        this.navbar?.nativeElement.classList.add('blur-filter');
+      } else {
+        this.navbar?.nativeElement.classList.remove('blur-filter');
+      }
+    });
+
     this.mediaService.imageAdded$.subscribe(() => {
       this.getAuthAndAvatar();
     });

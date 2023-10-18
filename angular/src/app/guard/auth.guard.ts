@@ -2,11 +2,13 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { User } from '../interfaces/user';
 import { AuthService } from '../service/auth.service';
+import { CookieService } from 'ngx-cookie-service';
 
 export const authGuard: CanActivateFn = (route) => {
   const authService = inject(AuthService);
   const path = route.routeConfig?.path;
   const router = inject(Router);
+  const cookieService = inject(CookieService);
 
   authService.getAuth().subscribe({
     next: (user: User) => {
@@ -33,8 +35,8 @@ export const authGuard: CanActivateFn = (route) => {
       }
       return false;
     },
-    error: (err) => {
-      console.error(err);
+    error: () => {
+      cookieService.delete('buy-01');
     },
   });
 

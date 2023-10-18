@@ -22,6 +22,8 @@ import { DataService } from 'src/app/service/data.service';
   styleUrls: ['./product-card.component.css'],
 })
 export class ProductCardComponent implements OnInit, OnDestroy {
+  @ViewChild('container')
+    container: ElementRef | undefined;
   @ViewChild('productModal')
     productModal: ElementRef | undefined;
   @Input()
@@ -65,6 +67,13 @@ export class ProductCardComponent implements OnInit, OnDestroy {
   //     },
   //   });
   ngOnInit(): void {
+    this.formStateService.formOpen$.subscribe((isOpen) => {
+      if (isOpen) {
+        this.container?.nativeElement.classList.add('blur-filter');
+      } else {
+        this.container?.nativeElement.classList.remove('blur-filter');
+      }
+    });
     this.getProductThumbnail();
     this.dataService.ids$.subscribe((id) => {
       this.updateThumbnailIfEmpty(id);

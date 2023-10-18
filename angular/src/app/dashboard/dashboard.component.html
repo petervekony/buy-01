@@ -1,9 +1,9 @@
 <div class="top-bar">
-  <button type="button" pButton pRipple label="Add product" icon="" (click)="manageProducts($event)"
-    class="add-product"></button>
+  <button type="button" pButton pRipple label="Add product" icon="" (click)="manageProducts($event)" class="add-product"
+    *ngIf="showAddButton"></button>
 </div>
 <div class="product-container">
-  <div class="wrapper" #container>
+  <div class="wrapper">
     <ng-container *ngFor="let product of (userProducts$ | async)">
       <app-product-card [product]="product"></app-product-card>
     </ng-container>
@@ -14,6 +14,6 @@
     <app-add-product [modalRef]="productDialog"></app-add-product>
   </dialog>
 </ng-container>
-<ng-container *ngIf="showUserForm">
-  <dialog id="user-dialog" #userDialog id="user-dialog"></dialog>
-</ng-container>
+<!-- <ng-container> -->
+<!--   <dialog id="user-dialog" #userDialog id="user-dialog"></dialog> -->
+<!-- </ng-container> -->

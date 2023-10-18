@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../interfaces/user';
 import { AuthService } from './auth.service';
 import { Observable, of, Subscription } from 'rxjs';
@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
-export class StateService implements OnDestroy {
+export class StateService implements OnInit, OnDestroy {
   private _state: Observable<User> | undefined;
   private subscription: Subscription = Subscription.EMPTY;
   private _cookie: string | undefined = undefined;
@@ -18,6 +18,9 @@ export class StateService implements OnDestroy {
     private cookieService: CookieService,
     private router: Router,
   ) {
+  }
+
+  ngOnInit(): void {
     this.cookie = this.cookieService.get('buy-01');
     this.state = of({
       name: '',
@@ -30,16 +33,15 @@ export class StateService implements OnDestroy {
   }
 
   initialize(): void {
-    // const cookieCheck = this.authService.getAuth();
     this.subscription = this.authService.getAuth().subscribe({
       next: (user: User) => {
         this.state = of(user);
-        // console.log(user);
-        // this.roouter.navigate(['home']);
       },
       error: (error) => {
-        if (error.status !== 200) this.router.navigate(['login']);
-        // this.resetState();
+        if (error.status !== 200) {
+          this.cookieService.delete('buy-01');
+          this.router.navigate(['login']);
+        }
       },
     });
   }

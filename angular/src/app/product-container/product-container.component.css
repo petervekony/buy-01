@@ -6,6 +6,7 @@
   padding-top: 10px;
   display: flex;
   flex-wrap: wrap;
+  flex-shrink: 1;
   justify-content: center;
 }
 

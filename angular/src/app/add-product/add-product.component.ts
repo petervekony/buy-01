@@ -44,12 +44,6 @@ export class AddProductComponent implements OnInit {
       this.showProductForm = true;
       this.formStateService.setFormOpen(true);
     }
-
-    // this.formStateService.formOpen$.subscribe((isOpen) => {
-    //   this.product
-    //     ? (this.showProductForm = true)
-    //     : (this.showProductForm = isOpen);
-    // });
   }
 
   productForm: FormGroup = new FormGroup({
@@ -137,6 +131,5 @@ export class AddProductComponent implements OnInit {
   closeModal() {
     this.formStateService.setFormOpen(false);
     this.modalRef?.close();
-    // this.refresh();
   }
 }
