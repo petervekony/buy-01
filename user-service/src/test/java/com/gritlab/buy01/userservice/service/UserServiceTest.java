@@ -5,6 +5,7 @@ import com.gritlab.buy01.userservice.model.enums.Role;
 import com.gritlab.buy01.userservice.payload.response.UserUpdateRequest;
 import com.gritlab.buy01.userservice.repository.UserRepository;
 import com.gritlab.buy01.userservice.security.UserDetailsServiceImpl;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,6 +31,9 @@ public class UserServiceTest {
 
   @Mock
   private UserDetailsServiceImpl userDetailsServiceImpl;
+
+  @Mock
+  private ApplicationEventPublisher eventPublisher;
 
   @InjectMocks
   private UserService userService;
@@ -78,6 +82,9 @@ public class UserServiceTest {
   @Test
   public void testDeleteUser() {
     String id = "someUniqueID";
+    when(userRepository.findById(id)).thenReturn(Optional.of(new User("name", "email@email.com", "password", Role.CLIENT)));
+
+    doNothing().when(eventPublisher).publishEvent(any());
 
     userService.deleteUser(id);
 
