@@ -49,6 +49,10 @@ public class KafkaService {
   private ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> responseQueues =
       new ConcurrentHashMap<>();
 
+  public ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> getResponseQueues() {
+    return responseQueues;
+  }
+
   public TokenValidationResponse validateTokenWithUserMicroservice(TokenValidationRequest request) {
     BlockingQueue<TokenValidationResponse> queue = new ArrayBlockingQueue<>(1);
     if (request.getCorrelationId() != null) {
