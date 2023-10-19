@@ -2,8 +2,11 @@ FROM maven:3.9.4-eclipse-temurin-17 as build
 
 WORKDIR /app
 
-COPY pom.xml ./
-COPY src ./src/
+COPY ./product-service/pom.xml ./product-service/
+COPY ./product-service/src ./product-service/src/
+COPY pom.xml .
+
+WORKDIR /app/product-service
 
 RUN mvn clean package -DskipTests -X
 
@@ -13,7 +16,7 @@ RUN apk add --no-cache bash
 
 WORKDIR /app
 
-COPY --from=build /app/target/product-service-*.jar product-service.jar
+COPY --from=build /app/product-service/target/product-service-*.jar product-service.jar
 
 COPY wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
