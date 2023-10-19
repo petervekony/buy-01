@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.3</version>
-    <relativePath /> <!-- lookup parent from repository -->
+    <groupId>com.gritlab.buy01</groupId>
+    <artifactId>buy01-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>com.gritlab.buy-01</groupId>
+
   <artifactId>user-service</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>user-service</name>
   <description>User microservice for the buy-01 project @ grit:lab</description>
-  <properties>
-    <java.version>17</java.version>
-  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -37,51 +34,34 @@
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
-      <version>3.0.11</version>
     </dependency>
     <dependency>
       <groupId>org.hibernate.validator</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>8.0.1.Final</version>
     </dependency>
-
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-api</artifactId>
-      <version>0.11.5</version>
     </dependency>
-
-
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-impl</artifactId>
-      <version>0.11.5</version>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-jackson</artifactId>
-      <version>0.11.5</version>
       <scope>runtime</scope>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
       <scope>runtime</scope>
       <optional>true</optional>
     </dependency>
-    <!-- <dependency> -->
-    <!--   <groupId>org.springframework.boot</groupId> -->
-    <!--   <artifactId>spring-boot-docker-compose</artifactId> -->
-    <!--   <scope>runtime</scope> -->
-    <!--   <optional>true</optional> -->
-    <!-- </dependency> -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -101,7 +81,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-junit-jupiter</artifactId>
-      <version>5.3.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -111,32 +90,21 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <excludes>
-            <exclude>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </exclude>
-          </excludes>
+          <mainClass>com.gritlab.buy01.userservice.UserServiceApplication</mainClass>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>17</source>
-          <target>17</target>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>1.18.30</version> <!-- or your desired version -->
-            </path>
-          </annotationProcessorPaths>
-        </configuration>
       </plugin>
     </plugins>
   </build>
-
 </project>

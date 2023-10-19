@@ -9,7 +9,9 @@
         <button pButton pRipple label="EDIT PROFILE" icon="pi pi-user" (click)="openForm('profile')"></button>
         <button pButton pRipple label="UPDATE AVATAR" icon="pi pi-user" (click)="openForm('avatar')"></button>
         <button *ngIf="avatar$.value !== placeholder" pButton pRipple label="DELETE AVATAR" icon="pi pi-user"
-          (click)="openForm('delete')"></button>
+          (click)="openForm('deleteAvatar')"></button>
+        <button pButton pRipple label="DELETE USER" class="delete-user" icon="pi pi-user"
+          (click)="openForm('deleteUser')"></button>
       </div>
     </div>
 
@@ -41,7 +43,7 @@
         </div>
       </div>
     </div>
-    <div class="surface-card p-4 shadow-2 border-round lg:w-5 form half" #avatarForm *ngIf="avatarFormOpen">
+    <div class="surface-card p-4 shadow-2 border-round lg:w-5 form half" #avatarForm *ngIf="updateAvatarFormOpen">
       <button class="profile-close" (click)="hideModal()">X</button>
       <div class="text-900 text-3xl font-medium mb-6">Upload image</div>
       <form (ngSubmit)="submitAvatar()">
@@ -59,11 +61,20 @@
       </form>
     </div>
   </ng-container>
-  <ng-container *ngIf="deleteFormOpen" #delete>
+  <ng-container *ngIf="deleteAvatarFormOpen">
     <div class="confirm">
       <p>Are you sure?</p>
       <div class="button-container">
         <button pButton pRipple label="YES" (click)="deleteAvatar()"></button>
+        <button pButton pRipple label="NO" id="no-button" (click)="hideModal()"></button>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="deleteUserFormOpen">
+    <div class="confirm">
+      <p>Are you sure?</p>
+      <div class="button-container">
+        <button pButton pRipple label="YES" (click)="deleteUser()"></button>
         <button pButton pRipple label="NO" id="no-button" (click)="hideModal()"></button>
       </div>
     </div>

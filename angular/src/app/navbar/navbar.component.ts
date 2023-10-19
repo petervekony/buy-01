@@ -1,4 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
@@ -19,6 +26,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class NavbarComponent implements OnInit {
   @ViewChild('navbar')
     navbar: ElementRef | undefined;
+
   placeholder = environment.placeholder;
   route: string = '';
   dash = false;
@@ -28,53 +36,53 @@ export class NavbarComponent implements OnInit {
   user$ = new Subject<User>();
   avatar$ = new BehaviorSubject<string>(this.placeholder);
 
-  constructor(
-    private router: Router,
-    private stateService: StateService,
-    private userService: UserService,
-    private authService: AuthService,
-    private formStateService: FormStateService,
-    private mediaService: MediaService,
-  ) {
-  }
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private stateService = inject(StateService);
+  private formStateService = inject(FormStateService);
+  private authService = inject(AuthService);
+  private mediaService = inject(MediaService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.formStateService.formOpen$.pipe(takeUntilDestroyed()).subscribe(
-      (isOpen) => {
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((isOpen) => {
         if (isOpen) {
           this.navbar?.nativeElement.classList.add('blur-filter');
         } else {
           this.navbar?.nativeElement.classList.remove('blur-filter');
         }
-      },
-    );
+      });
 
-    this.mediaService.imageAdded$.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.getAuthAndAvatar();
-    });
-    this.userService.usernameAdded$.subscribe((data) => {
-      this.user$.next(data);
-    });
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.getAuthAndAvatar();
+      });
+    this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.user$.next(data);
+      });
     this.checkRoutes();
   }
 
   private getAuthAndAvatar() {
-    this.authService.getAuth().pipe(takeUntilDestroyed()).subscribe({
-      next: (user) => {
-        this.user$.next(user);
-        this.currentUser = user;
-        if (user.avatar) {
-          this.getAvatar();
-        }
-      },
-      error: (error) => console.error(error),
-    });
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.user$.next(user);
+          this.currentUser = user;
+          if (user.avatar) {
+            this.getAvatar();
+          }
+        },
+        error: (error) => console.error(error),
+      });
   }
 
   private getAvatar() {
     this.mediaService.getAvatar(
       this.currentUser.id,
-    ).pipe(takeUntilDestroyed()).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (media) => {
         const image = this.mediaService.formatMedia(media);
         this.avatar$.next(image);
@@ -89,7 +97,7 @@ export class NavbarComponent implements OnInit {
         filter((event): event is NavigationEnd =>
           event instanceof NavigationEnd
         ),
-      ).pipe(takeUntilDestroyed())
+      ).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((event: NavigationEnd) => {
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;

@@ -1,9 +1,10 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
+  inject,
   // HostListener,
   Input,
-  OnInit,
   ViewChild,
 } from '@angular/core';
 import { of } from 'rxjs';
@@ -21,45 +22,50 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css'],
 })
-export class ProductCardComponent implements OnInit {
+export class ProductCardComponent {
   @ViewChild('container')
     container: ElementRef | undefined;
   @ViewChild('productModal')
     productModal: ElementRef | undefined;
   @Input()
     product: Product = {} as Product;
+
   placeholder: string = environment.placeholder;
   imageSrc: string = this.placeholder;
   currentUser?: User;
   modalVisible = false;
 
-  constructor(
-    private mediaService: MediaService,
-    private authservice: AuthService,
-    private formStateService: FormStateService,
-    private dataService: DataService,
-  ) {}
+  private mediaService = inject(MediaService);
+  private authservice = inject(AuthService);
+  private formStateService = inject(FormStateService);
+  private dataService = inject(DataService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.formStateService.formOpen$.pipe(takeUntilDestroyed()).subscribe(
-      (isOpen) => {
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((isOpen) => {
         if (isOpen) {
           this.container?.nativeElement.classList.add('blur-filter');
         } else {
           this.container?.nativeElement.classList.remove('blur-filter');
         }
+      });
+
+    this.getProductThumbnail();
+
+    this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
+      (id) => {
+        this.updateThumbnailIfEmpty(id);
       },
     );
-    this.getProductThumbnail();
-    this.dataService.ids$.pipe(takeUntilDestroyed()).subscribe((id) => {
-      this.updateThumbnailIfEmpty(id);
-    });
 
     const cookieCheck = this.authservice.getAuth();
     if (cookieCheck) {
-      cookieCheck.pipe(takeUntilDestroyed()).subscribe((user) => {
-        this.currentUser = user;
-      });
+      cookieCheck.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
+        (user) => {
+          this.currentUser = user;
+        },
+      );
     }
   }
 
@@ -71,7 +77,9 @@ export class ProductCardComponent implements OnInit {
 
   private getProductThumbnail() {
     this.mediaService
-      .getProductThumbnail(this.product.id!).pipe(takeUntilDestroyed())
+      .getProductThumbnail(this.product.id!).pipe(
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe({
         next: (media) => {
           if (media && media?.image) {

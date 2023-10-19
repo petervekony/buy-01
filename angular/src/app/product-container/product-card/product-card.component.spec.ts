@@ -46,4 +46,8 @@ describe('ProductCardComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should set formOpen to initially false', () => {
+    expect(component.modalVisible).toBeFalse();
+  });
 });

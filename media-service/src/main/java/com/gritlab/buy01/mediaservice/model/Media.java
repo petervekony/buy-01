@@ -7,7 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
 @Document(collection = "media")
 public class Media {

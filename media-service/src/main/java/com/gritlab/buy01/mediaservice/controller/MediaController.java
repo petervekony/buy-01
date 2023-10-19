@@ -109,7 +109,6 @@ public class MediaController {
       }
 
       if (userId != null) {
-        System.out.println("UserId is not null: " + userId);
         if (!userDetails.getId().equals(userId)) {
           ErrorMessage error =
               new ErrorMessage(
@@ -118,7 +117,6 @@ public class MediaController {
         }
 
         ResponseEntity<?> mediaResponse = mediaService.createMedia(image, userId, productId);
-        System.out.println("Media Response: " + mediaResponse);
         Object responseBody = mediaResponse.getBody();
 
         if (responseBody instanceof Media) {

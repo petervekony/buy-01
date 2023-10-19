@@ -15,6 +15,7 @@ describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
   let httpMock: HttpTestingController;
+  let productService: ProductService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -22,7 +23,10 @@ describe('DashboardComponent', () => {
       providers: [
         {
           provide: ProductService,
-          useValue: {},
+          useValue: {
+            getProductsById: () => of([]),
+            productAdded$: of({}),
+          },
         },
         {
           provide: AuthService,
@@ -42,6 +46,7 @@ describe('DashboardComponent', () => {
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
     httpMock = TestBed.inject(HttpTestingController);
+    productService = TestBed.inject(ProductService);
     fixture.detectChanges();
   });
 

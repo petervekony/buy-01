@@ -1,4 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { User } from '../interfaces/user';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
@@ -10,9 +17,9 @@ import { MediaService } from '../service/media.service';
 import { StateService } from '../service/state.service';
 import { ValidatorService } from '../service/validator.service';
 import { FileSelectEvent } from 'primeng/fileupload';
-import { Media } from '../interfaces/media';
 import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Media } from '../interfaces/media';
 
 @Component({
   selector: 'app-profile-page',
@@ -20,18 +27,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit {
-  deleteFormOpen = false;
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
   @ViewChild('profile')
     profile: ElementRef | undefined;
   @ViewChild('avatarForm')
     avaterForm: ElementRef | undefined;
+
   formOpen = false;
   formValid = false;
   buttonClicked = false;
-  avatarFormOpen = false;
   profileFormOpen = false;
+  deleteAvatarFormOpen = false;
+  deleteUserFormOpen = false;
+  updateAvatarFormOpen = false;
+  deleteFormOpen = false;
   filename: string = '';
   user$ = new Subject<User>();
   currentUser: User = {} as User;
@@ -39,67 +49,73 @@ export class ProfilePageComponent implements OnInit {
   placeholder: string = environment.placeholder;
   avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
-  constructor(
-    private authService: AuthService,
-    private formStateService: FormStateService,
-    private cookieService: CookieService,
-    private userService: UserService,
-    private mediaService: MediaService,
-    private stateService: StateService,
-    private validatorService: ValidatorService,
-  ) {
-    //TODO: fix if clicked outside form, close form!
-    // this.renderer.listen('window', 'click', (e: Event) => {
-    //   if (
-    //     this.buttonClicked &&
-    //     this.profileForm?.nativeElement &&
-    //     this.formOpen
-    //   ) {
-    //     if (this.profileForm?.nativeElement !== e.target) {
-    //       this.formStateService.setFormOpen(false);
-    //       this.buttonClicked = false;
-    //     }
-    //   }
-    // });
-  }
+  private authService = inject(AuthService);
+  private formStateService = inject(FormStateService);
+  private cookieService = inject(CookieService);
+  private userService = inject(UserService);
+  private mediaService = inject(MediaService);
+  private stateService = inject(StateService);
+  private validatorService = inject(ValidatorService);
+  private destroyRef = inject(DestroyRef);
+
+  //TODO: fix if clicked outside form, close form!
+  // this.renderer.listen('window', 'click', (e: Event) => {
+  //   if (
+  //     this.buttonClicked &&
+  //     this.profileForm?.nativeElement &&
+  //     this.formOpen
+  //   ) {
+  //     if (this.profileForm?.nativeElement !== e.target) {
+  //       this.formStateService.setFormOpen(false);
+  //       this.buttonClicked = false;
+  //     }
+  //   }
+  // });
+
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
-    this.mediaService.imageAdded$.pipe(takeUntilDestroyed()).subscribe(() => {
-      this.getAuthAndAvatar();
-    });
-    this.userService.usernameAdded$.pipe(takeUntilDestroyed()).subscribe(
-      (data) => this.user$.next(data),
-    );
+
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.getAuthAndAvatar();
+      });
+
+    this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(
+        (data) => this.user$.next(data),
+      );
   }
 
   private getAuthAndAvatar() {
-    this.authService.getAuth().pipe(takeUntilDestroyed()).subscribe({
-      next: (user) => {
-        this.user$.next(user);
-        this.currentUser = user;
-        if (user.avatar) {
-          this.mediaService.getAvatar(
-            this.currentUser.id,
-          ).pipe(takeUntilDestroyed())
-            .subscribe({
-              next: (media) => {
-                if (media && media?.image) {
-                  this.avatar$.next(this.mediaService.formatMedia(media));
-                }
-              },
-              error: (err) => console.log(err),
-            });
-        }
-      },
-      error: (error) => console.error(error),
-    });
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.user$.next(user);
+          this.currentUser = user;
+          if (user.avatar) {
+            this.mediaService.getAvatar(
+              this.currentUser.id,
+            ).pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: (media) => {
+                  if (media && media?.image) {
+                    this.avatar$.next(this.mediaService.formatMedia(media));
+                  }
+                },
+                error: (err) => console.log(err),
+              });
+          }
+        },
+        error: (error) => console.error(error),
+      });
     this.formValid = true;
-    this.formStateService.formOpen$.pipe(takeUntilDestroyed()).subscribe(
-      (isOpen) => {
-        this.formOpen = isOpen;
-      },
-    );
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(
+        (isOpen) => {
+          this.formOpen = isOpen;
+        },
+      );
   }
 
   onFileSelected(event: FileSelectEvent) {
@@ -125,7 +141,7 @@ export class ProfilePageComponent implements OnInit {
     this.mediaService.uploadAvatar(
       this.currentUser.id,
       mediaData!,
-    ).pipe(takeUntilDestroyed()).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
@@ -159,11 +175,19 @@ export class ProfilePageComponent implements OnInit {
       this.setToTrue();
       break;
     case 'avatar':
-      this.avatarFormOpen = true;
+      this.updateAvatarFormOpen = true;
+      this.setToTrue();
+      break;
+    case 'deleteAvatar':
+      this.deleteAvatarFormOpen = true;
+      this.setToTrue();
+      break;
+    case 'deleteUser':
+      this.deleteUserFormOpen = true;
       this.setToTrue();
       break;
     default:
-      this.deleteFormOpen = true;
+      this.deleteUserFormOpen = true;
       this.setToTrue();
     }
   }
@@ -180,8 +204,9 @@ export class ProfilePageComponent implements OnInit {
   hideModal(): void {
     this.formStateService.setFormOpen(false);
     this.profileFormOpen = false;
-    this.avatarFormOpen = false;
-    this.deleteFormOpen = false;
+    this.deleteAvatarFormOpen = false;
+    this.deleteUserFormOpen = false;
+    this.updateAvatarFormOpen = false;
   }
 
   onSubmit() {
@@ -192,7 +217,7 @@ export class ProfilePageComponent implements OnInit {
     this.userService.updateUser(
       request,
       this.currentUser.id,
-    ).pipe(takeUntilDestroyed()).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.userService.updateUsernameAdded(data);
       },
@@ -210,12 +235,21 @@ export class ProfilePageComponent implements OnInit {
   deleteAvatar() {
     this.mediaService.deleteAvatar(
       this.currentUser.id,
-    ).pipe(takeUntilDestroyed()).subscribe({
       //eslint-disable-next-line
-      next: (data: any) => console.log(data),
-    });
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: any) =>
+      console.log(data)
+    );
     this.mediaService.updateImageAdded({} as Media);
     this.avatar$.next(this.placeholder);
+    this.hideModal();
+  }
+
+  deleteUser() {
+    this.userService.deleteUser(this.currentUser.id).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(() => {
+      this.userService.logout();
+    });
     this.hideModal();
   }
 }

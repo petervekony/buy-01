@@ -1,24 +1,22 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { DestroyRef, inject, Injectable, OnInit } from '@angular/core';
 import { User } from '../interfaces/user';
 import { AuthService } from './auth.service';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
 })
-export class StateService implements OnInit, OnDestroy {
+export class StateService implements OnInit {
   private _state: Observable<User> | undefined;
-  private subscription: Subscription = Subscription.EMPTY;
   private _cookie: string | undefined = undefined;
 
-  constructor(
-    private authService: AuthService,
-    private cookieService: CookieService,
-    private router: Router,
-  ) {
-  }
+  private authService = inject(AuthService);
+  private cookieService = inject(CookieService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.cookie = this.cookieService.get('buy-01');
@@ -33,17 +31,18 @@ export class StateService implements OnInit, OnDestroy {
   }
 
   initialize(): void {
-    this.subscription = this.authService.getAuth().subscribe({
-      next: (user: User) => {
-        this.state = of(user);
-      },
-      error: (error) => {
-        if (error.status !== 200) {
-          this.cookieService.delete('buy-01');
-          this.router.navigate(['login']);
-        }
-      },
-    });
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user: User) => {
+          this.state = of(user);
+        },
+        error: (error) => {
+          if (error.status !== 200) {
+            this.cookieService.delete('buy-01');
+            this.router.navigate(['login']);
+          }
+        },
+      });
   }
 
   get state(): Observable<User> | undefined {
@@ -82,9 +81,5 @@ export class StateService implements OnInit, OnDestroy {
   refreshState(jwtToken: string, user: User) {
     this.cookie = jwtToken;
     this.state = of(user);
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

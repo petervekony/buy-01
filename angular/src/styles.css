@@ -120,6 +120,15 @@ body {
   align-items: center !important;
 }
 
+.reg-forms {
+  max-width: 350px;
+  min-width: 250px;
+}
+
+.register {
+  min-height: 550px;
+}
+
 /* .third { */
 /*   height: 30vh; */
 /* } */

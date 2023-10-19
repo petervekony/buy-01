@@ -1,4 +1,12 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ProductService } from '../service/product.service';
 import { ProductRequest } from '../interfaces/product-request';
@@ -32,11 +40,10 @@ export class AddProductComponent implements OnInit {
   showProductForm = false;
   edit: boolean = this.product !== undefined;
 
-  constructor(
-    private productService: ProductService,
-    private formStateService: FormStateService,
-    private validatorService: ValidatorService,
-  ) {}
+  private productService = inject(ProductService);
+  private formStateService = inject(FormStateService);
+  private validatorService = inject(ValidatorService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     if (this.dialog) {
@@ -113,7 +120,7 @@ export class AddProductComponent implements OnInit {
         quantity: this.productForm.value.quantity,
       } as ProductRequest;
       this.productService.addProduct(productRequest, mediaData).pipe(
-        takeUntilDestroyed(),
+        takeUntilDestroyed(this.destroyRef),
       ).subscribe({
         next: (data: Product | null) => {
           this.success = data !== null;

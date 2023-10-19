@@ -1,13 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
 import { NavigationExtras } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoginRequest } from '../interfaces/login-request';
 import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-login',
@@ -15,17 +14,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class LoginComponent {
   formValid: boolean = false;
-  subscription: Subscription;
   user: User | undefined;
   error: string | null = null;
 
-  constructor(
-    private router: Router,
-    private userService: UserService,
-    private stateService: StateService,
-  ) {
-    this.subscription = Subscription.EMPTY;
-  }
+  private userService = inject(UserService);
+  private destroyRef = inject(DestroyRef);
+  private stateService = inject(StateService);
+  private router = inject(Router);
 
   loginForm: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -46,17 +41,18 @@ export class LoginComponent {
 
   onSubmit() {
     const request: LoginRequest = this.loginForm.value;
-    this.userService.sendLoginRequest(request).pipe(takeUntilDestroyed())
-      .subscribe({
-        next: (data) => {
-          const navigationExtras: NavigationExtras = { state: { data: data } };
-          this.stateService.refreshState(data.jwtToken!, data);
-          this.router.navigate(['home'], navigationExtras);
-        },
-        error: (data) => {
-          this.error = data.error.message;
-        },
-      });
+    this.userService.sendLoginRequest(request).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: (data) => {
+        const navigationExtras: NavigationExtras = { state: { data: data } };
+        this.stateService.refreshState(data.jwtToken!, data);
+        this.router.navigate(['home'], navigationExtras);
+      },
+      error: (data) => {
+        this.error = data.error.message;
+      },
+    });
   }
 
   onValidate() {

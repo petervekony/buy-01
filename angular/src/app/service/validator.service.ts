@@ -10,8 +10,6 @@ import {
   providedIn: 'root',
 })
 export class ValidatorService {
-  constructor() {}
-
   numberValidator(): ValidatorFn {
     //eslint-disable-next-line
     return (control: AbstractControl): { [key: string]: any } | null => {

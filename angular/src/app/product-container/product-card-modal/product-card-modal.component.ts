@@ -1,4 +1,12 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTabGroup } from '@angular/material/tabs';
@@ -33,6 +41,7 @@ export class ProductCardModalComponent implements OnInit {
     product!: Product;
   @Input()
     user?: User;
+
   images: string[] = [];
   imageIds: string[] = [];
   placeholder: string = environment.placeholder;
@@ -54,6 +63,14 @@ export class ProductCardModalComponent implements OnInit {
   currentImageIndex = 0;
   currentDeleteIndex = 0;
 
+  private productService = inject(ProductService);
+  private mediaService = inject(MediaService);
+  private formStateService = inject(FormStateService);
+  private userService = inject(UserService);
+  private validatorService = inject(ValidatorService);
+  private dataService = inject(DataService);
+  private destroyRef = inject(DestroyRef);
+
   productForm: FormGroup = new FormGroup({
     name: new FormControl(null, [this.validatorService.productNameValidator()]),
     description: new FormControl(null, [
@@ -67,55 +84,50 @@ export class ProductCardModalComponent implements OnInit {
     ]),
   });
 
-  constructor(
-    private mediaService: MediaService,
-    private formStateService: FormStateService,
-    private productService: ProductService,
-    private userService: UserService,
-    private validatorService: ValidatorService,
-    private dataService: DataService,
-  ) {
-  }
-
   ngOnInit(): void {
     this.initFormValues();
 
     this.mediaService.getProductThumbnail(
       this.product.id!,
-    ).pipe(takeUntilDestroyed()).subscribe((media) => {
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((media) => {
       if (media) {
         this.picture = this.mediaService.formatMedia(media);
       }
     });
 
-    this.dataService.deleteImage$.subscribe((index) => {
-      this.currentDeleteIndex = index;
-    });
+    this.dataService.deleteImage$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((index) => {
+        this.currentDeleteIndex = index;
+      });
 
-    this.dataService.ids$.pipe(takeUntilDestroyed()).subscribe((id) => {
-      if (id !== this.product.id) return;
-      this.mediaService
-        .getProductMedia(this.product.id!).pipe(takeUntilDestroyed())
-        .subscribe({
-          next: (data) => {
-            if (data && data.media && data.media.length > 0) {
-              this.images = data.media.map((item) => {
-                this.imageIds.push(item.id);
-                return this.mediaService.formatMultipleMedia(item);
-              });
-            }
-          },
-          error: () => of(null),
-        });
+    this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
+      (id) => {
+        if (id !== this.product.id) return;
+        this.mediaService
+          .getProductMedia(this.product.id!).pipe(
+            takeUntilDestroyed(this.destroyRef),
+          )
+          .subscribe({
+            next: (data) => {
+              if (data && data.media && data.media.length > 0) {
+                this.images = data.media.map((item) => {
+                  this.imageIds.push(item.id);
+                  return this.mediaService.formatMultipleMedia(item);
+                });
+              }
+            },
+            error: () => of(null),
+          });
 
-      this.userService.getOwnerInfo(
-        this.product.userId!,
-      ).pipe(takeUntilDestroyed())
-        .subscribe({
-          next: (user) => this.owner = user,
-          error: (err) => console.log(err),
-        });
-    });
+        this.userService.getOwnerInfo(
+          this.product.userId!,
+        ).pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: (user) => this.owner = user,
+            error: (err) => console.log(err),
+          });
+      },
+    );
   }
 
   nextImage() {
@@ -194,7 +206,7 @@ export class ProductCardModalComponent implements OnInit {
         quantity: this.productForm.value.quantity,
       } as ProductRequest;
       this.productService.addProduct(productRequest, mediaData).pipe(
-        takeUntilDestroyed(),
+        takeUntilDestroyed(this.destroyRef),
       ).subscribe({
         next: (data: Product | null) => {
           this.success = data !== null;
@@ -224,7 +236,7 @@ export class ProductCardModalComponent implements OnInit {
     this.mediaService.addMedia(
       this.product.id!,
       mediaForm,
-    ).pipe(takeUntilDestroyed()).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.images.push(this.mediaService.formatMultipleMedia(data));
         this.fileSelected = null;
