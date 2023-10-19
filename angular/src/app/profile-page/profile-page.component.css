@@ -105,6 +105,17 @@
   background-color: #ff739a;
 }
 
+.delete-user {
+  background-color: #ff739a;
+  border: 1px solid #ff739aff;
+}
+
+.delete-user:hover {
+  background-color: #ff5266;
+  border: 1px solid #ff5266;
+  color: azure;
+}
+
 .profile-form {
   border-radius: 10px !important;
   box-shadow: 0 0 10px #cacaf433 !important;

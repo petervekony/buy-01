@@ -11,6 +11,7 @@
   position: absolute;
   /* left: 3vh; */
   top: -100px;
+  max-height: 750px;
 }
 
 .upload-container {

@@ -17,9 +17,9 @@ import { MediaService } from '../service/media.service';
 import { StateService } from '../service/state.service';
 import { ValidatorService } from '../service/validator.service';
 import { FileSelectEvent } from 'primeng/fileupload';
-import { Media } from '../interfaces/media';
 import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Media } from '../interfaces/media';
 
 @Component({
   selector: 'app-profile-page',
@@ -27,7 +27,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit {
-  deleteFormOpen = false;
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
   @ViewChild('profile')
@@ -38,8 +37,11 @@ export class ProfilePageComponent implements OnInit {
   formOpen = false;
   formValid = false;
   buttonClicked = false;
-  avatarFormOpen = false;
   profileFormOpen = false;
+  deleteAvatarFormOpen = false;
+  deleteUserFormOpen = false;
+  updateAvatarFormOpen = false;
+  deleteFormOpen = false;
   filename: string = '';
   user$ = new Subject<User>();
   currentUser: User = {} as User;
@@ -73,10 +75,12 @@ export class ProfilePageComponent implements OnInit {
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
+
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.getAuthAndAvatar();
       });
+
     this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (data) => this.user$.next(data),
@@ -171,11 +175,19 @@ export class ProfilePageComponent implements OnInit {
       this.setToTrue();
       break;
     case 'avatar':
-      this.avatarFormOpen = true;
+      this.updateAvatarFormOpen = true;
+      this.setToTrue();
+      break;
+    case 'deleteAvatar':
+      this.deleteAvatarFormOpen = true;
+      this.setToTrue();
+      break;
+    case 'deleteUser':
+      this.deleteUserFormOpen = true;
       this.setToTrue();
       break;
     default:
-      this.deleteFormOpen = true;
+      this.deleteUserFormOpen = true;
       this.setToTrue();
     }
   }
@@ -192,8 +204,9 @@ export class ProfilePageComponent implements OnInit {
   hideModal(): void {
     this.formStateService.setFormOpen(false);
     this.profileFormOpen = false;
-    this.avatarFormOpen = false;
-    this.deleteFormOpen = false;
+    this.deleteAvatarFormOpen = false;
+    this.deleteUserFormOpen = false;
+    this.updateAvatarFormOpen = false;
   }
 
   onSubmit() {
@@ -222,12 +235,21 @@ export class ProfilePageComponent implements OnInit {
   deleteAvatar() {
     this.mediaService.deleteAvatar(
       this.currentUser.id,
-    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       //eslint-disable-next-line
-      next: (data: any) => console.log(data),
-    });
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: any) =>
+      console.log(data)
+    );
     this.mediaService.updateImageAdded({} as Media);
     this.avatar$.next(this.placeholder);
+    this.hideModal();
+  }
+
+  deleteUser() {
+    this.userService.deleteUser(this.currentUser.id).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(() => {
+      this.userService.logout();
+    });
     this.hideModal();
   }
 }

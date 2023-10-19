@@ -17,12 +17,13 @@
                       <button id="delete-image-button" (click)="openConfirm('image')">
                         <mat-icon aria-hidden="false" aria-label="delete icon" fontIcon="delete"></mat-icon>
                       </button>
-                      <button (click)="prevImage()" [disabled]="currentImageIndex === 0">
+                      <button (click)="prevImage()" [disabled]="currentImageIndex === 0" *ngIf="images.length > 1">
                         <mat-icon aria-hidden="false" aria-label="arrow left"
                           fontIcon="arrow_back_ios_new_icon"></mat-icon>
                       </button>
-                      <span>{{ currentImageIndex + 1 }} / {{ images.length }}</span>
-                      <button (click)="nextImage()" [disabled]="currentImageIndex === images.length - 1">
+                      <span *ngIf="images.length > 1">{{ currentImageIndex + 1 }} / {{ images.length }}</span>
+                      <button (click)="nextImage()" [disabled]="currentImageIndex === images.length - 1"
+                        *ngIf="images.length > 1">
                         <mat-icon aria-hidden="false" aria-label="arrow right"
                           fontIcon="arrow_forward_ios_icon"></mat-icon>
                       </button>
@@ -83,15 +84,6 @@
                 <label for="product-quantity" class="block text-900 font-medium mb-2">Quantity</label>
                 <p-inputNumber id="product-quantity" value="product.price" class="mb-3" name="product-quantity"
                   formControlName="quantity"></p-inputNumber>
-                <!-- <div crlass="flex align-items-center justify-content-between mb-6"> -->
-                <!-- <div class="upload-container"> -->
-                <!--   <label for="image" class="block text-900 font-medium mb-2">Add an image?</label> -->
-                <!--   <!-- <input #imageUpload type="file" name="image" id="upload-product-image" (change)="onFileSelected($event)" -->
-                <!--   <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" id="image" accept="image/*" -->
-                <!--     (onSelect)="onFileSelected($event)" class="w-full half"></p-fileUpload> -->
-                <!--   <!--   accept="image/*" /> -->
-                <!-- </div> -->
-
                 <button type="submit" id="submit-button" [disabled]="!formValid" pButton pRipple label="Submit"
                   icon="pi pi-user" (click)="submitProduct()" class="w-full"></button>
               </form>
