@@ -28,8 +28,8 @@ services:
 
   product-service:
     build:
-      context: ./product-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: product-service/Dockerfile
     environment:
       SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
       SPRING_DATA_MONGODB_DB: buy-01-products
@@ -42,8 +42,8 @@ services:
 
   media-service:
     build:
-      context: ./media-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: media-service/Dockerfile
     environment:
       SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
       SPRING_DATA_MONGODB_DB: buy-01-media
