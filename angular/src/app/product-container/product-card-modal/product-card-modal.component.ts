@@ -1,15 +1,17 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
+  inject,
   Input,
-  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTabGroup } from '@angular/material/tabs';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
-import { of, Subscription } from 'rxjs';
+import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
@@ -26,7 +28,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './product-card-modal.component.html',
   styleUrls: ['./product-card-modal.component.css'],
 })
-export class ProductCardModalComponent implements OnInit, OnDestroy {
+export class ProductCardModalComponent implements OnInit {
   @ViewChild('tabGroup')
     tabGroup!: MatTabGroup;
   @ViewChild('productModal')
@@ -39,12 +41,9 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     product!: Product;
   @Input()
     user?: User;
+
   images: string[] = [];
   imageIds: string[] = [];
-  mediaSubscription: Subscription = Subscription.EMPTY;
-  tumbnailSubscription: Subscription = Subscription.EMPTY;
-  ownerSubscription: Subscription = Subscription.EMPTY;
-  mediaUpdateSubscription: Subscription = Subscription.EMPTY;
   placeholder: string = environment.placeholder;
   picture: string = this.placeholder;
   formOpen = false;
@@ -64,6 +63,14 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   currentImageIndex = 0;
   currentDeleteIndex = 0;
 
+  private productService = inject(ProductService);
+  private mediaService = inject(MediaService);
+  private formStateService = inject(FormStateService);
+  private userService = inject(UserService);
+  private validatorService = inject(ValidatorService);
+  private dataService = inject(DataService);
+  private destroyRef = inject(DestroyRef);
+
   productForm: FormGroup = new FormGroup({
     name: new FormControl(null, [this.validatorService.productNameValidator()]),
     description: new FormControl(null, [
@@ -77,55 +84,50 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
     ]),
   });
 
-  constructor(
-    private mediaService: MediaService,
-    private formStateService: FormStateService,
-    private productService: ProductService,
-    private userService: UserService,
-    private validatorService: ValidatorService,
-    private dataService: DataService,
-  ) {
-  }
-
   ngOnInit(): void {
     this.initFormValues();
 
-    this.tumbnailSubscription = this.mediaService.getProductThumbnail(
+    this.mediaService.getProductThumbnail(
       this.product.id!,
-    ).subscribe((media) => {
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((media) => {
       if (media) {
         this.picture = this.mediaService.formatMedia(media);
       }
     });
 
-    this.dataService.deleteImage$.subscribe((index) => {
-      this.currentDeleteIndex = index;
-    });
+    this.dataService.deleteImage$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((index) => {
+        this.currentDeleteIndex = index;
+      });
 
-    this.dataService.ids$.subscribe((id) => {
-      if (id !== this.product.id) return;
-      this.mediaSubscription = this.mediaService
-        .getProductMedia(this.product.id!)
-        .subscribe({
-          next: (data) => {
-            if (data && data.media && data.media.length > 0) {
-              this.images = data.media.map((item) => {
-                this.imageIds.push(item.id);
-                return this.mediaService.formatMultipleMedia(item);
-              });
-            }
-          },
-          error: () => of(null),
-        });
+    this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
+      (id) => {
+        if (id !== this.product.id) return;
+        this.mediaService
+          .getProductMedia(this.product.id!).pipe(
+            takeUntilDestroyed(this.destroyRef),
+          )
+          .subscribe({
+            next: (data) => {
+              if (data && data.media && data.media.length > 0) {
+                this.images = data.media.map((item) => {
+                  this.imageIds.push(item.id);
+                  return this.mediaService.formatMultipleMedia(item);
+                });
+              }
+            },
+            error: () => of(null),
+          });
 
-      this.ownerSubscription = this.userService.getOwnerInfo(
-        this.product.userId!,
-      )
-        .subscribe({
-          next: (user) => this.owner = user,
-          error: (err) => console.log(err),
-        });
-    });
+        this.userService.getOwnerInfo(
+          this.product.userId!,
+        ).pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: (user) => this.owner = user,
+            error: (err) => console.log(err),
+          });
+      },
+    );
   }
 
   nextImage() {
@@ -203,7 +205,9 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
         price: this.productForm.value.price,
         quantity: this.productForm.value.quantity,
       } as ProductRequest;
-      this.productService.addProduct(productRequest, mediaData).subscribe({
+      this.productService.addProduct(productRequest, mediaData).pipe(
+        takeUntilDestroyed(this.destroyRef),
+      ).subscribe({
         next: (data: Product | null) => {
           this.success = data !== null;
           this.requestSent = true;
@@ -229,10 +233,10 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
       this.fileToBlob(this.fileSelected),
       this.filename,
     );
-    this.mediaUpdateSubscription = this.mediaService.addMedia(
+    this.mediaService.addMedia(
       this.product.id!,
       mediaForm,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.images.push(this.mediaService.formatMultipleMedia(data));
         this.fileSelected = null;
@@ -258,12 +262,5 @@ export class ProductCardModalComponent implements OnInit, OnDestroy {
   closeConfirm() {
     this.confirm = false;
     this.imageDeleteConfirm = false;
-  }
-
-  ngOnDestroy(): void {
-    this.mediaSubscription.unsubscribe();
-    this.ownerSubscription.unsubscribe();
-    this.tumbnailSubscription.unsubscribe();
-    this.mediaUpdateSubscription.unsubscribe();
   }
 }

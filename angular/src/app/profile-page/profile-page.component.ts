@@ -1,14 +1,15 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
-  OnDestroy,
+  inject,
   OnInit,
   ViewChild,
 } from '@angular/core';
 import { User } from '../interfaces/user';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { BehaviorSubject, of, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../service/user.service';
@@ -18,13 +19,14 @@ import { ValidatorService } from '../service/validator.service';
 import { FileSelectEvent } from 'primeng/fileupload';
 import { Media } from '../interfaces/media';
 import { environment } from 'src/environments/environment';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.css'],
 })
-export class ProfilePageComponent implements OnInit, OnDestroy {
+export class ProfilePageComponent implements OnInit {
   deleteFormOpen = false;
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
@@ -32,6 +34,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     profile: ElementRef | undefined;
   @ViewChild('avatarForm')
     avaterForm: ElementRef | undefined;
+
   formOpen = false;
   formValid = false;
   buttonClicked = false;
@@ -42,77 +45,73 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   currentUser: User = {} as User;
   fileSelected: File | null = null;
   placeholder: string = environment.placeholder;
-  deleteSubscription: Subscription = Subscription.EMPTY;
-  imageSubscription: Subscription = Subscription.EMPTY;
-  usernameSubscription: Subscription = Subscription.EMPTY;
-  userSubscription: Subscription = Subscription.EMPTY;
-  avatarSubscription: Subscription = Subscription.EMPTY;
-  authSubscription: Subscription = Subscription.EMPTY;
-  formSubscription: Subscription = Subscription.EMPTY;
-  uploadSubscription: Subscription = Subscription.EMPTY;
   avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
-  constructor(
-    private authService: AuthService,
-    private formStateService: FormStateService,
-    private cookieService: CookieService,
-    private userService: UserService,
-    private mediaService: MediaService,
-    private stateService: StateService,
-    private validatorService: ValidatorService,
-  ) {
-    //TODO: fix if clicked outside form, close form!
-    // this.renderer.listen('window', 'click', (e: Event) => {
-    //   if (
-    //     this.buttonClicked &&
-    //     this.profileForm?.nativeElement &&
-    //     this.formOpen
-    //   ) {
-    //     if (this.profileForm?.nativeElement !== e.target) {
-    //       this.formStateService.setFormOpen(false);
-    //       this.buttonClicked = false;
-    //     }
-    //   }
-    // });
-  }
+  private authService = inject(AuthService);
+  private formStateService = inject(FormStateService);
+  private cookieService = inject(CookieService);
+  private userService = inject(UserService);
+  private mediaService = inject(MediaService);
+  private stateService = inject(StateService);
+  private validatorService = inject(ValidatorService);
+  private destroyRef = inject(DestroyRef);
+
+  //TODO: fix if clicked outside form, close form!
+  // this.renderer.listen('window', 'click', (e: Event) => {
+  //   if (
+  //     this.buttonClicked &&
+  //     this.profileForm?.nativeElement &&
+  //     this.formOpen
+  //   ) {
+  //     if (this.profileForm?.nativeElement !== e.target) {
+  //       this.formStateService.setFormOpen(false);
+  //       this.buttonClicked = false;
+  //     }
+  //   }
+  // });
+
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
-    this.imageSubscription = this.mediaService.imageAdded$.subscribe(() => {
-      this.getAuthAndAvatar();
-    });
-    this.usernameSubscription = this.userService.usernameAdded$.subscribe(
-      (data) => this.user$.next(data),
-    );
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.getAuthAndAvatar();
+      });
+    this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(
+        (data) => this.user$.next(data),
+      );
   }
 
   private getAuthAndAvatar() {
-    this.authSubscription = this.authService.getAuth().subscribe({
-      next: (user) => {
-        this.user$.next(user);
-        this.currentUser = user;
-        if (user.avatar) {
-          this.avatarSubscription = this.mediaService.getAvatar(
-            this.currentUser.id,
-          )
-            .subscribe({
-              next: (media) => {
-                if (media && media?.image) {
-                  this.avatar$.next(this.mediaService.formatMedia(media));
-                }
-              },
-              error: (err) => console.log(err),
-            });
-        }
-      },
-      error: (error) => console.error(error),
-    });
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.user$.next(user);
+          this.currentUser = user;
+          if (user.avatar) {
+            this.mediaService.getAvatar(
+              this.currentUser.id,
+            ).pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: (media) => {
+                  if (media && media?.image) {
+                    this.avatar$.next(this.mediaService.formatMedia(media));
+                  }
+                },
+                error: (err) => console.log(err),
+              });
+          }
+        },
+        error: (error) => console.error(error),
+      });
     this.formValid = true;
-    this.formSubscription = this.formStateService.formOpen$.subscribe(
-      (isOpen) => {
-        this.formOpen = isOpen;
-      },
-    );
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(
+        (isOpen) => {
+          this.formOpen = isOpen;
+        },
+      );
   }
 
   onFileSelected(event: FileSelectEvent) {
@@ -135,10 +134,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
         this.filename as string,
       );
     }
-    this.uploadSubscription = this.mediaService.uploadAvatar(
+    this.mediaService.uploadAvatar(
       this.currentUser.id,
       mediaData!,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.state = of(this.currentUser);
@@ -202,10 +201,10 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     delete request.confirmPassword;
     formatForm();
     this.formStateService.setFormOpen(false);
-    this.userSubscription = this.userService.updateUser(
+    this.userService.updateUser(
       request,
       this.currentUser.id,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.userService.updateUsernameAdded(data);
       },
@@ -221,26 +220,14 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   deleteAvatar() {
-    this.deleteSubscription = this.mediaService.deleteAvatar(
+    this.mediaService.deleteAvatar(
       this.currentUser.id,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       //eslint-disable-next-line
       next: (data: any) => console.log(data),
     });
     this.mediaService.updateImageAdded({} as Media);
     this.avatar$.next(this.placeholder);
     this.hideModal();
-  }
-
-  ngOnDestroy(): void {
-    this.avatarSubscription.unsubscribe();
-    this.deleteSubscription.unsubscribe();
-    this.imageSubscription.unsubscribe();
-    this.usernameSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.avatarSubscription.unsubscribe();
-    this.authSubscription.unsubscribe();
-    this.formSubscription.unsubscribe();
-    this.uploadSubscription.unsubscribe();
   }
 }

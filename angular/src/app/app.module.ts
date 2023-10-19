@@ -13,7 +13,6 @@ import { RippleModule } from 'primeng/ripple';
 import { InputTextModule } from 'primeng/inputtext';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
-import { EditUserDetailsComponent } from './edit-user-details/edit-user-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { AddProductComponent } from './add-product/add-product.component';
@@ -38,7 +37,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
     LoginComponent,
     SignupComponent,
     HomeComponent,
-    EditUserDetailsComponent,
     DashboardComponent,
     NavbarComponent,
     AddProductComponent,
@@ -72,13 +70,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(
-    private stateService: StateService,
-    // private cookieService: CookieService,
-  ) {
-    // console.log('check', this.cookieService.check('buy-01'));
-    // console.log(this.cookieService.getAll());
-    // console.log('AppModule constructor is called!');
+  constructor(private stateService: StateService) {
     this.stateService.initialize();
   }
 }

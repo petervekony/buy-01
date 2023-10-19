@@ -1,8 +1,8 @@
 import {
   Component,
+  DestroyRef,
   ElementRef,
-  OnDestroy,
-  OnInit,
+  inject,
   ViewChild,
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -10,24 +10,23 @@ import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
 import { User } from '../interfaces/user';
 import { AuthService } from '../service/auth.service';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { filter } from 'rxjs/operators';
 import { MediaService } from '../service/media.service';
 import { environment } from 'src/environments/environment';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class NavbarComponent {
   @ViewChild('navbar')
     navbar: ElementRef | undefined;
+
   placeholder = environment.placeholder;
-  routeSubscription: Subscription = Subscription.EMPTY;
-  authSubscription: Subscription = Subscription.EMPTY;
-  avatarSubscription: Subscription = Subscription.EMPTY;
   route: string = '';
   dash = false;
   home = false;
@@ -36,51 +35,53 @@ export class NavbarComponent implements OnInit, OnDestroy {
   user$ = new Subject<User>();
   avatar$ = new BehaviorSubject<string>(this.placeholder);
 
-  constructor(
-    private router: Router,
-    private stateService: StateService,
-    private userService: UserService,
-    private authService: AuthService,
-    private formStateService: FormStateService,
-    private mediaService: MediaService,
-  ) {
-  }
+  private router = inject(Router);
+  private userService = inject(UserService);
+  private stateService = inject(StateService);
+  private formStateService = inject(FormStateService);
+  private authService = inject(AuthService);
+  private mediaService = inject(MediaService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
-    this.formStateService.formOpen$.subscribe((isOpen) => {
-      if (isOpen) {
-        this.navbar?.nativeElement.classList.add('blur-filter');
-      } else {
-        this.navbar?.nativeElement.classList.remove('blur-filter');
-      }
-    });
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((isOpen) => {
+        if (isOpen) {
+          this.navbar?.nativeElement.classList.add('blur-filter');
+        } else {
+          this.navbar?.nativeElement.classList.remove('blur-filter');
+        }
+      });
 
-    this.mediaService.imageAdded$.subscribe(() => {
-      this.getAuthAndAvatar();
-    });
-    this.userService.usernameAdded$.subscribe((data) => {
-      this.user$.next(data);
-    });
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.getAuthAndAvatar();
+      });
+    this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.user$.next(data);
+      });
     this.checkRoutes();
   }
 
   private getAuthAndAvatar() {
-    this.authSubscription = this.authService.getAuth().subscribe({
-      next: (user) => {
-        this.user$.next(user);
-        this.currentUser = user;
-        if (user.avatar) {
-          this.getAvatar();
-        }
-      },
-      error: (error) => console.error(error),
-    });
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.user$.next(user);
+          this.currentUser = user;
+          if (user.avatar) {
+            this.getAvatar();
+          }
+        },
+        error: (error) => console.error(error),
+      });
   }
 
   private getAvatar() {
-    this.avatarSubscription = this.mediaService.getAvatar(
+    this.mediaService.getAvatar(
       this.currentUser.id,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (media) => {
         const image = this.mediaService.formatMedia(media);
         this.avatar$.next(image);
@@ -90,12 +91,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private checkRoutes() {
-    this.routeSubscription = this.router.events
+    this.router.events
       .pipe(
         filter((event): event is NavigationEnd =>
           event instanceof NavigationEnd
         ),
-      )
+      ).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((event: NavigationEnd) => {
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
@@ -121,11 +122,5 @@ export class NavbarComponent implements OnInit, OnDestroy {
   goToProfile() {
     this.formStateService.setFormOpen(false);
     this.move('profile');
-  }
-
-  ngOnDestroy(): void {
-    this.authSubscription.unsubscribe();
-    this.routeSubscription.unsubscribe();
-    this.avatarSubscription.unsubscribe();
   }
 }

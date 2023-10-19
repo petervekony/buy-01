@@ -1,77 +1,62 @@
 import {
   AfterViewInit,
   Component,
+  DestroyRef,
   ElementRef,
-  OnDestroy,
+  inject,
   OnInit,
-  Renderer2,
   ViewChild,
 } from '@angular/core';
 import { Product } from '../interfaces/product';
-import { Subscription } from 'rxjs';
 import { UserService } from '../service/user.service';
 import { ProductService } from '../service/product.service';
 import { CookieService } from 'ngx-cookie-service';
-import { FormStateService } from '../service/form-state.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-product-container',
   templateUrl: './product-container.component.html',
   styleUrls: ['./product-container.component.css'],
 })
-export class ProductContainerComponent
-implements OnInit, OnDestroy, AfterViewInit {
+export class ProductContainerComponent implements OnInit, AfterViewInit {
   @ViewChild('container')
     container: ElementRef | undefined;
-  products: Product[] = [];
-  subscription: Subscription = Subscription.EMPTY;
-  filterSubscription: Subscription = Subscription.EMPTY;
 
-  constructor(
-    private userService: UserService,
-    private productService: ProductService,
-    private cookieService: CookieService,
-    private formStateService: FormStateService,
-    private renderer: Renderer2,
-  ) {
-    //TODO: for testing
-    // this.filterSubscription = this.formStateService.formOpen$.subscribe(
-    //   (isOpen) => {
-    //     if (isOpen) {
-    //       this.renderer.addClass(this.container?.nativeElement, 'blur-filter');
-    //     } else {
-    //       this.renderer.removeClass(
-    //         this.container?.nativeElement,
-    //         'blur-filer',
-    //       );
-    //     }
-    //   },
-    // );
-  }
+  products: Product[] = [];
+
+  private userService = inject(UserService);
+  private productService = inject(ProductService);
+  private cookieService = inject(CookieService);
+  private destroyRef = inject(DestroyRef);
+
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
     this.showProducts();
   }
   ngAfterViewInit(): void {
-    this.productService.productAdded$.subscribe(() => {
-      this.showProducts();
-    });
+    this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.showProducts();
+      });
   }
 
   showProducts() {
-    this.subscription = this.productService.getProducts().subscribe({
-      next: (products) => {
-        if (products) this.products = products.reverse();
-      },
-      error: (error) => {
-        console.log(error);
-      },
-    });
+    this.productService.getProducts().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (products) => {
+          if (products) this.products = products.reverse();
+        },
+        error: (error) => {
+          console.log(error);
+        },
+      });
   }
 
   showUsers() {
-    this.userService.sendUserInfoRequest().subscribe({
+    this.userService.sendUserInfoRequest().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: (data) => {
         console.log(data);
       },
@@ -79,10 +64,5 @@ implements OnInit, OnDestroy, AfterViewInit {
         console.log('error', error);
       },
     });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    this.filterSubscription.unsubscribe();
   }
 }

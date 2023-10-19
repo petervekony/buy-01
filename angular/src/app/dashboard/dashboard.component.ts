@@ -1,11 +1,19 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormStateService } from '../service/form-state.service';
 import { ProductService } from '../service/product.service';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Product } from '../interfaces/product';
 import { map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../service/auth.service';
 import { CookieService } from 'ngx-cookie-service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,35 +29,35 @@ export class DashboardComponent implements OnInit {
   showAddButton = true;
   products: Product[] = [];
   userProducts$: Observable<Product[]> = of([]);
-  formSubscription: Subscription = Subscription.EMPTY;
-  productSubscription: Subscription = Subscription.EMPTY;
-  constructor(
-    private formStateService: FormStateService,
-    private productService: ProductService,
-    private authService: AuthService,
-    private cookieService: CookieService,
-  ) {}
+
+  private formStateService = inject(FormStateService);
+  private productService = inject(ProductService);
+  private authService = inject(AuthService);
+  private cookieService = inject(CookieService);
+  private destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     const cookie = this.cookieService.check('buy-01');
     if (!cookie) return;
 
-    this.formSubscription = this.formStateService.formOpen$.subscribe(
-      (isOpen) => {
-        if (!isOpen) {
-          this.showProductForm = false;
-          this.showAddButton = true;
-        } else {
-          this.showAddButton = false;
-        }
-      },
-    );
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(
+        (isOpen) => {
+          if (!isOpen) {
+            this.showProductForm = false;
+            this.showAddButton = true;
+          } else {
+            this.showAddButton = false;
+          }
+        },
+      );
 
-    this.productSubscription = this.productService.productAdded$.subscribe(
-      () => {
-        this.getOwnerProducts();
-      },
-    );
+    this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(
+        () => {
+          this.getOwnerProducts();
+        },
+      );
 
     this.formStateService.setFormOpen(false);
   }

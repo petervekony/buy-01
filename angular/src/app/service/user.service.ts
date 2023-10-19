@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -14,7 +14,7 @@ export class UserService {
   private usernameAddedSource = new BehaviorSubject<User>({} as User);
   usernameAdded$ = this.usernameAddedSource.asObservable();
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   updateUsernameAdded(data: User): void {
     this.usernameAddedSource.next(data);
