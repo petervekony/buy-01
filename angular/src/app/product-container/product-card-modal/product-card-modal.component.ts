@@ -43,10 +43,10 @@ export class ProductCardModalComponent implements OnInit {
   @Input()
     user?: User;
 
-  images: string[] = [];
-  imageIds: string[] = [];
-  placeholder: string = environment.placeholder;
-  picture: string = this.placeholder;
+  price = 0;
+  quantity = 0;
+  currentImageIndex = 0;
+  currentDeleteIndex = 0;
   formOpen = false;
   formValid = true;
   success = false;
@@ -57,13 +57,13 @@ export class ProductCardModalComponent implements OnInit {
   productResult: string = '';
   errorMessage: string = '';
   filename: string = '';
+  images: string[] = [];
+  imageIds: string[] = [];
+  placeholder: string = environment.placeholder;
+  picture: string = this.placeholder;
   fileSelected: File | null = null;
   owner: User = {} as User;
   currentUser: User = {} as User;
-  price: number = 0;
-  quantity: number = 0;
-  currentImageIndex = 0;
-  currentDeleteIndex = 0;
 
   private productService = inject(ProductService);
   private mediaService = inject(MediaService);
@@ -124,7 +124,6 @@ export class ProductCardModalComponent implements OnInit {
             },
             error: () => of(null),
           });
-
         this.userService.getOwnerInfo(
           this.product.userId!,
         ).pipe(takeUntilDestroyed(this.destroyRef))

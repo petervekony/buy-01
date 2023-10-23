@@ -27,7 +27,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { FileUploadModule } from 'primeng/fileupload';
 import { GalleriaModule } from 'primeng/galleria';
-import { MediaGalleryComponent } from './media-gallery/media-gallery.component';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputNumberModule } from 'primeng/inputnumber';
 
@@ -44,7 +43,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
     ProductCardModalComponent,
     ProductCardComponent,
     ProfilePageComponent,
-    MediaGalleryComponent,
   ],
   imports: [
     BrowserModule,

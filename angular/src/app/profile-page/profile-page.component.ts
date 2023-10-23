@@ -107,7 +107,7 @@ export class ProfilePageComponent implements OnInit {
               });
           }
         },
-        error: (error) => console.error(error),
+        error: (err) => console.error(err),
       });
     this.formValid = true;
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))

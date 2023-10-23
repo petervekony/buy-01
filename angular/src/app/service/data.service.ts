@@ -6,22 +6,22 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class DataService {
   //eslint-disable-next-line
-  private dataSubject = new BehaviorSubject<any>(null);
-  data$ = this.dataSubject.asObservable();
+  private dataSource = new BehaviorSubject<any>(null);
+  data$ = this.dataSource.asObservable();
 
-  private idStream = new BehaviorSubject<string>('');
-  ids$ = this.idStream.asObservable();
+  private idSource = new BehaviorSubject<string>('');
+  ids$ = this.idSource.asObservable();
 
   private deleteImageSource = new BehaviorSubject<number>(0);
   deleteImage$ = this.deleteImageSource.asObservable();
 
   //eslint-disable-next-line
   sendData(data: any): void {
-    this.dataSubject.next(data);
+    this.dataSource.next(data);
   }
 
   sendProductId(data: string): void {
-    this.idStream.next(data);
+    this.idSource.next(data);
   }
 
   changeDeleteIndex(data: number): void {
