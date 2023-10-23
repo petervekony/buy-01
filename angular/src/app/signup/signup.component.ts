@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { NavigationExtras, Router } from '@angular/router';
 import {
   AbstractControl,
@@ -10,14 +10,14 @@ import {
 } from '@angular/forms';
 import { UserService } from '../service/user.service';
 import { SignupRequest } from '../interfaces/signup-request';
-import { Subscription } from 'rxjs';
 import { StateService } from '../service/state.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'signup',
   templateUrl: './signup.component.html',
 })
-export class SignupComponent implements OnDestroy {
+export class SignupComponent {
   private checkPassword: ValidatorFn = (
     form: AbstractControl,
   ): ValidationErrors | null => {
@@ -26,15 +26,7 @@ export class SignupComponent implements OnDestroy {
       : { notSame: true };
   };
   formValid: boolean = false;
-  subscription: Subscription = Subscription.EMPTY;
   error: string | null = null;
-
-  constructor(
-    private router: Router,
-    private userService: UserService,
-    private stateService: StateService,
-  ) {}
-
   registerForm: FormGroup = new FormGroup(
     {
       name: new FormControl('', [
@@ -63,6 +55,11 @@ export class SignupComponent implements OnDestroy {
     { validators: this.checkPassword },
   );
 
+  private stateService = inject(StateService);
+  private userService = inject(UserService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
   onValidate() {
     this.formValid = this.registerForm.valid;
   }
@@ -75,7 +72,9 @@ export class SignupComponent implements OnDestroy {
     this.formValid = false;
     const request: SignupRequest = this.registerForm.value;
     request.role ? (request.role = 'SELLER') : (request.role = 'CLIENT');
-    this.subscription = this.userService.sendSignupRequest(request).subscribe({
+    this.userService.sendSignupRequest(request).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       error: (error) => {
         this.error = error.error.message;
       },
@@ -86,7 +85,9 @@ export class SignupComponent implements OnDestroy {
   }
 
   autoLogin(request: SignupRequest): void {
-    this.subscription = this.userService.sendLoginRequest(request).subscribe({
+    this.userService.sendLoginRequest(request).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: (data) => {
         const navigationExtras: NavigationExtras = { state: { data: data } };
         this.stateService.refreshState(data.jwtToken!, data);
@@ -94,9 +95,5 @@ export class SignupComponent implements OnDestroy {
       },
       error: (data) => console.log(data),
     });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

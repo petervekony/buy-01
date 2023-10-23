@@ -3,7 +3,7 @@
   position: sticky;
   top: 0;
   height: 100px;
-  width: 100vw;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -120,7 +120,7 @@
 }
 
 #profile-button:hover {
-  transform: scale(1.1);
+  /* transform: scale(1.1); */
   color: #8d45ce;
 }
 

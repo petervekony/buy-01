@@ -2,22 +2,25 @@
   width: 80vw;
   height: calc(80vh - 100px);
   margin-left: 10vw;
-  /* margin-top: 10vh; */
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  min-height: 400px;
 }
 
 .profile-page {
-  width: 80%;
+  width: 100%;
   text-align: justify;
+  justify-content: center;
 }
 
 .footer {
   display: flex;
   flex-direction: column;
-  /* justify-content: space-evenly; */
+  justify-content: center;
+  align-items: center;
   margin-top: 5rem;
   width: 100%;
   gap: 1rem;
@@ -26,9 +29,12 @@
 
 
 .footer button {
-  width: 50%;
-  margin-left: 25%;
+  /* width: 50%; */
+  /* margin-left: 25%; */
   justify-self: center;
+  max-width: 250px;
+  min-width: 200px;
+  width: 33vw;
 }
 
 
@@ -95,8 +101,59 @@
   justify-content: center;
 }
 
-
-
 #no-button {
   background-color: #ff739a;
+}
+
+.delete-user {
+  background-color: #ff739a;
+  border: 1px solid #ff739aff;
+}
+
+.delete-user:hover {
+  background-color: #ff5266;
+  border: 1px solid #ff5266;
+  color: azure;
+}
+
+.profile-form {
+  border-radius: 10px !important;
+  box-shadow: 0 0 10px #cacaf433 !important;
+  min-width: 200px;
+}
+
+@media screen and (width < 285px){
+  .footer button {
+    width: 95%;
+    justify-self: center;
+  }
+}
+
+@media screen and (width < 700px){
+  .form {
+    width: 60vw;
+  }
+}
+
+@media screen and (width >= 700px){
+  .form {
+    width: 40vw;
+    max-width: 400px;
+  }
+}
+
+@media screen and (width < 400px){
+  .profile-form {
+    width: 100vw;
+  }
+}
+
+@media screen and (width < 500px){
+  .profile-form {
+    width: 90vw;
+  }
+
+  .form {
+    width: 90vw;
+  }
 }

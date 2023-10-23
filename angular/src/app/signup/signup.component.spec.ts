@@ -24,10 +24,7 @@ describe('SignupComponent', () => {
     sendLoginRequest: () =>
       of({
         name: 'taneli',
-        email: 'taneli@gmail.com',
-        confirmPassword: 'test123',
         role: 'SELLER',
-        id: '123123123',
       }),
   };
 
@@ -135,7 +132,6 @@ describe('SignupComponent', () => {
       name: 'taneli',
       email: 'taneli@gmail.com',
       password: 'test123',
-      confirmPassword: 'test123',
       role: 'SELLER',
     });
 
@@ -143,9 +139,6 @@ describe('SignupComponent', () => {
       state: {
         data: {
           name: 'taneli',
-          email: 'taneli@gmail.com',
-          password: 'test123',
-          confirmPassword: 'test123',
           role: 'SELLER',
         },
       },

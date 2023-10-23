@@ -1,9 +1,9 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UserService } from '../service/user.service';
 import { NavigationExtras } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoginRequest } from '../interfaces/login-request';
 import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
@@ -12,19 +12,15 @@ import { User } from '../interfaces/user';
   selector: 'app-login',
   templateUrl: './login.component.html',
 })
-export class LoginComponent implements OnDestroy {
+export class LoginComponent {
   formValid: boolean = false;
-  subscription: Subscription;
   user: User | undefined;
   error: string | null = null;
 
-  constructor(
-    private router: Router,
-    private userService: UserService,
-    private stateService: StateService,
-  ) {
-    this.subscription = Subscription.EMPTY;
-  }
+  private userService = inject(UserService);
+  private destroyRef = inject(DestroyRef);
+  private stateService = inject(StateService);
+  private router = inject(Router);
 
   loginForm: FormGroup = new FormGroup({
     name: new FormControl('', [
@@ -45,7 +41,9 @@ export class LoginComponent implements OnDestroy {
 
   onSubmit() {
     const request: LoginRequest = this.loginForm.value;
-    this.subscription = this.userService.sendLoginRequest(request).subscribe({
+    this.userService.sendLoginRequest(request).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: (data) => {
         const navigationExtras: NavigationExtras = { state: { data: data } };
         this.stateService.refreshState(data.jwtToken!, data);
@@ -59,9 +57,5 @@ export class LoginComponent implements OnDestroy {
 
   onValidate() {
     this.formValid = this.loginForm.valid;
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
   }
 }

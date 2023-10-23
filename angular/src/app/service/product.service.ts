@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
 import {
@@ -15,6 +15,7 @@ import { ProductRequest } from '../interfaces/product-request';
 import { ProductCreationResponse } from '../interfaces/product-creation-response';
 import { AuthService } from './auth.service';
 import { MediaService } from './media.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -27,11 +28,10 @@ export class ProductService {
   private userProductsSource = new BehaviorSubject<Product[]>([]);
   userProducts$ = this.userProductsSource.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private mediaService: MediaService,
-  ) {}
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private mediaService = inject(MediaService);
+  private destroyRef = inject(DestroyRef);
 
   updateProductAdded(product: Product): void {
     this.productAddedSource.next(product);
@@ -77,7 +77,9 @@ export class ProductService {
       .pipe(
         map((data: ProductCreationResponse) => {
           if (mediaForm && mediaForm.get('image') !== null) {
-            this.mediaService.addMedia(data.product.id!, mediaForm).subscribe({
+            this.mediaService.addMedia(data.product.id!, mediaForm).pipe(
+              takeUntilDestroyed(this.destroyRef),
+            ).subscribe({
               error: ((err) => console.log(err)),
             });
             mediaForm.append('name', '');
@@ -92,7 +94,9 @@ export class ProductService {
 
   deleteProduct(id: string): void {
     const address = environment.productsURL + '/' + id;
-    this.http.delete(address, { withCredentials: true }).subscribe({
+    this.http.delete(address, { withCredentials: true }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: (data) => {
         console.log(data);
       },

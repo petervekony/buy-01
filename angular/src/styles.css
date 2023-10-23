@@ -6,6 +6,7 @@ body {
   height: 100vh;
   width: 100vw;
   overflow-x: hidden;
+  z-index: 40;
 }
 
 body {
@@ -47,6 +48,7 @@ body {
   position: absolute;
   top: 0.4rem;
   right: 0.4rem;
+  /* left: 30rem; */
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
@@ -61,12 +63,18 @@ body {
   z-index: 12;
 }
 
+#blur-wrap {
+  width: 100vw;
+  height: 100vh;
+  z-index: 40;
+  position: absolute;
+}
+
 .blur-filter {
-  /* opacity: 0.5; */
-  background-color: #000;
-  filter: blur(20), brightness(0.7);
-  /* backdrop-filter: blur(10px), brightness(0.7); */
-  z-index: 10;
+  opacity: 0.3;
+  filter: blur(20px), brightness(0.7);
+  backdrop-filter: blur(10px), brightness(0.7);
+  pointer-events: none;
 }
 
 .close-button:hover {
@@ -112,22 +120,31 @@ body {
   align-items: center !important;
 }
 
-.third {
-  height: 30vh;
+.reg-forms {
+  max-width: 350px;
+  min-width: 250px;
 }
 
-.half {
-  width: 50vw;
+.register {
+  min-height: 550px;
 }
 
-@media screen and (width <= 700px) {
-  .half {
-    width: 75vw;
-  }
-}
+/* .third { */
+/*   height: 30vh; */
+/* } */
 
-@media (width >= 600px) {
-.modal-container {
-    width: 30vw;
-  }
-}
+/* .half { */
+/*   width: 50vw; */
+/* } */
+
+/* @media screen and (width <= 700px) { */
+/*   .half { */
+/*     width: 75vw; */
+/*   } */
+/* } */
+
+/* @media (width >= 600px) { */
+/* .modal-container { */
+/*     width: 30vw; */
+/*   } */
+/* } */
