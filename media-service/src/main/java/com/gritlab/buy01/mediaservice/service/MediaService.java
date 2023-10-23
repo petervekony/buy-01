@@ -34,6 +34,10 @@ public class MediaService {
     eventPublisher.publishEvent(new DeleteMediaEvent(this, null, productId));
   }
 
+  public Optional<Media> getMediaById(String id) {
+    return mediaRepository.findById(id);
+  }
+
   public Optional<List<Media>> getAllMediaByProductId(String productId) {
     Optional<List<Media>> media = mediaRepository.findAllByProductId(productId);
     return media;
