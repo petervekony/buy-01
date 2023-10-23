@@ -10,14 +10,14 @@ import { User } from '../interfaces/user';
 import { HttpClientModule } from '@angular/common/http';
 import {
   HttpClientTestingModule,
-  HttpTestingController,
+  // HttpTestingController,
 } from '@angular/common/http/testing';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
-  let httpMock: HttpTestingController;
-  let authService: AuthService;
+  // let httpMock: HttpTestingController;
+  // let authService: AuthService;
   let userService: UserService;
   let stateService: StateService;
   let router: Router;
@@ -62,9 +62,9 @@ describe('NavbarComponent', () => {
       ],
     });
     fixture = TestBed.createComponent(NavbarComponent);
-    httpMock = TestBed.inject(HttpTestingController);
+    // httpMock = TestBed.inject(HttpTestingController);
     component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService);
+    // authService = TestBed.inject(AuthService);
     userService = TestBed.inject(UserService);
     stateService = TestBed.inject(StateService);
     router = TestBed.inject(Router);

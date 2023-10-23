@@ -3,7 +3,6 @@ import {
   DestroyRef,
   ElementRef,
   inject,
-  // HostListener,
   Input,
   ViewChild,
 } from '@angular/core';
@@ -81,8 +80,7 @@ export class ProductCardComponent {
       .subscribe({
         next: (media) => {
           if (media && media?.image) {
-            this.imageSrc = 'data:' + media.mimeType + ';base64,' +
-              media.image;
+            this.imageSrc = this.mediaService.formatMedia(media);
           } else {
             this.imageSrc = environment.placeholder;
           }
@@ -93,18 +91,6 @@ export class ProductCardComponent {
         },
       });
   }
-
-  // TODO: FIX THE CLICK LISTENER!
-  // @HostListener('document:click')
-  // onClick(event: MouseEvent) {
-  //   if (
-  //     this.modalVisible &&
-  //     this.productModal &&
-  //     this.productModal.nativeElement.contains(event.target)
-  //   ) {
-  //     this.hideModal();
-  //   }
-  // }
 
   showModal() {
     if (this.productModal) {

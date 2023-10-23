@@ -15,6 +15,7 @@ import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
+import { AuthService } from 'src/app/service/auth.service';
 import { DataService } from 'src/app/service/data.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
@@ -58,6 +59,7 @@ export class ProductCardModalComponent implements OnInit {
   filename: string = '';
   fileSelected: File | null = null;
   owner: User = {} as User;
+  currentUser: User = {} as User;
   price: number = 0;
   quantity: number = 0;
   currentImageIndex = 0;
@@ -70,6 +72,7 @@ export class ProductCardModalComponent implements OnInit {
   private validatorService = inject(ValidatorService);
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
+  private authService = inject(AuthService);
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl(null, [this.validatorService.productNameValidator()]),
@@ -86,6 +89,9 @@ export class ProductCardModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.initFormValues();
+
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => this.currentUser = user);
 
     this.mediaService.getProductThumbnail(
       this.product.id!,
@@ -146,7 +152,6 @@ export class ProductCardModalComponent implements OnInit {
     this.imageIds.splice(index, 1);
     this.mediaService.deleteProductImage(id);
     this.currentImageIndex--;
-    //HACK
     this.dataService.sendProductId(this.product.id!);
     if (this.currentImageIndex < 0) this.currentImageIndex = 0;
     if (this.images.length === 0) this.picture = this.placeholder;
