@@ -30,8 +30,8 @@
 
 .product-tab-container {
   width: 100%;
-  flex: 1;
-  min-height: 50px;
+  min-height: 300px;
+  height: fit-content;
 }
 
 .product-image-container {
@@ -63,6 +63,7 @@
   flex: 6;
   /* height: 60%; */
   width: 100%;
+  /* height: 100%; */
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -75,11 +76,11 @@
   padding-bottom: 0.7rem;
   overflow-y: scroll;
   overflow-x: hidden;
-  /* min-height: 400px; */
+  min-height: 200px;
   margin-top: 40px;
   z-index: 2;
   position: relative;
-  bottom: -50px;
+  /* bottom: -50px; */
   /* padding-top: 1rem; */
 }
 

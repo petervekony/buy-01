@@ -8,7 +8,6 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Product } from '../interfaces/product';
-import { UserService } from '../service/user.service';
 import { ProductService } from '../service/product.service';
 import { CookieService } from 'ngx-cookie-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -38,7 +37,6 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
 
   products: Product[] = [];
 
-  private userService = inject(UserService);
   private productService = inject(ProductService);
   private cookieService = inject(CookieService);
   private destroyRef = inject(DestroyRef);
@@ -65,18 +63,5 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
           console.log(error);
         },
       });
-  }
-
-  showUsers() {
-    this.userService.sendUserInfoRequest().pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: (data) => {
-        console.log(data);
-      },
-      error: (error) => {
-        console.log('error', error);
-      },
-    });
   }
 }
