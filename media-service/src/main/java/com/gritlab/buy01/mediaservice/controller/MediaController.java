@@ -61,6 +61,43 @@ public class MediaController {
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/media/{id}")
   public ResponseEntity<?> deleteById(@PathVariable String id) {
+    try {
+      UserDetailsImpl userDetails = null;
+
+      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      if (principal instanceof UserDetailsImpl) {
+        userDetails = (UserDetailsImpl) principal;
+      } else {
+        throw new Exception("Unexpected principal type");
+      }
+
+      Optional<Media> mediaQuery = mediaService.getMediaById(id);
+      Media media = null;
+
+      if (mediaQuery.isPresent()) {
+        media = mediaQuery.get();
+      } else {
+        throw new Exception("Media not found by id");
+      }
+
+      if (media.getUserId() != null && !userDetails.getId().equals(media.getUserId())) {
+        throw new Exception("Only the owner can delete user avatar");
+      }
+
+      if (media.getProductId() != null) {
+        ProductOwnershipRequest ownershipRequest =
+            new ProductOwnershipRequest(media.getProductId(), userDetails.getId());
+        ProductOwnershipResponse ownershipResponse =
+            kafkaService.sendProductOwnershipRequestAndWaitForResponse(ownershipRequest);
+
+        if (!ownershipResponse.isOwner()) {
+          throw new Exception("Media can only be deleted from own products");
+        }
+      }
+    } catch (Exception e) {
+      ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
     return mediaService.deleteById(id);
   }
 
@@ -69,6 +106,51 @@ public class MediaController {
   public ResponseEntity<?> deleteByUserOrProductId(
       @RequestParam(required = false) String userId,
       @RequestParam(required = false) String productId) {
+
+    if (userId != null && productId != null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+    try {
+      UserDetailsImpl userDetails = null;
+
+      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+      if (principal instanceof UserDetailsImpl) {
+        userDetails = (UserDetailsImpl) principal;
+      } else {
+        throw new Exception("Unexpected principal type");
+      }
+
+      if (productId != null) {
+        ProductOwnershipRequest ownershipRequest =
+            new ProductOwnershipRequest(productId, userDetails.getId());
+        ProductOwnershipResponse ownershipResponse =
+            kafkaService.sendProductOwnershipRequestAndWaitForResponse(ownershipRequest);
+
+        if (!ownershipResponse.isOwner()) {
+          ErrorMessage error =
+              new ErrorMessage(
+                  "Media can only be deleted from own products", HttpStatus.FORBIDDEN.value());
+          return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+        }
+      }
+
+      if (userId != null) {
+
+        if (!userDetails.getId().equals(userId)) {
+          ErrorMessage error =
+              new ErrorMessage(
+                  "You can only delete avatar belonging to your profile",
+                  HttpStatus.FORBIDDEN.value());
+          return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+        }
+      }
+    } catch (Exception e) {
+      ErrorMessage error =
+          new ErrorMessage(
+              "An error was encountered during media upload", HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
     return mediaService.deleteMediaById(userId, productId);
   }
 
