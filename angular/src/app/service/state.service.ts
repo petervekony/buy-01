@@ -20,12 +20,12 @@ export class StateService implements OnInit {
 
   ngOnInit(): void {
     this.cookie = this.cookieService.get('buy-01');
-    this.state = of({
+    this.setUserState(of({
       name: '',
       email: '',
       password: '',
       role: '',
-    } as User);
+    } as User));
     if (!this.cookie) return;
     this.initialize();
   }
@@ -34,7 +34,7 @@ export class StateService implements OnInit {
     this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user: User) => {
-          this.state = of(user);
+          this.setUserState(of(user));
         },
         error: (error) => {
           if (error.status !== 200) {
@@ -49,7 +49,7 @@ export class StateService implements OnInit {
     return this._state;
   }
 
-  set state(user: Observable<User> | undefined) {
+  setUserState(user: Observable<User> | undefined) {
     this._state = user;
   }
 
@@ -63,7 +63,7 @@ export class StateService implements OnInit {
 
   resetState() {
     this.cookie = undefined;
-    this.state = undefined;
+    this.setUserState(undefined);
     const expirationDate = new Date('Thu, 01 Jan 1970 00:00:00 UTC');
     this.cookieService.set(
       'buy-01',
@@ -80,6 +80,6 @@ export class StateService implements OnInit {
 
   refreshState(jwtToken: string, user: User) {
     this.cookie = jwtToken;
-    this.state = of(user);
+    this.setUserState(of(user));
   }
 }

@@ -24,6 +24,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
 
   products: Product[] = [];
 
+  private changeDetector = inject(ChangeDetectorRef);
   private productService = inject(ProductService);
   private cookieService = inject(CookieService);
   private destroyRef = inject(DestroyRef);
@@ -46,7 +47,10 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
     this.productService.getProducts().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (products) => {
-          if (products) this.products = products.reverse();
+          if (products) {
+            this.products = products.reverse();
+            this.changeDetector.detectChanges();
+          }
         },
         error: (error) => {
           console.log(error);

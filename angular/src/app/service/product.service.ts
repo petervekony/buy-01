@@ -37,6 +37,10 @@ export class ProductService {
     this.productAddedSource.next(product);
   }
 
+  updateUserProducts(products: Product[]): void {
+    this.userProductsSource.next(products);
+  }
+
   getProducts(): Observable<Product[]> {
     const address = environment.productsURL;
     return this.http.get<Product[]>(address, { withCredentials: true });
@@ -48,7 +52,7 @@ export class ProductService {
       .get<Product[]>(address, { withCredentials: true })
       .pipe(
         map((products) =>
-          products?.filter((product) => product.userId == userId)
+          products.filter((product) => product.userId == userId)
         ),
       );
   }

@@ -74,7 +74,18 @@ public class MediaControllerTests {
   }
 
   @Test
-  public void testDeleteById() {
+  public void testDeleteProductMediaById() {
+    simulateSecurityContext("456", "testUser", "SELLER");
+    ProductOwnershipResponse ownershipResponse = new ProductOwnershipResponse();
+    ownershipResponse.setOwner(true);
+    when(kafkaService.sendProductOwnershipRequestAndWaitForResponse(
+            any(ProductOwnershipRequest.class)))
+        .thenReturn(ownershipResponse);
+
+    Media media = new Media();
+    media.setProductId("234");
+    when(mediaService.getMediaById("123")).thenReturn(Optional.of(media));
+
     when(mediaService.deleteById(anyString()))
         .thenReturn((ResponseEntity) ResponseEntity.noContent().build());
 
@@ -85,12 +96,16 @@ public class MediaControllerTests {
 
   @Test
   public void testDeleteByUserOrProductId() {
-    when(mediaService.deleteMediaById(anyString(), anyString()))
-        .thenReturn((ResponseEntity) ResponseEntity.noContent().build());
+    simulateSecurityContext("456", "testUser", "SELLER");
 
-    ResponseEntity<?> response = mediaController.deleteByUserOrProductId("testUser", "testProduct");
+    when(mediaService.deleteMediaById("456", null))
+        .thenReturn(new ResponseEntity<>(HttpStatus.NO_CONTENT));
 
-    assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    ResponseEntity<?> response = mediaController.deleteByUserOrProductId("456", null);
+
+    assertNotNull(response, "Response should not be null");
+    assertEquals(
+        HttpStatus.NO_CONTENT, response.getStatusCode(), "Status code should be 204 NO_CONTENT");
   }
 
   @Test

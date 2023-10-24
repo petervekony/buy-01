@@ -69,11 +69,10 @@ describe('AddProductComponent', () => {
     component.onValidate();
     expect(component.formValid).toBeTrue();
 
-    // Test with invalid data
     component.productForm.setValue({
-      name: 'Pr', // Invalid name
+      name: 'Pr',
       description: 'Product Description',
-      price: -1, // Invalid price
+      price: -1,
       quantity: 5,
     });
     component.onValidate();

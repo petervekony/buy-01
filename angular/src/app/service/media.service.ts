@@ -9,8 +9,8 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
 })
 export class MediaService {
   imageAddedSource = new BehaviorSubject<Media>({} as Media);
-  placeholder: string = environment.placeholder;
   imageAdded$ = this.imageAddedSource.asObservable();
+  placeholder: string = environment.placeholder;
 
   private http = inject(HttpClient);
 
@@ -63,8 +63,11 @@ export class MediaService {
 
   uploadAvatar(userId: string, image: FormData): Observable<Media> {
     const address = environment.mediaURL;
-    const headers = new HttpHeaders();
-    headers.append('Content-Type', 'multipart/form-data');
+    const headers = new HttpHeaders().set(
+      'Content-Type',
+      'multipart/form-data',
+    );
+    // headers.append('Content-Type', 'multipart/form-data');
     return this.http
       .post<Media>(address, image, {
         params: { userId: userId },
@@ -79,12 +82,12 @@ export class MediaService {
   }
 
   formatMedia(media: Media): string {
-    if (!media) return this.placeholder;
+    if (!media.image) return this.placeholder;
     return 'data:' + media.mimeType + ';base64,' + media.image;
   }
 
   formatMultipleMedia(media: Media): string {
-    if (!media || !media.image.data) return this.placeholder;
+    if (!media.image || !media.image.data) return this.placeholder;
     return 'data:' + media.mimeType + ';base64,' + media.image.data;
   }
 }

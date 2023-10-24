@@ -49,7 +49,9 @@ export class ProductCardComponent {
           this.container?.nativeElement.classList.remove('blur-filter');
         }
       });
+
     this.getProductThumbnail();
+
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (id) => {
         this.updateThumbnailIfEmpty(id);

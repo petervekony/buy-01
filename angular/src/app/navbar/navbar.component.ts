@@ -3,6 +3,7 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
@@ -22,7 +23,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   @ViewChild('navbar')
     navbar: ElementRef | undefined;
 
