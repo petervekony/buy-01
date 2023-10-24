@@ -27,12 +27,13 @@ import { Media } from '../interfaces/media';
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit {
+  //TODO: check if we can delete these viewChilds!
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
   @ViewChild('profile')
     profile: ElementRef | undefined;
   @ViewChild('avatarForm')
-    avaterForm: ElementRef | undefined;
+    avatarForm: ElementRef | undefined;
 
   formOpen = false;
   formValid = false;
@@ -87,7 +88,7 @@ export class ProfilePageComponent implements OnInit {
       );
   }
 
-  private getAuthAndAvatar() {
+  getAuthAndAvatar() {
     this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user) => {
@@ -144,7 +145,7 @@ export class ProfilePageComponent implements OnInit {
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.currentUser.avatar = data.id;
-        this.stateService.state = of(this.currentUser);
+        this.stateService.setUserState(of(this.currentUser));
         this.mediaService.updateImageAdded(data);
         this.hideModal();
       },

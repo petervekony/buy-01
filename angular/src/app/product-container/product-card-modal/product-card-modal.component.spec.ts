@@ -7,7 +7,6 @@ import {
   BrowserAnimationsModule,
   NoopAnimationsModule,
 } from '@angular/platform-browser/animations';
-import { MediaGalleryComponent } from 'src/app/media-gallery/media-gallery.component';
 
 describe('ProductCardModalComponent', () => {
   let component: ProductCardModalComponent;
@@ -15,7 +14,7 @@ describe('ProductCardModalComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ProductCardModalComponent, MediaGalleryComponent],
+      declarations: [ProductCardModalComponent],
       imports: [
         HttpClientTestingModule,
         MatTabsModule,
