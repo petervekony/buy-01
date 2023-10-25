@@ -127,7 +127,9 @@ describe('ProductService', () => {
       expect(products).toEqual(mockProducts);
     });
 
-    const req = httpTestingController.expectOne(`${environment.productsURL}`);
+    const req = httpTestingController.expectOne(
+      `${environment.userProductsURL}` + userId,
+    );
     expect(req.request.method).toEqual('GET');
 
     req.flush(mockProducts);
@@ -170,7 +172,7 @@ describe('ProductService', () => {
     // service.getProductsById(userId);
 
     const req = httpTestingController.expectOne(
-      `${environment.productsURL}`,
+      `${environment.userProductsURL}` + userId,
     );
 
     expect(req.request.method).toEqual('GET');

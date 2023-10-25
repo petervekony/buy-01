@@ -141,7 +141,10 @@ export class ProductCardModalComponent implements OnInit {
   }
 
   prevImage() {
-    this.currentImageIndex = (this.currentImageIndex - 1) % this.images.length;
+    this.currentImageIndex = Math.max(
+      (this.currentImageIndex - 1) % this.images.length,
+      0,
+    );
     this.dataService.changeDeleteIndex(this.currentImageIndex);
   }
 
@@ -156,9 +159,11 @@ export class ProductCardModalComponent implements OnInit {
     if (this.images.length === 0) this.picture = this.placeholder;
   }
 
-  private initFormValues() {
+  initFormValues() {
     this.productForm.get('price')?.setValue(this.product.price);
     this.productForm.get('quantity')?.setValue(this.product.quantity);
+    this.productForm.get('name')?.setValue(this.product.name);
+    this.productForm.get('description')?.setValue(this.product.description);
   }
 
   hideModal() {
@@ -225,7 +230,7 @@ export class ProductCardModalComponent implements OnInit {
       });
     }
     this.productForm.reset();
-    this.imageUploadButton!.clear();
+    this.imageUploadButton?.clear();
     this.tabGroup.selectedIndex = 0;
   }
 

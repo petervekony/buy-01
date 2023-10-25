@@ -62,7 +62,7 @@ export class DashboardComponent implements OnInit {
     this.formStateService.setFormOpen(false);
   }
 
-  private getOwnerProducts() {
+  getOwnerProducts() {
     this.userProducts$ = this.authService
       .getAuth()
       .pipe(

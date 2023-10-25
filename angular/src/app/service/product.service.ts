@@ -47,15 +47,20 @@ export class ProductService {
   }
 
   getProductsById(userId: string): Observable<Product[]> {
-    const address = environment.productsURL;
-    return this.http
-      .get<Product[]>(address, { withCredentials: true })
-      .pipe(
-        map((products) =>
-          products.filter((product) => product.userId == userId)
-        ),
-      );
+    const address = environment.userProductsURL + userId;
+    return this.http.get<Product[]>(address, { withCredentials: true });
   }
+
+  // getProductsById(userId: string): Observable<Product[]> {
+  //   const address = environment.productsURL;
+  //   return this.http
+  //     .get<Product[]>(address, { withCredentials: true })
+  //     .pipe(
+  //       map((products) =>
+  //         products.filter((product) => product.userId == userId)
+  //       ),
+  //     );
+  // }
 
   getOwner(userId: string): Observable<User> {
     const address = environment.productsURL;
