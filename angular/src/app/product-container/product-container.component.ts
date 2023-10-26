@@ -28,6 +28,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   private productService = inject(ProductService);
   private cookieService = inject(CookieService);
   private destroyRef = inject(DestroyRef);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
@@ -38,6 +39,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.showProducts();
+        this.changeDetectorRef.detectChanges();
       });
   }
 
