@@ -110,7 +110,6 @@ public class MediaControllerTests {
 
   @Test
   public void testCreateMedia() {
-    // Simulate authenticated user
     simulateSecurityContext("123", "testUser", "SELLER");
 
     ProductOwnershipResponse ownershipResponse = new ProductOwnershipResponse();
@@ -129,7 +128,6 @@ public class MediaControllerTests {
     ResponseEntity<?> response =
         mediaController.createMedia(null, "testProduct", multipartFile, null);
 
-    // Assert the result
     assertNotNull(response, "Response is null");
     assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Unexpected status code");
   }
@@ -154,5 +152,51 @@ public class MediaControllerTests {
     ResponseEntity<?> response = mediaController.getUserAvatar("testUser");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
+  }
+
+  @Test
+  public void testGetMediaByProductId_NoMediaFound() {
+    when(mediaService.getAllMediaByProductId(anyString())).thenReturn(Optional.empty());
+
+    ResponseEntity<?> response = mediaController.getMediaByProductId("testProduct");
+
+    assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+  }
+
+  @Test
+  public void testCreateMedia_OwnershipDenied() {
+    simulateSecurityContext("123", "testUser", "SELLER");
+
+    ProductOwnershipResponse ownershipResponse = new ProductOwnershipResponse();
+    ownershipResponse.setOwner(false);
+    when(kafkaService.sendProductOwnershipRequestAndWaitForResponse(
+            any(ProductOwnershipRequest.class)))
+        .thenReturn(ownershipResponse);
+
+    ResponseEntity<?> response =
+        mediaController.createMedia(null, "testProduct", multipartFile, null);
+
+    assertNotNull(response, "Response is null");
+    assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode(), "Unexpected status code");
+  }
+
+  @Test
+  public void testGetProductThumbnail_NoThumbnailFound() {
+    when(mediaService.getProductThumbnail(anyString()))
+        .thenReturn((ResponseEntity) ResponseEntity.notFound().build());
+
+    ResponseEntity<?> response = mediaController.getProductThumbnail("testProduct");
+
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+  }
+
+  @Test
+  public void testGetUserAvatar_NoAvatarFound() {
+    when(mediaService.getUserAvatar(anyString()))
+        .thenReturn((ResponseEntity) ResponseEntity.notFound().build());
+
+    ResponseEntity<?> response = mediaController.getUserAvatar("testUser");
+
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
   }
 }

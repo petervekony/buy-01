@@ -8,7 +8,7 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MediaService {
-  imageAddedSource = new BehaviorSubject<Media>({} as Media);
+  private imageAddedSource = new BehaviorSubject<Media>({} as Media);
   imageAdded$ = this.imageAddedSource.asObservable();
   placeholder: string = environment.placeholder;
 
