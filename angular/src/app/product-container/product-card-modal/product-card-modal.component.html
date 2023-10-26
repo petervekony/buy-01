@@ -8,11 +8,13 @@
             <div class="product-tab-container">
               <div class="product-image-container">
                 <ng-container *ngIf="images.length < 1 && !imageDeleteConfirm">
-                  <img [src]="picture" alt="product picture" class="product-modal-image" />
+                  <img [src]="picture" alt="product picture" class="product-modal-image"
+                    (click)="openImageInNewTab(picture)" />
                 </ng-container>
                 <ng-container *ngIf="images && images.length > 0 && !imageDeleteConfirm">
                   <div class="image-container">
-                    <img [src]="images[currentImageIndex]" alt="product picture" class="product-modal-image" />
+                    <img [src]="images[currentImageIndex]" alt="product picture" class="product-modal-image"
+                      (click)="openImageInNewTab(images[currentImageIndex])" />
                     <div class="image-navigation">
                       <button *ngIf="product.userId === currentUser.id" id="delete-image-button"
                         (click)="openConfirm('image')">

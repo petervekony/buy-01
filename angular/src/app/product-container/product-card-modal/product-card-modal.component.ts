@@ -109,30 +109,47 @@ export class ProductCardModalComponent implements OnInit {
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (id) => {
         if (id !== this.product.id) return;
-        this.mediaService
-          .getProductMedia(this.product.id!).pipe(
-            takeUntilDestroyed(this.destroyRef),
-          )
-          .subscribe({
-            next: (data) => {
-              if (data && data.media && data.media.length > 0) {
-                this.images = data.media.map((item) => {
-                  this.imageIds.push(item.id);
-                  return this.mediaService.formatMultipleMedia(item);
-                });
-              }
-            },
-            error: () => of(null),
-          });
-        this.userService.getOwnerInfo(
-          this.product.userId!,
-        ).pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe({
-            next: (user) => this.owner = user,
-            error: (err) => console.log(err),
-          });
+        this.getProductImages();
+        this.getProductOwnerInfo();
       },
     );
+  }
+
+  getProductOwnerInfo() {
+    this.userService.getOwnerInfo(
+      this.product.userId!,
+    ).pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => this.owner = user,
+        error: (err) => console.log(err),
+      });
+  }
+
+  getProductImages() {
+    this.mediaService
+      .getProductMedia(this.product.id!).pipe(
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: (data) => {
+          if (data && data.media && data.media.length > 0) {
+            this.images = data.media.map((item) => {
+              this.imageIds.push(item.id);
+              return this.mediaService.formatMultipleMedia(item);
+            });
+          }
+        },
+        error: () => of(null),
+      });
+  }
+
+  openImageInNewTab(imageData: string): void {
+    const newTab = window.open();
+    if (newTab) {
+      newTab.document.write(
+        `<img src="${imageData}" alt="product image" />`,
+      );
+    }
   }
 
   nextImage() {
@@ -155,6 +172,9 @@ export class ProductCardModalComponent implements OnInit {
     this.mediaService.deleteProductImage(id);
     this.currentImageIndex--;
     this.dataService.sendProductId(this.product.id!);
+    this.closeConfirm();
+    this.getProductImages();
+    this.tabGroup.selectedIndex = 0;
     if (this.currentImageIndex < 0) this.currentImageIndex = 0;
     if (this.images.length === 0) this.picture = this.placeholder;
   }

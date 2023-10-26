@@ -57,6 +57,7 @@
   object-fit: contain;
   object-position: center center;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .product-details-body {
@@ -170,7 +171,7 @@
 .delete-container,
 .edit-product-container {
   /* flex: 9; */
-  height: calc(80vh - 2.9rem);
+  height: calc(80vh - 5rem);
   width: 100%;
   display: flex;
   align-items: center;

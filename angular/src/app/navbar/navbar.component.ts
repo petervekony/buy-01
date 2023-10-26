@@ -84,8 +84,10 @@ export class NavbarComponent implements OnInit {
       this.currentUser.id,
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (media) => {
-        const image = this.mediaService.formatMedia(media);
-        this.avatar$.next(image);
+        if (media) {
+          const image = this.mediaService.formatMedia(media);
+          this.avatar$.next(image);
+        }
       },
       error: (err) => console.log(err),
     });

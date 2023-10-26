@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit {
       .getAuth()
       .pipe(
         switchMap((user) => this.productService.getProductsById(user.id)),
-        map((products: Product[]) => products.reverse()),
+        map((products: Product[]) => products?.reverse()),
       );
   }
 
