@@ -2,6 +2,9 @@ package com.gritlab.buy01.mediaservice.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -11,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.Binary;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -22,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.gritlab.buy01.mediaservice.model.Media;
+import com.gritlab.buy01.mediaservice.payload.response.SingleMediaResponse;
 import com.gritlab.buy01.mediaservice.repository.MediaRepository;
 
 public class MediaServiceTests {
@@ -123,6 +128,70 @@ public class MediaServiceTests {
         HttpStatus.PAYLOAD_TOO_LARGE,
         response.getStatusCode(),
         "Status code should be 413 PAYLOAD_TOO_LARGE");
+  }
+
+  @Test
+  public void testConvertAndReturnMediaWithMedia() {
+    Media media = new Media();
+    media.setId("123");
+    media.setProductId("product123");
+    media.setUserId("user123");
+    media.setMimeType("image/jpeg");
+    media.setImage(new Binary(new byte[] {0x12, 0x34, 0x56}));
+
+    when(mediaRepository.findFirstByProductId("product123")).thenReturn(Optional.of(media));
+
+    ResponseEntity<?> response = mediaService.getProductThumbnail("product123");
+
+    assertNotNull(response, "Response should not be null");
+    assertEquals(HttpStatus.OK, response.getStatusCode(), "Status code should be 200 OK");
+    assertTrue(
+        response.getBody() instanceof SingleMediaResponse,
+        "Response body should be a SingleMediaResponse");
+
+    SingleMediaResponse singleMediaResponse = (SingleMediaResponse) response.getBody();
+    assertEquals("123", singleMediaResponse.getId(), "Media ID should match");
+    assertEquals("product123", singleMediaResponse.getProductId(), "Product ID should match");
+    assertEquals("user123", singleMediaResponse.getUserId(), "User ID should match");
+    assertEquals("image/jpeg", singleMediaResponse.getMimeType(), "MIME type should match");
+    assertNotNull(singleMediaResponse.getImage(), "Base64 image should not be null");
+  }
+
+  @Test
+  public void testConvertAndReturnMediaWithNoMedia() {
+    when(mediaRepository.findFirstByProductId("product123")).thenReturn(Optional.empty());
+
+    ResponseEntity<?> response = mediaService.getProductThumbnail("product123");
+
+    assertNotNull(response, "Response should not be null");
+    assertEquals(
+        HttpStatus.NO_CONTENT, response.getStatusCode(), "Status code should be 204 NO_CONTENT");
+    assertNull(response.getBody(), "Response body should be null");
+  }
+
+  @Test
+  public void testDeletePreviousUserAvatars() {
+    String userId = "123";
+
+    Media media1 = new Media();
+    media1.setId("890");
+    media1.setUserId("123");
+
+    Media media2 = new Media();
+    media2.setId("456");
+    media2.setUserId("123");
+
+    List<Media> mediaList = new ArrayList<>();
+    mediaList.add(media1);
+    mediaList.add(media2);
+
+    when(mediaRepository.findAllByUserId(userId)).thenReturn(Optional.of(mediaList));
+    doNothing().when(mediaRepository).deleteById(mediaList.get(0).getId());
+
+    mediaService.deletePreviousUserAvatars(userId, mediaList.get(1).getId());
+
+    // HACK: i couldnt figure how to verify the correct order and number of calls
+    Mockito.verify(mediaRepository, Mockito.times(1)).deleteById(Mockito.anyString());
   }
 
   private MultipartFile createTestMultipartFile() {
