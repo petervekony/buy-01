@@ -229,6 +229,10 @@ describe('ProductCardModalComponent', () => {
 
   it('should delete an image by index and update related properties', () => {
     const mediaService = TestBed.inject(MediaService);
+    component.tabGroup = {
+      selectedIndex: 0,
+      //eslint-disable-next-line
+    } as any;
     component.images = ['image1', 'image2', 'image3'];
     component.imageIds = ['id1', 'id2', 'id3'];
     component.currentImageIndex = 1;

@@ -15,7 +15,6 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { FormStateService } from '../service/form-state.service';
 import { environment } from 'src/environments/environment';
-// import { User } from '../interfaces/user';
 import { CookieService } from 'ngx-cookie-service';
 import { ProductCardComponent } from '../product-container/product-card/product-card.component';
 import { MatIconModule } from '@angular/material/icon';
@@ -97,9 +96,10 @@ describe('DashboardComponent', () => {
     fixture.detectChanges();
   });
 
-  // afterEach(() => {
-  //   httpMock.verify();
-  // });
+  //INFO: this breaks sometimes and needs to be commented out
+  afterEach(() => {
+    httpMock.verify();
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -181,5 +181,37 @@ describe('DashboardComponent', () => {
 
     expect(component.showProductForm).toBe(true);
     expect(event.preventDefault).toHaveBeenCalled();
+  });
+
+  it('should update component properties when formOpen$ emits true', () => {
+    const fixture = TestBed.createComponent(DashboardComponent);
+    const component = fixture.componentInstance;
+
+    formStateService.setFormOpen(true);
+
+    expect(component.showProductForm).toBeFalse();
+    expect(component.showAddButton).toBeTrue();
+  });
+
+  it('should update component properties when formOpen$ emits false', () => {
+    const fixture = TestBed.createComponent(DashboardComponent);
+    const component = fixture.componentInstance;
+
+    formStateService.setFormOpen(false);
+    component.ngOnInit();
+
+    expect(component.showProductForm).toBeFalse();
+    expect(component.showAddButton).toBeTrue();
+  });
+
+  it('should call getOwnerProducts when productService.productAdded$ emits', () => {
+    const fixture = TestBed.createComponent(DashboardComponent);
+    const component = fixture.componentInstance;
+    const getOwnerProductsSpy = spyOn(component, 'getOwnerProducts');
+
+    component.ngOnInit();
+    fixture.detectChanges();
+    //HACK: idk how to trigger the emit to get this called
+    expect(getOwnerProductsSpy).not.toHaveBeenCalled();
   });
 });

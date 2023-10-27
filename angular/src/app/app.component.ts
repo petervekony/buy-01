@@ -1,4 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -11,19 +12,22 @@ export class AppComponent implements OnInit {
   loggedIn = false;
 
   private router = inject(Router);
+  private destroy = inject(DestroyRef);
 
   ngOnInit(): void {
     this.checkUnauthenticatedRoutes(this.router.url);
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-    ).subscribe((event: NavigationEnd) => {
-      this.loggedIn = this.checkUnauthenticatedRoutes(
-        event.urlAfterRedirects,
-      );
-    });
+    ).pipe(takeUntilDestroyed(this.destroy)).subscribe(
+      (event: NavigationEnd) => {
+        this.loggedIn = this.checkUnauthenticatedRoutes(
+          event.urlAfterRedirects,
+        );
+      },
+    );
   }
 
-  private checkUnauthenticatedRoutes(route: string): boolean {
+  checkUnauthenticatedRoutes(route: string): boolean {
     return !['/login', '/register'].includes(route);
   }
 }
