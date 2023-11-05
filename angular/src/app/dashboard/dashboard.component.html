@@ -4,7 +4,7 @@
 </div>
 <div class="product-container">
   <div class="wrapper">
-    <ng-container *ngFor="let product of (userProducts$ | async)">
+    <ng-container *ngFor="let product of (userProducts$ | async); trackBy: getProductId">
       <app-product-card [product]="product"></app-product-card>
     </ng-container>
   </div>

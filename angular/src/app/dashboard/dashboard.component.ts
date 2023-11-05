@@ -71,6 +71,10 @@ export class DashboardComponent implements OnInit {
       );
   }
 
+  getProductId(_: number, product: Product): string {
+    return product.id!;
+  }
+
   manageProducts(event: MouseEvent) {
     this.showProductForm = true;
     this.formStateService.setFormOpen(true);
