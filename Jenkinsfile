@@ -101,7 +101,8 @@ pipeline {
         script {
           sshagent(credentials: ['prod-jenkins-user']) {
             if (fileExists('~/production/buy-01')) {
-              sh 'docker-compose down -f ~/production/buy-01/docker-compose.yml --remove-orphans --volumes'
+              sh 'cd ~/production/buy-01'
+              sh 'docker-compose down --remove-orphans --volumes'
                 sleep time: 15, unit: 'SECONDS'
             }
             // sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"
