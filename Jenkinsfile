@@ -106,7 +106,7 @@ pipeline {
               sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"
 
               sh "git clone git@github.com:petervekony/buy-01.git ~/production/"
-              sh "cd production/buy-01 && git pull origin main"
+              sh "cd ~/production/buy-01 && git pull origin main"
 
               sh "docker-compose up -d"
           }
