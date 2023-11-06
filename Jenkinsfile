@@ -93,6 +93,24 @@ pipeline {
         }
       }
     }
+    stage('Deploy to Production') {
+      agent {
+        label 'deploy'
+      }
+      steps {
+        script {
+          sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"
+            sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"
+            sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"
+            sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"
+
+            sh "git clone git@github.com:petervekony/buy-01.git ~/production/"
+            sh "cd production/buy-01 && git pull origin main"
+
+            sh "docker-compose up -d"
+        }
+      }
+    }
   } 
   post {
     always{
