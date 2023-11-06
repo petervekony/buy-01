@@ -100,21 +100,22 @@ pipeline {
       steps {
         script {
           sshagent(credentials: ['prod-jenkins-user']) {
-           def dir = "${env.HOME}/production/buy-01"
-           
-            if (fileExists(dir)) {
-              dir(dir) {
-                sh 'docker-compose down --remove-orphans --volumes'
+            def dir = "${env.HOME}/production/buy-01"
+
+              if (fileExists(dir)) {
+                sh 'cd ${dir}'
+                  sh 'docker-compose down --remove-orphans --volumes'
+                  sleep time: 15, unit: 'SECONDS'
+                  sh 'cd ..'
+                  sh 'cd ..'
+                  sh 'rm -rf ~/production/buy-01'
               }
-              sleep time: 15, unit: 'SECONDS'
-              sh 'rm -rf ~/production/buy-01'
-            }
             // sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"
             //   sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"
             //   sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"
             //   sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"
 
-              sh "git clone git@github.com:petervekony/buy-01.git ~/production/buy-01"
+            sh "git clone git@github.com:petervekony/buy-01.git ~/production/buy-01"
               sh "cd ~/production/buy-01 && git pull origin main"
 
               sh "docker-compose up -d"
