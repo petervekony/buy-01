@@ -99,7 +99,7 @@ pipeline {
       }
       steps {
         script {
-          sshagent(credentials: ['91c9b2cd-2645-4619-bdf2-cdb9f9c63476']) {
+          // sshagent(credentials: ['prod-jenkins-user']) {
             sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"
               sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"
               sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"
@@ -109,7 +109,7 @@ pipeline {
               sh "cd production/buy-01 && git pull origin main"
 
               sh "docker-compose up -d"
-          }
+          // }
         }
       }
     }
