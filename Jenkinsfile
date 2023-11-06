@@ -103,7 +103,7 @@ pipeline {
            def dir = "${env.HOME}/production/buy-01"
            
             if (fileExists(dir)) {
-              dir("${dir}") {
+              dir(dir) {
                 sh 'docker-compose down --remove-orphans --volumes'
               }
               sleep time: 15, unit: 'SECONDS'
