@@ -64,11 +64,12 @@ export class MediaService {
 
   uploadAvatar(userId: string, image: FormData): Observable<Media> {
     const address = environment.mediaURL;
-    const headers = new HttpHeaders().set(
-      'Content-Type',
-      'multipart/form-data',
-    );
-    // headers.append('Content-Type', 'multipart/form-data');
+    const headers = new HttpHeaders();
+    headers.append('Content-Type', 'multipart/form-data');
+    // const headers = new HttpHeaders().set(
+    //   'Content-Type',
+    //   'multipart/form-data',
+    // );
     return this.http
       .post<Media>(address, image, {
         params: { userId: userId },

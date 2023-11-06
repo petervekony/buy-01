@@ -234,3 +234,7 @@ tags
 
 # Zookeeper data
 zookeeper_data/
+
+#codes
+codes.txt
+
