@@ -6,75 +6,75 @@ pipeline {
         PROJECT_NAME = "buy01"
     }
   stages {
-      stage('Media Service') {
-        agent {
-          label 'master'
-        }
-        steps {
-          dir('media-service') {
-            sh 'mvn test'
-          }
+    stage('Media Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('media-service') {
+          sh 'mvn test'
         }
       }
-      stage('User Service') {
-        agent {
-          label 'master'
-        }
-        steps {
-          dir('user-service') {
-            sh 'mvn test'
-          }
+    }
+    stage('User Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('user-service') {
+          sh 'mvn test'
         }
       }
-      stage('Product Service') {
-        agent {
-          label 'master'
-        }
-        steps {
-          dir('product-service') {
-            sh 'mvn test'
-          }
+    }
+    stage('Product Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('product-service') {
+          sh 'mvn test'
         }
       }
-      stage('Angular') {
-        agent {
-          label 'master'
-        }
-        steps {
-          dir('angular') {
-            sh 'export CHROME_BIN=/usr/bin/google-chrome'
-              sh 'npm install'
-              sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
-          }
+    }
+    stage('Angular') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          sh 'export CHROME_BIN=/usr/bin/google-chrome'
+            sh 'npm install'
+            sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
         }
       }
-      stage('Build Docker Images') {
-        agent {
-          label 'master'
-        }
-        steps {
-          script {
-            sh 'docker build -f media-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest" .'
-              sh 'docker build -f user-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest" .'
-              sh 'docker build -f product-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest" .'
-              sh 'docker build -f angular/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest" .'
-          }
+    }
+    stage('Build Docker Images') {
+      agent {
+        label 'master'
+      }
+      steps {
+        script {
+          sh 'docker build -f media-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest" .'
+            sh 'docker build -f user-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest" .'
+            sh 'docker build -f product-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest" .'
+            sh 'docker build -f angular/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest" .'
         }
       }
-      stage('Push to docker hub'){
-        agent {
-          label 'master'
-        }
-        steps{
-          withCredentials([usernamePassword(credentialsId: 'dockerhub2', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-            sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-              sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"'
-              sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"'
-              sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"'
-              sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"'
-          }
+    }
+    stage('Push to docker hub'){
+      agent {
+        label 'master'
+      }
+      steps{
+        withCredentials([usernamePassword(credentialsId: 'dockerhub2', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+          sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+            sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"'
+            sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"'
+            sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"'
+            sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"'
         }
       }
+    }
     stage('Cleaning up'){
       agent {
         label 'master'
@@ -87,7 +87,7 @@ pipeline {
                 sh "docker rmi $imageId"
               } catch (Exception e) {
                 echo "Failed to remove image $imageId: ${e.message}"
-                  // Handle the error, or just log it and continue
+                  // do something or just log it
               }
             }
         }
@@ -99,15 +99,17 @@ pipeline {
       }
       steps {
         script {
-          sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"
-            sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"
-            sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"
-            sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"
+          sshagent(credentials: ['91c9b2cd-2645-4619-bdf2-cdb9f9c63476']) {
+            sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"
+              sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"
+              sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"
+              sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"
 
-            sh "git clone git@github.com:petervekony/buy-01.git ~/production/"
-            sh "cd production/buy-01 && git pull origin main"
+              sh "git clone git@github.com:petervekony/buy-01.git ~/production/"
+              sh "cd production/buy-01 && git pull origin main"
 
-            sh "docker-compose up -d"
+              sh "docker-compose up -d"
+          }
         }
       }
     }
@@ -126,5 +128,5 @@ pipeline {
            subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
            body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
     }
-    }
   }
+}
