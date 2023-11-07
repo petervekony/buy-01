@@ -76,6 +76,15 @@ export class ProductService {
       .pipe(switchMap((user) => this.getProductsById(user.id)));
   }
 
+  updateProduct(
+    id: string,
+    form: ProductRequest,
+  ): Observable<Product | null> {
+    console.log('gothere');
+    const address = environment.productsURL + '/' + id;
+    return this.http.put<Product>(address, form, { withCredentials: true });
+  }
+
   addProduct(
     form: ProductRequest,
     mediaForm: FormData | null,

@@ -213,6 +213,25 @@ export class ProductCardModalComponent implements OnInit {
     }
   }
 
+  updateProduct() {
+    console.log(this.product.id);
+    if (this.formValid) {
+      const prod = {
+        name: this.productForm.value.name,
+        description: this.productForm.value.description,
+        price: this.productForm.value.price,
+        quantity: this.productForm.value.quantity,
+      } as Product;
+      this.productService.updateProduct(this.product.id!, prod).pipe(
+        takeUntilDestroyed(this.destroyRef),
+      ).subscribe({
+        next: (data) => {
+          this.productService.updateProductAdded(data!);
+        },
+      });
+    }
+  }
+
   submitProduct() {
     let mediaData;
     if (this.fileSelected) {

@@ -43,6 +43,10 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
       });
   }
 
+  trackById(_: number, product: Product): string {
+    return product.id!;
+  }
+
   showProducts() {
     this.productService.getProducts().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
