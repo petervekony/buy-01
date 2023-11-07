@@ -3,7 +3,7 @@ pipeline {
     environment {
       DOCKER_REPO = 'tvntvn'
         DOCKER_PROJECT = 'buy01'
-        PROJECT_NAME = "buy01"
+          PROJECT_NAME = "buy01"
     }
   stages {
     // stage('Media Service') {
@@ -128,15 +128,15 @@ pipeline {
     always{
       sh 'docker logout'
     }
-    success {
-      mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
-           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
-           body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
-    }
-    failure {
-      mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
-           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
-           body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
-    }
+    // success {
+    //   mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
+    //        subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
+    //        body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
+    // }
+    // failure {
+    //   mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
+    //        subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
+    //        body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
+    // }
   }
 }
