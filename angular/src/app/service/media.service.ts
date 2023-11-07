@@ -8,9 +8,13 @@ import { BehaviorSubject, map, Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class MediaService {
+  placeholder: string = environment.placeholder;
+
+  private avatarSource = new BehaviorSubject<string>(this.placeholder);
+  avatar$ = this.avatarSource.asObservable();
+
   private imageAddedSource = new BehaviorSubject<Media>({} as Media);
   imageAdded$ = this.imageAddedSource.asObservable();
-  placeholder: string = environment.placeholder;
 
   private http = inject(HttpClient);
 
@@ -18,6 +22,11 @@ export class MediaService {
   updateImageAdded(data: any): void {
     console.log(data);
     this.imageAddedSource.next(data);
+  }
+
+  //eslint-disable-next-line
+  updateAvatar(data: any): void {
+    this.avatarSource.next(data);
   }
 
   getProductThumbnail(productId: string): Observable<Media> {
@@ -49,6 +58,7 @@ export class MediaService {
   //eslint-disable-next-line
   deleteAvatar(userId: string): any {
     const address = environment.mediaURL;
+    this.avatarSource.next(this.placeholder);
     return this.http.delete(address, {
       params: { userId: userId },
       withCredentials: true,
@@ -66,10 +76,6 @@ export class MediaService {
     const address = environment.mediaURL;
     const headers = new HttpHeaders();
     headers.append('Content-Type', 'multipart/form-data');
-    // const headers = new HttpHeaders().set(
-    //   'Content-Type',
-    //   'multipart/form-data',
-    // );
     return this.http
       .post<Media>(address, image, {
         params: { userId: userId },
@@ -77,7 +83,7 @@ export class MediaService {
         withCredentials: true,
       }).pipe(
         map((data: Media) => {
-          this.updateImageAdded(data);
+          this.updateAvatar(data);
           return data;
         }),
       );

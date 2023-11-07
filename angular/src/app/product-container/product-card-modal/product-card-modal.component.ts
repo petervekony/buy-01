@@ -11,15 +11,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTabGroup } from '@angular/material/tabs';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
-// import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
-import { AuthService } from 'src/app/service/auth.service';
+// import { AuthService } from 'src/app/service/auth.service';
 import { DataService } from 'src/app/service/data.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
 import { ProductService } from 'src/app/service/product.service';
+import { StateService } from 'src/app/service/state.service';
 import { UserService } from 'src/app/service/user.service';
 import { ValidatorService } from 'src/app/service/validator.service';
 import { environment } from 'src/environments/environment';
@@ -73,7 +73,8 @@ export class ProductCardModalComponent implements OnInit {
   private validatorService = inject(ValidatorService);
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
-  private authService = inject(AuthService);
+  // private authService = inject(AuthService);
+  private stateService = inject(StateService);
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl(null, [this.validatorService.productNameValidator()]),
@@ -91,8 +92,11 @@ export class ProductCardModalComponent implements OnInit {
   ngOnInit(): void {
     this.initFormValues();
 
-    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((user) => this.currentUser = user);
+    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
+      (user) => this.user = user,
+    );
+    // this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+    //   .subscribe((user) => this.currentUser = user);
 
     this.mediaService.getProductThumbnail(
       this.product.id!,
@@ -110,9 +114,9 @@ export class ProductCardModalComponent implements OnInit {
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (id) => {
         if (id !== this.product.id) return;
-        this.getProductImages();
-        this.getProductOwnerInfo();
-        this.mediaService.getProductThumbnail(this.product.id);
+        // this.getProductImages();
+        // this.getProductOwnerInfo();
+        // this.mediaService.getProductThumbnail(this.product.id);
       },
     );
   }
@@ -180,7 +184,7 @@ export class ProductCardModalComponent implements OnInit {
     this.images.splice(index, 1);
     this.imageIds.splice(index, 1);
     //INFO: this might not work, to refresh the images & products
-    this.productService.updateProductAdded(this.product);
+    // this.productService.updateProductAdded(this.product);
     this.closeConfirm('image');
   }
 

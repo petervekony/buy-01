@@ -9,7 +9,7 @@ import {
 import { User } from '../interfaces/user';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../service/user.service';
@@ -48,7 +48,8 @@ export class ProfilePageComponent implements OnInit {
   currentUser: User = {} as User;
   fileSelected: File | null = null;
   placeholder: string = environment.placeholder;
-  avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
+  avatar$: Observable<string> | null = null;
+  // avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
   private authService = inject(AuthService);
   private formStateService = inject(FormStateService);
@@ -77,10 +78,12 @@ export class ProfilePageComponent implements OnInit {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
 
-    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.getAuthAndAvatar();
-      });
+    //NOTE: this might need to be reworked
+    this.avatar$ = this.mediaService.avatar$;
+    // this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+    //   .subscribe(() => {
+    //     this.getAuthAndAvatar();
+    //   });
 
     this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
@@ -101,7 +104,9 @@ export class ProfilePageComponent implements OnInit {
               .subscribe({
                 next: (media) => {
                   if (media && media?.image) {
-                    this.avatar$.next(this.mediaService.formatMedia(media));
+                    this.mediaService.updateAvatar(
+                      this.mediaService.formatMedia(media),
+                    );
                   }
                 },
                 error: (err) => console.log(err),
@@ -146,7 +151,7 @@ export class ProfilePageComponent implements OnInit {
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.setUserState(this.currentUser);
-        this.mediaService.updateImageAdded(data);
+        this.mediaService.updateAvatar(data);
         this.hideModal();
       },
       error: (err) => console.log(err),
@@ -242,7 +247,7 @@ export class ProfilePageComponent implements OnInit {
       console.log(data)
     );
     this.mediaService.updateImageAdded({} as Media);
-    this.avatar$.next(this.placeholder);
+    this.mediaService.updateAvatar(this.placeholder);
     this.hideModal();
   }
 

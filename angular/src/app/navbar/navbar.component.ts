@@ -11,7 +11,7 @@ import { StateService } from '../service/state.service';
 import { UserService } from '../service/user.service';
 import { User } from '../interfaces/user';
 import { AuthService } from '../service/auth.service';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { filter } from 'rxjs/operators';
 import { MediaService } from '../service/media.service';
@@ -36,7 +36,6 @@ export class NavbarComponent implements OnInit {
   profile = false;
   currentUser: User = {} as User;
   user$ = new Subject<User>();
-  avatar$ = new BehaviorSubject<string>(this.placeholder);
 
   private router = inject(Router);
   private userService = inject(UserService);
@@ -46,6 +45,8 @@ export class NavbarComponent implements OnInit {
   private mediaService = inject(MediaService);
   private destroyRef = inject(DestroyRef);
   private dataService = inject(DataService);
+
+  avatar$ = this.mediaService.avatar$;
 
   ngOnInit(): void {
     this.dash = false;
@@ -62,7 +63,7 @@ export class NavbarComponent implements OnInit {
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
-        if (!data) this.avatar$.next(this.placeholder);
+        if (!data) this.mediaService.updateAvatar(this.placeholder);
         else this.getAuthAndAvatar();
       });
 
@@ -92,7 +93,7 @@ export class NavbarComponent implements OnInit {
           if (user.avatar) {
             this.getAvatar();
           } else {
-            this.avatar$.next(this.placeholder);
+            this.mediaService.updateAvatar(this.placeholder);
           }
         },
         error: (error) => console.error(error),
@@ -106,9 +107,9 @@ export class NavbarComponent implements OnInit {
       next: (media) => {
         if (media) {
           const image = this.mediaService.formatMedia(media);
-          this.avatar$.next(image);
+          this.mediaService.updateAvatar(image);
         } else {
-          this.avatar$.next(this.placeholder);
+          this.mediaService.updateAvatar(this.placeholder);
         }
       },
       error: (err) => console.log(err),
@@ -126,7 +127,6 @@ export class NavbarComponent implements OnInit {
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
           this.home = this.route === '/home';
-          this.dash = this.route === '/dashboard';
           this.profile = this.route === '/profile';
         }
       });
