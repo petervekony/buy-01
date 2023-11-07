@@ -55,6 +55,7 @@ export class UserService {
   }
 
   updateUser(request: UserUpdateRequest, id: string): Observable<User> {
+    console.log('updateUser:', request);
     const address = environment.usersURL + '/' + id;
     return this.http.put<User>(address, request, { withCredentials: true });
   }

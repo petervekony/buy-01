@@ -21,10 +21,12 @@ export class DataService {
   }
 
   sendProductId(data: string): void {
+    console.log('dataservice SENDproductId', data);
     this.idSource.next(data);
   }
 
   changeDeleteIndex(data: number): void {
+    console.log('changeDeleteIndex:', data);
     this.deleteImageSource.next(data);
   }
 }

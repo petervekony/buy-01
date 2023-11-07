@@ -54,6 +54,7 @@ export class ProductCardModalComponent implements OnInit {
   requestSent = false;
   imageValid = false;
   imageDeleteConfirm = false;
+  deletingProduct = false;
   productResult: string = '';
   errorMessage: string = '';
   filename: string = '';
@@ -111,6 +112,7 @@ export class ProductCardModalComponent implements OnInit {
         if (id !== this.product.id) return;
         this.getProductImages();
         this.getProductOwnerInfo();
+        this.mediaService.getProductThumbnail(this.product.id);
       },
     );
   }
@@ -133,6 +135,7 @@ export class ProductCardModalComponent implements OnInit {
       .subscribe({
         next: (data) => {
           if (data && data.media && data.media.length > 0) {
+            this.imageIds = [];
             this.images = data.media.map((item) => {
               this.imageIds.push(item.id);
               return this.mediaService.formatMultipleMedia(item);
@@ -166,17 +169,20 @@ export class ProductCardModalComponent implements OnInit {
   }
 
   deleteImage(index: number) {
+    if (this.imageIds.length === 1) index = 0;
     const id = this.imageIds[index];
-    this.images.splice(index, 1);
-    this.imageIds.splice(index, 1);
     this.mediaService.deleteProductImage(id);
     this.currentImageIndex--;
     this.dataService.sendProductId(this.product.id!);
-    this.closeConfirm();
-    this.getProductImages();
     this.tabGroup.selectedIndex = 0;
     if (this.currentImageIndex < 0) this.currentImageIndex = 0;
     if (this.images.length === 0) this.picture = this.placeholder;
+    this.images.splice(index, 1);
+    this.imageIds.splice(index, 1);
+    //INFO: this might not work, to refresh the images & products
+    this.productService.updateProductAdded(this.product);
+    this.dataService.sendProductId(this.product.id!);
+    this.closeConfirm('image');
   }
 
   initFormValues() {
@@ -187,9 +193,11 @@ export class ProductCardModalComponent implements OnInit {
   }
 
   hideModal() {
-    this.formStateService.setFormOpen(false);
-    this.dialog?.close();
-    this.closeConfirm();
+    if (!this.deletingProduct) {
+      this.formStateService.setFormOpen(false);
+      this.dialog?.close();
+      this.closeConfirm('product');
+    }
   }
 
   onValidate() {
@@ -290,6 +298,7 @@ export class ProductCardModalComponent implements OnInit {
         this.fileSelected = null;
         this.filename = '';
         this.dataService.sendProductId(this.product.id!);
+        this.getProductImages();
       },
       error: (err) => this.errorMessage = err.error.message,
     });
@@ -297,8 +306,18 @@ export class ProductCardModalComponent implements OnInit {
     this.dataService.sendProductId(this.product.id!);
   }
 
-  deleteProduct(productId: string): void {
-    this.productService.deleteProduct(productId);
+  deleteProduct(productId: string, isDeletingProduct: boolean = false): void {
+    if (isDeletingProduct) {
+      // this.hideModal();
+      // this.dialog?.close();
+    } else {
+      this.deletingProduct = true;
+      this.productService.deleteProduct(productId);
+      this.dialog?.close();
+      this.formStateService.setFormOpen(false);
+      //INFO: this might cause issues, try to update the products, to remove the deleted one from the list
+      this.productService.updateProductAdded({} as Product);
+    }
   }
 
   openConfirm(form: string) {
@@ -307,8 +326,11 @@ export class ProductCardModalComponent implements OnInit {
     } else this.imageDeleteConfirm = true;
   }
 
-  closeConfirm() {
-    this.confirm = false;
-    this.imageDeleteConfirm = false;
+  closeConfirm(tag: string) {
+    if (tag == 'image') {
+      this.imageDeleteConfirm = false;
+    } else {
+      this.confirm = false;
+    }
   }
 }

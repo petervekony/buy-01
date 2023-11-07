@@ -24,8 +24,8 @@ export const authGuard: CanActivateFn = (route) => {
           return false;
         }
       }
+      // case 'dashboard':
       case 'profile':
-      case 'dashboard':
       case 'home': {
         if (user && user.name) {
           return true;
@@ -34,6 +34,13 @@ export const authGuard: CanActivateFn = (route) => {
           return false;
         }
       }
+      case 'dashboard':
+        if (user && user.name && user.role === 'SELLER') {
+          return true;
+        } else {
+          router.navigate(['home']);
+          return false;
+        }
       }
       return false;
     },

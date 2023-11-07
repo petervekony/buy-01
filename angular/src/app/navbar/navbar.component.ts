@@ -29,6 +29,7 @@ export class NavbarComponent implements OnInit {
 
   placeholder = environment.placeholder;
   route: string = '';
+  seller: boolean = false;
   dash = false;
   home = false;
   profile = false;
@@ -55,8 +56,9 @@ export class NavbarComponent implements OnInit {
       });
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.getAuthAndAvatar();
+      .subscribe((data) => {
+        if (!data) this.avatar$.next(this.placeholder);
+        else this.getAuthAndAvatar();
       });
     this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
@@ -71,8 +73,11 @@ export class NavbarComponent implements OnInit {
         next: (user) => {
           this.user$.next(user);
           this.currentUser = user;
+          this.seller = user.role === 'SELLER';
           if (user.avatar) {
             this.getAvatar();
+          } else {
+            this.avatar$.next(this.placeholder);
           }
         },
         error: (error) => console.error(error),
@@ -87,6 +92,8 @@ export class NavbarComponent implements OnInit {
         if (media) {
           const image = this.mediaService.formatMedia(media);
           this.avatar$.next(image);
+        } else {
+          this.avatar$.next(this.placeholder);
         }
       },
       error: (err) => console.log(err),

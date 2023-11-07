@@ -187,6 +187,7 @@
 .confirm-button {
   margin-inline: 1rem;
   width: 24vw;
+  max-width: 200px;
 }
 
 .confirm-text {
@@ -280,6 +281,7 @@
   margin-left: auto;
   margin-right: auto;
   align-items: center;
+  max-width: 500px;
 }
 
 .confirm-image-container div {

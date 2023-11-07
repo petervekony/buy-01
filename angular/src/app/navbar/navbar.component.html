@@ -12,7 +12,7 @@
     <button class="dashboard" *ngIf="!home" (click)="move('home')">
       <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="home"></mat-icon>
     </button>
-    <button class="dashboard" *ngIf="!dash" (click)="move('dashboard')">
+    <button class="dashboard" *ngIf="!dash && seller" (click)="move('dashboard')">
       <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="apps"></mat-icon>
     </button>
     <button class="logout" (click)="logout()">

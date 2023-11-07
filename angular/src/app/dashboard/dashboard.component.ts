@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -35,6 +36,7 @@ export class DashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private cookieService = inject(CookieService);
   private destroyRef = inject(DestroyRef);
+  private changeDetectorRef = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     const cookie = this.cookieService.check('buy-01');
@@ -56,6 +58,7 @@ export class DashboardComponent implements OnInit {
       .subscribe(
         () => {
           this.getOwnerProducts();
+          this.changeDetectorRef.detectChanges();
         },
       );
 

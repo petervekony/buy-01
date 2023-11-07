@@ -40,7 +40,7 @@
                       <button class="confirm-button" pButton pRiple label="Yes"
                         (click)="deleteImage(currentDeleteIndex)"></button>
                       <button class="confirm-button" id="no-button" pButton pRiple label="No"
-                        (click)="closeConfirm()"></button>
+                        (click)="closeConfirm('image')"></button>
                     </div>
                   </div>
                 </ng-container>
@@ -126,9 +126,9 @@
               </div>
               <div class="button-container">
                 <button *ngIf="confirm" class="confirm-button" pButton pRiple label="Yes"
-                  (click)="deleteProduct(product.id!)"></button>
-                <button *ngIf="confirm" class="confirm-button" pButton pRiple label="No" (click)="closeConfirm()"
-                  id="no-button"></button>
+                  (click)="deleteProduct(product.id!,false)"></button>
+                <button *ngIf="confirm" class="confirm-button" pButton pRiple label="No"
+                  (click)="closeConfirm('product')" id="no-button"></button>
               </div>
             </div>
           </ng-template>
@@ -137,11 +137,11 @@
     </div>
   </div>
 </div>
-<dialog #confirmDelete>
-  <div class="confirm-container">
-    <button class="confirm-button" pButton pRiple label="Yes" (click)="deleteProduct(product.id!)"></button>
-    <button class="confirm-button" pButton pRiple label="No" (click)="closeConfirm()"></button>
-  </div>
-</dialog>
-<dialog #confirmImageDelete>
-</dialog>
+<!-- <dialog #confirmDelete> -->
+<!--   <div class="confirm-container"> -->
+<!--     <button class="confirm-button" pButton pRiple label="Yes" (click)="deleteProduct(product.id!)"></button> -->
+<!--     <button class="confirm-button" pButton pRiple label="No" (click)="closeConfirm('product')"></button> -->
+<!--   </div> -->
+<!-- </dialog> -->
+<!-- <dialog #confirmImageDelete> -->
+<!-- </dialog> -->
