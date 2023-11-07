@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import com.gritlab.buy01.productservice.model.ProductDTO;
 import com.gritlab.buy01.productservice.model.ProductModel;
@@ -37,8 +36,6 @@ import jakarta.validation.Valid;
 @RequestMapping("/api")
 public class ProductController {
   @Autowired ProductService productService;
-
-  @Autowired RestTemplate restTemplate;
 
   @GetMapping("/products")
   public ResponseEntity<List<ProductModel>> getAllProducts(

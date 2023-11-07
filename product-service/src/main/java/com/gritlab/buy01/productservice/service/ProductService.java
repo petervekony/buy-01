@@ -65,6 +65,7 @@ public class ProductService {
   }
 
   public void deleteProduct(String id) {
+    kafkaService.deleteProductMedia(id);
     productRepository.deleteById(id);
   }
 
