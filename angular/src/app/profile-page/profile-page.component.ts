@@ -9,7 +9,7 @@ import {
 import { User } from '../interfaces/user';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { BehaviorSubject, of, Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../service/user.service';
@@ -145,7 +145,7 @@ export class ProfilePageComponent implements OnInit {
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.currentUser.avatar = data.id;
-        this.stateService.setUserState(of(this.currentUser));
+        this.stateService.setUserState(this.currentUser);
         this.mediaService.updateImageAdded(data);
         this.hideModal();
       },

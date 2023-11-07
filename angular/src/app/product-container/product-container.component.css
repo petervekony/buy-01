@@ -1,13 +1,73 @@
-/* .product-container { */
-/*   margin-top: 200px; */
-/* } */
+.top-bar {
+  position: sticky;
+  height: 3rem;
+  width: 100%;
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  z-index: 10;
+  top: 100px;
+}
+
+.add-product {
+  width: max-content;
+  height: 2rem;
+  padding: 0.5rem;
+  margin-right: 1rem;
+  margin-top: -1rem;
+}
+
+dialog {
+  display: flex;
+  width: 90vw;
+  height: 80vh;
+  min-height: 700px;
+  min-width: 300px;
+  position: absolute;
+  left: 5vw;
+  /* margin-left: 3.5vw; */
+  top: calc(10vw + 100px);
+  z-index: 15;
+  border: none;
+}
 
 .wrapper {
   padding-top: 10px;
   display: flex;
-  flex-wrap: wrap;
-  flex-shrink: 1;
+  flex-wrap: column-wrap;
   justify-content: center;
+  width: 100vw;
+}
+
+@media screen and (width >= 700px){
+  dialog {
+    width: 60vw;
+    left: 20vw;
+  }
+}
+
+@media screen and (width < 700px){
+  dialog {
+    width: 80vw;
+    height: 100vh;
+    left: 10vw;
+  }
+}
+
+@media screen and (width < 500px){
+  dialog {
+    width: 100vw;
+    height: 100vh;
+    top: 10;
+    left: 0;
+  }
+}
+
+@media screen and (height < 800px){
+  dialog {
+    top: 10;
+  }
 }
 
 /* .footer button { */

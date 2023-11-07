@@ -11,7 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTabGroup } from '@angular/material/tabs';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
-import { of } from 'rxjs';
+// import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
@@ -123,7 +123,7 @@ export class ProductCardModalComponent implements OnInit {
     ).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user) => this.owner = user,
-        error: (err) => console.log(err),
+        // error: (err) => console.log(err),
       });
   }
 
@@ -142,7 +142,7 @@ export class ProductCardModalComponent implements OnInit {
             });
           }
         },
-        error: () => of(null),
+        // error: () => of(null),
       });
   }
 
@@ -181,7 +181,6 @@ export class ProductCardModalComponent implements OnInit {
     this.imageIds.splice(index, 1);
     //INFO: this might not work, to refresh the images & products
     this.productService.updateProductAdded(this.product);
-    this.dataService.sendProductId(this.product.id!);
     this.closeConfirm('image');
   }
 

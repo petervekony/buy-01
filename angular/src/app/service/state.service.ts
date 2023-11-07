@@ -1,7 +1,7 @@
 import { DestroyRef, inject, Injectable, OnInit } from '@angular/core';
 import { User } from '../interfaces/user';
 import { AuthService } from './auth.service';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   providedIn: 'root',
 })
 export class StateService implements OnInit {
-  private _state: Observable<User> | undefined;
+  private _state: BehaviorSubject<User> = new BehaviorSubject<User>({} as User);
   private _cookie: string | undefined = undefined;
 
   private authService = inject(AuthService);
@@ -20,12 +20,12 @@ export class StateService implements OnInit {
 
   ngOnInit(): void {
     this.cookie = this.cookieService.get('buy-01');
-    this.setUserState(of({
+    this.setUserState({
       name: '',
       email: '',
       password: '',
       role: '',
-    } as User));
+    } as User);
     if (!this.cookie) return;
     this.initialize();
   }
@@ -34,7 +34,7 @@ export class StateService implements OnInit {
     this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user: User) => {
-          this.setUserState(of(user));
+          this.setUserState(user);
         },
         error: (error) => {
           if (error.status !== 200) {
@@ -45,12 +45,12 @@ export class StateService implements OnInit {
       });
   }
 
-  get state(): Observable<User> | undefined {
+  get state(): Observable<User> {
     return this._state;
   }
 
-  setUserState(user: Observable<User> | undefined) {
-    this._state = user;
+  setUserState(user: User) {
+    this._state.next(user);
   }
 
   get cookie(): string | undefined {
@@ -63,7 +63,7 @@ export class StateService implements OnInit {
 
   resetState() {
     this.cookie = undefined;
-    this.setUserState(undefined);
+    this.setUserState({} as User);
     const expirationDate = new Date('Thu, 01 Jan 1970 00:00:00 UTC');
     this.cookieService.set(
       'buy-01',
@@ -80,6 +80,6 @@ export class StateService implements OnInit {
 
   refreshState(jwtToken: string, user: User) {
     this.cookie = jwtToken;
-    this.setUserState(of(user));
+    this.setUserState(user);
   }
 }

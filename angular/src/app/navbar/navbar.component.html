@@ -1,5 +1,5 @@
 <div class="nav-bar" #navbar>
-  <div class="user-info" (click)="goToProfile()">
+  <div class="user-info" (click)="goToProfile()" matTooltip="Go to profile">
     <div id="image-container">
       <img [src]="avatar$ | async" alt="profile picture" />
     </div>
@@ -9,14 +9,14 @@
   <div id="title" (click)="move('home')">THE PRODUCT WAREHOUSE</div>
   <div class="buttons">
     <!-- fix the location and buttons to be conditional  -->
-    <button class="dashboard" *ngIf="!home" (click)="move('home')">
-      <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="home"></mat-icon>
+    <button class="dashboard" *ngIf="!home" (click)="showDashboard(false)">
+      <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="home" matTooltip="Go to home"></mat-icon>
     </button>
-    <button class="dashboard" *ngIf="!dash && seller" (click)="move('dashboard')">
-      <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="apps"></mat-icon>
+    <button class="dashboard" *ngIf="!dash && seller && home" (click)="showDashboard(true)">
+      <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="apps" matTooltip="Manage your products"></mat-icon>
     </button>
     <button class="logout" (click)="logout()">
-      <mat-icon aria-hidden="false" aria-label="logout icon" fontIcon="logout"></mat-icon>
+      <mat-icon aria-hidden="false" aria-label="logout icon" fontIcon="logout" matTooltip="Logout"></mat-icon>
     </button>
   </div>
 </div>

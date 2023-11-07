@@ -17,6 +17,7 @@ import { filter } from 'rxjs/operators';
 import { MediaService } from '../service/media.service';
 import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DataService } from '../service/data.service';
 
 @Component({
   selector: 'app-navbar',
@@ -31,7 +32,7 @@ export class NavbarComponent implements OnInit {
   route: string = '';
   seller: boolean = false;
   dash = false;
-  home = false;
+  home = true;
   profile = false;
   currentUser: User = {} as User;
   user$ = new Subject<User>();
@@ -44,8 +45,12 @@ export class NavbarComponent implements OnInit {
   private authService = inject(AuthService);
   private mediaService = inject(MediaService);
   private destroyRef = inject(DestroyRef);
+  private dataService = inject(DataService);
 
   ngOnInit(): void {
+    this.dash = false;
+    this.home = true;
+    this.profile = false;
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isOpen) => {
         if (isOpen) {
@@ -60,11 +65,21 @@ export class NavbarComponent implements OnInit {
         if (!data) this.avatar$.next(this.placeholder);
         else this.getAuthAndAvatar();
       });
+
     this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.user$.next(data);
       });
     this.checkRoutes();
+  }
+
+  showDashboard(dash: boolean) {
+    if (this.router.url !== '/home') {
+      this.move('home');
+    }
+    this.dataService.updateDashboard(dash);
+    this.dash = dash;
+    this.home = !dash;
   }
 
   private getAuthAndAvatar() {
@@ -130,6 +145,7 @@ export class NavbarComponent implements OnInit {
   }
 
   goToProfile() {
+    this.showDashboard(false);
     this.formStateService.setFormOpen(false);
     this.move('profile');
   }

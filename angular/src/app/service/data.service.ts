@@ -15,6 +15,9 @@ export class DataService {
   private deleteImageSource = new BehaviorSubject<number>(0);
   deleteImage$ = this.deleteImageSource.asObservable();
 
+  private dashboardSource = new BehaviorSubject<boolean>(false);
+  dashboard$ = this.dashboardSource.asObservable();
+
   //eslint-disable-next-line
   sendData(data: any): void {
     this.dataSource.next(data);
@@ -28,5 +31,10 @@ export class DataService {
   changeDeleteIndex(data: number): void {
     console.log('changeDeleteIndex:', data);
     this.deleteImageSource.next(data);
+  }
+
+  updateDashboard(data: boolean): void {
+    console.log('updatedashboard');
+    this.dashboardSource.next(data);
   }
 }

@@ -29,6 +29,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { GalleriaModule } from 'primeng/galleria';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -63,6 +64,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
     GalleriaModule,
     InputTextareaModule,
     InputNumberModule,
+    MatTooltipModule,
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],
