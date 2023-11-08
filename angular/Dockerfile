@@ -8,7 +8,7 @@ RUN npm run build
 FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist/buy-01 /usr/share/nginx/html
-COPY /home/tvntvn/thewarehouse.rocks.chained.crt /etc/nginx/ssl/
-COPY /home/tvntvn/thewarehouse.rocks.key /etc/nginx/ssl/
+# COPY /home/tvntvn/thewarehouse.rocks.chained.crt /etc/nginx/ssl/
+# COPY /home/tvntvn/thewarehouse.rocks.key /etc/nginx/ssl/
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
