@@ -105,7 +105,7 @@ pipeline {
               if (fileExists(dir)) {
                 sh 'cd ${dir}'
                   sh 'docker-compose down --remove-orphans --volumes'
-                  sleep time: 15, unit: 'SECONDS'
+                  sleep time: 5, unit: 'SECONDS'
                   sh 'cd ..'
                   sh 'cd ..'
                   sh 'rm -rf ~/production/buy-01'

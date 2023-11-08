@@ -54,7 +54,7 @@ public class AuthController {
         ResponseCookie.from("buy-01", token)
             .httpOnly(false)
             .sameSite("Lax")
-            .domain("localhost")
+            .domain("thewarehouse.rocks")
             .secure(true)
             .path("/")
             .maxAge(0)
