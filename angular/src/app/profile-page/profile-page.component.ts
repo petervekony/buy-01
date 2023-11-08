@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { User } from '../interfaces/user';
 import { FormControl, FormGroup } from '@angular/forms';
-// import { AuthService } from '../service/auth.service';
+import { AuthService } from '../service/auth.service';
 import { Observable, of, Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
@@ -44,7 +44,8 @@ export class ProfilePageComponent implements OnInit {
   updateAvatarFormOpen = false;
   deleteFormOpen = false;
   filename: string = '';
-  user$: Subject<User> = new Subject<User>();
+  user$ = new Subject<User>();
+  // user$: Observable<User>;
   currentUser: User = {} as User;
   fileSelected: File | null = null;
   placeholder: string = environment.placeholder;
@@ -57,6 +58,7 @@ export class ProfilePageComponent implements OnInit {
   private stateService = inject(StateService);
   private validatorService = inject(ValidatorService);
   private destroyRef = inject(DestroyRef);
+  private authService = inject(AuthService);
 
   //TODO: fix if clicked outside form, close form!
   // this.renderer.listen('window', 'click', (e: Event) => {
@@ -79,12 +81,8 @@ export class ProfilePageComponent implements OnInit {
     //NOTE: this might need to be reworked
     this.avatar$ = this.mediaService.avatar$;
 
-    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
-      (user) => {
-        this.currentUser = user;
-        this.user$.next(user);
-      },
-    );
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => this.user$.next(user));
 
     this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(

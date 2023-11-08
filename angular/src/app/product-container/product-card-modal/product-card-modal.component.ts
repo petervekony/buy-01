@@ -95,8 +95,6 @@ export class ProductCardModalComponent implements OnInit {
     this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (user) => this.user = user,
     );
-    // this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
-    //   .subscribe((user) => this.currentUser = user);
 
     this.mediaService.getProductThumbnail(
       this.product.id!,

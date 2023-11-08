@@ -126,6 +126,7 @@ export class NavbarComponent implements OnInit {
       .subscribe((event: NavigationEnd) => {
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
+          this.dash = this.route === '/dashboard';
           this.home = this.route === '/home';
           this.profile = this.route === '/profile';
         }
