@@ -81,12 +81,7 @@ export class MediaService {
         params: { userId: userId },
         headers: headers,
         withCredentials: true,
-      }).pipe(
-        map((data: Media) => {
-          this.updateAvatar(data);
-          return data;
-        }),
-      );
+      });
   }
 
   formatMedia(media: Media): string {

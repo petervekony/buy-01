@@ -8,7 +8,7 @@
       <div class="footer">
         <button pButton pRipple label="EDIT PROFILE" icon="pi pi-user" (click)="openForm('profile')"></button>
         <button pButton pRipple label="UPDATE AVATAR" icon="pi pi-user" (click)="openForm('avatar')"></button>
-        <button *ngIf="avatar$.value !== placeholder" pButton pRipple label="DELETE AVATAR" icon="pi pi-user"
+        <button *ngIf="(avatar$ | async) !== placeholder" pButton pRipple label="DELETE AVATAR" icon="pi pi-user"
           (click)="openForm('deleteAvatar')"></button>
         <button pButton pRipple label="DELETE USER" class="delete-user" icon="pi pi-user"
           (click)="openForm('deleteUser')"></button>

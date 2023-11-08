@@ -95,7 +95,6 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   }
 
   showProducts() {
-    console.log('i should show the products');
     this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((user) => {
         this.user$.next(user);
