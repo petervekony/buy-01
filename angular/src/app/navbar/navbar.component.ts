@@ -48,9 +48,16 @@ export class NavbarComponent implements OnInit {
   private dataService = inject(DataService);
 
   ngOnInit(): void {
-    this.dash = false;
-    this.home = true;
-    this.profile = false;
+    if (this.router.url === '/profile') {
+      this.home = false;
+      this.dash = false;
+      this.profile = true;
+    } else if (this.router.url === '/home') {
+      this.home = true;
+      this.dash = false;
+      this.profile = false;
+    }
+
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isOpen) => {
         if (isOpen) {
@@ -77,6 +84,7 @@ export class NavbarComponent implements OnInit {
     if (this.router.url !== '/home') {
       this.move('home');
     }
+
     this.dataService.updateDashboard(dash);
     this.dash = dash;
     this.home = !dash;
