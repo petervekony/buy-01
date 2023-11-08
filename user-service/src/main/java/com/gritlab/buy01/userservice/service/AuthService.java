@@ -58,7 +58,7 @@ public class AuthService {
           ResponseCookie.from("buy-01", jwtToken)
               .httpOnly(false)
               .sameSite("Lax")
-              .domain("localhost")
+              .domain("thewarehouse.rocks")
               .secure(true)
               .path("/")
               .maxAge(jwtExpirationMs / 1000)
