@@ -10,6 +10,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class MediaService {
   private imageAddedSource = new BehaviorSubject<Media>({} as Media);
   imageAdded$ = this.imageAddedSource.asObservable();
+
   placeholder: string = environment.placeholder;
 
   private avatarSource = new BehaviorSubject<string>(this.placeholder);

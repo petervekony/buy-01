@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -11,6 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatTabGroup } from '@angular/material/tabs';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
+import { Media } from 'src/app/interfaces/media';
 // import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
@@ -74,6 +76,7 @@ export class ProductCardModalComponent implements OnInit {
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
   private authService = inject(AuthService);
+  private changeDetector = inject(ChangeDetectorRef);
 
   productForm: FormGroup = new FormGroup({
     name: new FormControl(null, [this.validatorService.productNameValidator()]),
@@ -107,12 +110,19 @@ export class ProductCardModalComponent implements OnInit {
         this.currentDeleteIndex = index;
       });
 
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.getProductImages();
+        this.getProductOwnerInfo();
+        // this.mediaService.getProductThumbnail(this.product.id!);
+      });
+
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (id) => {
         if (id !== this.product.id) return;
         this.getProductImages();
         this.getProductOwnerInfo();
-        this.mediaService.getProductThumbnail(this.product.id);
+        // this.mediaService.getProductThumbnail(this.product.id);
       },
     );
   }
@@ -123,7 +133,6 @@ export class ProductCardModalComponent implements OnInit {
     ).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user) => this.owner = user,
-        // error: (err) => console.log(err),
       });
   }
 
@@ -140,9 +149,11 @@ export class ProductCardModalComponent implements OnInit {
               this.imageIds.push(item.id);
               return this.mediaService.formatMultipleMedia(item);
             });
+          } else {
+            this.imageIds = [];
+            this.images = [this.placeholder];
           }
         },
-        // error: () => of(null),
       });
   }
 
@@ -172,6 +183,7 @@ export class ProductCardModalComponent implements OnInit {
     if (this.imageIds.length === 1) index = 0;
     const id = this.imageIds[index];
     this.mediaService.deleteProductImage(id);
+    this.mediaService.updateImageAdded({} as Media);
     this.currentImageIndex--;
     this.dataService.sendProductId(this.product.id!);
     this.tabGroup.selectedIndex = 0;
@@ -179,9 +191,9 @@ export class ProductCardModalComponent implements OnInit {
     if (this.images.length === 0) this.picture = this.placeholder;
     this.images.splice(index, 1);
     this.imageIds.splice(index, 1);
-    //INFO: this might not work, to refresh the images & products
     this.productService.updateProductAdded(this.product);
     this.closeConfirm('image');
+    this.changeDetector.detectChanges();
   }
 
   initFormValues() {
@@ -294,6 +306,9 @@ export class ProductCardModalComponent implements OnInit {
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.images.push(this.mediaService.formatMultipleMedia(data));
+        this.mediaService.updateImageAdded(
+          this.mediaService.formatMultipleMedia(data),
+        );
         this.fileSelected = null;
         this.filename = '';
         this.dataService.sendProductId(this.product.id!);

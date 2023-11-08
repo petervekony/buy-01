@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -15,6 +16,7 @@ import { FormStateService } from 'src/app/service/form-state.service';
 import { environment } from 'src/environments/environment';
 import { DataService } from 'src/app/service/data.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ProductService } from 'src/app/service/product.service';
 
 @Component({
   selector: 'app-product-card',
@@ -39,6 +41,8 @@ export class ProductCardComponent {
   private formStateService = inject(FormStateService);
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
+  private changeDetectorRef = inject(ChangeDetectorRef);
+  private productService = inject(ProductService);
 
   ngOnInit(): void {
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
@@ -50,6 +54,9 @@ export class ProductCardComponent {
         }
       });
 
+    this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.changeDetectorRef.detectChanges());
+
     this.getProductThumbnail();
 
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
@@ -57,6 +64,17 @@ export class ProductCardComponent {
         this.updateThumbnailIfEmpty(id);
       },
     );
+
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.changeDetectorRef.detectChanges();
+        this.mediaService.getProductThumbnail(this.product.id!).pipe(
+          takeUntilDestroyed(this.destroyRef),
+        ).subscribe((data) => {
+          console.log(data);
+          if (data) this.imageSrc = this.mediaService.formatMedia(data);
+        });
+      });
 
     const cookieCheck = this.authservice.getAuth();
     if (cookieCheck) {
@@ -83,8 +101,10 @@ export class ProductCardComponent {
         next: (media) => {
           if (media && media?.image) {
             this.imageSrc = this.mediaService.formatMedia(media);
+            // this.changeDetectorRef.detectChanges();
           } else {
             this.imageSrc = environment.placeholder;
+            this.changeDetectorRef.detectChanges();
           }
         },
         error: (err) => {
