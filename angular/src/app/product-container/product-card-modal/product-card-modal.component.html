@@ -16,8 +16,8 @@
                     <img [src]="images[currentImageIndex]" alt="product picture" class="product-modal-image"
                       (click)="openImageInNewTab(images[currentImageIndex])" />
                     <div class="image-navigation">
-                      <button *ngIf="product.userId === currentUser.id" id="delete-image-button"
-                        (click)="openConfirm('image')">
+                      <button *ngIf="product.userId === currentUser.id && images[0] !== placeholder"
+                        id="delete-image-button" (click)="openConfirm('image')">
                         <mat-icon aria-hidden="false" aria-label="delete icon" fontIcon="delete"></mat-icon>
                       </button>
                       <button (click)="prevImage()" [disabled]="currentImageIndex === 0" *ngIf="images.length > 1">
