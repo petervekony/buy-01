@@ -6,9 +6,10 @@ COPY . .
 RUN npm run build
 
 FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf.template
 COPY --from=build /app/dist/buy-01 /usr/share/nginx/html
-# COPY /home/tvntvn/thewarehouse.rocks.chained.crt /etc/nginx/ssl/
-# COPY /home/tvntvn/thewarehouse.rocks.key /etc/nginx/ssl/
-EXPOSE 80
+EXPOSE 80 443
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
