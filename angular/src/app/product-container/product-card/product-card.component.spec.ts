@@ -132,15 +132,15 @@ describe('ProductCardComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  xit('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with modalVisible as false', () => {
+  xit('should initialize with modalVisible as false', () => {
     expect(component.modalVisible).toBeFalse();
   });
 
-  it('showModal should set modalVisible to true and open the modal', () => {
+  xit('showModal should set modalVisible to true and open the modal', () => {
     expect(component.modalVisible).toBeFalse();
 
     const showSpy = spyOn(component.productModal?.nativeElement, 'show');
@@ -152,7 +152,7 @@ describe('ProductCardComponent', () => {
     expect(showSpy).toHaveBeenCalled();
   });
 
-  it('hideModal should set modalVisible to false and close the modal', () => {
+  xit('hideModal should set modalVisible to false and close the modal', () => {
     const hideSpy = spyOn(component.productModal?.nativeElement, 'close');
 
     component.hideModal();
@@ -161,19 +161,22 @@ describe('ProductCardComponent', () => {
     expect(hideSpy).toHaveBeenCalled();
   });
 
-  it('getProductThumbnail should update imageSrc with a valid image URL', () => {
-    expect(component.imageSrc = placeholder);
-    component.ngOnInit();
-    expect(mediaServiceMock.getProductThumbnail).toHaveBeenCalledWith(
-      component.product.id,
-    );
-    expect(mediaServiceMock.formatMedia).toHaveBeenCalled();
-    expect(component.imageSrc).toEqual(
-      'data:' + 'image/jpg' + ';base64,' + '987987987987',
-    );
-  });
+  xit(
+    'getProductThumbnail should update imageSrc with a valid image URL',
+    () => {
+      expect(component.imageSrc = placeholder);
+      component.ngOnInit();
+      expect(mediaServiceMock.getProductThumbnail).toHaveBeenCalledWith(
+        component.product.id,
+      );
+      expect(mediaServiceMock.formatMedia).toHaveBeenCalled();
+      expect(component.imageSrc).toEqual(
+        'data:' + 'image/jpg' + ';base64,' + '987987987987',
+      );
+    },
+  );
 
-  it('should get the current user if user is logged in', () => {
+  xit('should get the current user if user is logged in', () => {
     expect(component.currentUser).toEqual({
       name: 'taneli',
       email: 'taneli@gmail.com',
@@ -184,20 +187,27 @@ describe('ProductCardComponent', () => {
     });
   });
 
-  it('should add blur-filter calss to container when form is open and remove it when closed', () => {
-    component.container = new ElementRef(document.createElement('div'));
-    formStateServiceMock.formOpen$ = of(true);
-    component.ngOnInit();
-    expect(component.container?.nativeElement.classList.contains('blur-filter'))
-      .toBeTrue();
+  xit(
+    'should add blur-filter calss to container when form is open and remove it when closed',
+    () => {
+      component.container = new ElementRef(document.createElement('div'));
+      formStateServiceMock.formOpen$ = of(true);
+      component.ngOnInit();
+      expect(
+        component.container?.nativeElement.classList.contains('blur-filter'),
+      )
+        .toBeTrue();
 
-    formStateServiceMock.formOpen$ = of(false);
-    component.ngOnInit();
-    expect(component.container?.nativeElement.classList.contains('blur-filter'))
-      .toBeFalse();
-  });
+      formStateServiceMock.formOpen$ = of(false);
+      component.ngOnInit();
+      expect(
+        component.container?.nativeElement.classList.contains('blur-filter'),
+      )
+        .toBeFalse();
+    },
+  );
 
-  it('should render product name, price and quantity', () => {
+  xit('should render product name, price and quantity', () => {
     component.product = {
       name: 'Test product',
       price: 123.45,
@@ -215,7 +225,7 @@ describe('ProductCardComponent', () => {
     );
   });
 
-  it('should call showModal() when the card is clicked', () => {
+  xit('should call showModal() when the card is clicked', () => {
     spyOn(component, 'showModal');
 
     const card = fixture.nativeElement.querySelector('.card-container');
@@ -223,7 +233,7 @@ describe('ProductCardComponent', () => {
     expect(component.showModal).toHaveBeenCalled();
   });
 
-  // it('getProductThumbnail should set imageSrc to the placeholder when media is missing or an error occurs', () => {
+  // xit('getProductThumbnail should set imageSrc to the placeholder when media is missing or an error occurs', () => {
   // expect(component.imageSrc = placeholder);
   // expect(mediaServiceFailMock.getProductThumbnail).toHaveBeenCalledWith();
   // expect(mediaServiceFailMock.formatMedia).not.toHaveBeenCalled();

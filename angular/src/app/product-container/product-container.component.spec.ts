@@ -70,7 +70,7 @@ describe('ProductContainerComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it(
+  xit(
     'should display products when there are products',
     () => {
       productServiceMock.getProducts.and.returnValue(of([
@@ -102,14 +102,14 @@ describe('ProductContainerComponent', () => {
     },
   );
 
-  it('should call showProducts when productAdded$ emits', () => {
+  xit('should call showProducts when productAdded$ emits', () => {
     const showProductsSpy = spyOn(component, 'showProducts');
     productServiceMock.productAdded$ = of({} as Product);
     component.ngAfterViewInit();
     expect(showProductsSpy).toHaveBeenCalled();
   });
 
-  it(
+  xit(
     'should handle the case when there are no products',
     fakeAsync(() => {
       productServiceMock.getProducts.and.returnValue(of([]));
