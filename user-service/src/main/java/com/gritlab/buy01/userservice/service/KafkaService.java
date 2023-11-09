@@ -67,8 +67,6 @@ public class KafkaService {
 
   @KafkaListener(topics = "token-validation-request", groupId = "user-service-group")
   public void consumeMessage(TokenValidationRequest message) {
-    System.out.println("THIS HAPPENED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    System.out.println(message);
     try {
       // Check if this message was already processed
       if (processedCorrelationIds.contains(message.getCorrelationId())) {
@@ -80,6 +78,7 @@ public class KafkaService {
       User userDetails = authService.getUserDetailsFromToken(message.getJwtToken());
       TokenValidationResponse response = new TokenValidationResponse();
       response.setCorrelationId(message.getCorrelationId());
+      response.setJwtToken(message.getJwtToken());
 
       if (userDetails == null) {
         response.setErrorMessage("Error: invalid token");
