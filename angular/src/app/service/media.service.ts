@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Media, MediaResponse } from '../interfaces/media';
-import { BehaviorSubject, map, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -16,11 +16,15 @@ export class MediaService {
   private imageAddedSource = new BehaviorSubject<Media>({} as Media);
   imageAdded$ = this.imageAddedSource.asObservable();
 
+  placeholder: string = environment.placeholder;
+
+  private avatarSource = new BehaviorSubject<string>(this.placeholder);
+  avatar$ = this.avatarSource.asObservable();
+
   private http = inject(HttpClient);
 
   //eslint-disable-next-line
   updateImageAdded(data: any): void {
-    console.log(data);
     this.imageAddedSource.next(data);
   }
 

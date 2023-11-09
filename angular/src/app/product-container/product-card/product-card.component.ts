@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -10,11 +11,12 @@ import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
-import { AuthService } from 'src/app/service/auth.service';
+// import { AuthService } from 'src/app/service/auth.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { environment } from 'src/environments/environment';
 import { DataService } from 'src/app/service/data.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ProductService } from 'src/app/service/product.service';
 
 @Component({
   selector: 'app-product-card',
@@ -28,17 +30,21 @@ export class ProductCardComponent {
     productModal: ElementRef | undefined;
   @Input()
     product: Product = {} as Product;
+  @Input()
+    currentUser: User = {} as User;
 
   placeholder: string = environment.placeholder;
   imageSrc: string = this.placeholder;
-  currentUser?: User;
+  // currentUser?: User;
   modalVisible = false;
 
   private mediaService = inject(MediaService);
-  private authservice = inject(AuthService);
+  // private authservice = inject(AuthService);
   private formStateService = inject(FormStateService);
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
+  private changeDetectorRef = inject(ChangeDetectorRef);
+  private productService = inject(ProductService);
 
   ngOnInit(): void {
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
@@ -50,6 +56,9 @@ export class ProductCardComponent {
         }
       });
 
+    this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.changeDetectorRef.detectChanges());
+
     this.getProductThumbnail();
 
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
@@ -58,14 +67,24 @@ export class ProductCardComponent {
       },
     );
 
-    const cookieCheck = this.authservice.getAuth();
-    if (cookieCheck) {
-      cookieCheck.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
-        (user) => {
-          this.currentUser = user;
-        },
-      );
-    }
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.changeDetectorRef.detectChanges();
+        this.mediaService.getProductThumbnail(this.product.id!).pipe(
+          takeUntilDestroyed(this.destroyRef),
+        ).subscribe((data) => {
+          if (data) this.imageSrc = this.mediaService.formatMedia(data);
+        });
+      });
+
+    // const cookieCheck = this.authservice.getAuth();
+    // if (cookieCheck) {
+    //   cookieCheck.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
+    //     (user) => {
+    //       this.currentUser = user;
+    //     },
+    //   );
+    // }
   }
 
   private updateThumbnailIfEmpty(id: string) {
@@ -83,8 +102,10 @@ export class ProductCardComponent {
         next: (media) => {
           if (media && media?.image) {
             this.imageSrc = this.mediaService.formatMedia(media);
+            // this.changeDetectorRef.detectChanges();
           } else {
             this.imageSrc = environment.placeholder;
+            this.changeDetectorRef.detectChanges();
           }
         },
         error: (err) => {

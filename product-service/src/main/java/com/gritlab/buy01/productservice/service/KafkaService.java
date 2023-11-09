@@ -1,5 +1,6 @@
 package com.gritlab.buy01.productservice.service;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import com.gritlab.buy01.productservice.cache.CachedTokenInfo;
 import com.gritlab.buy01.productservice.event.ProductOwnershipValidationEvent;
 import com.gritlab.buy01.productservice.event.UserProductsDeletionEvent;
 import com.gritlab.buy01.productservice.kafka.message.ProductMediaDeleteMessage;
@@ -41,6 +43,10 @@ public class KafkaService {
   @Qualifier("productMediaDeleteMessageKafkaTemplate")
   private KafkaTemplate<String, ProductMediaDeleteMessage> productMediaDeleteMessageKafkaTemplate;
 
+  // token validation responses are cached to limit the number of kafka messages
+  private ConcurrentMap<String, CachedTokenInfo> tokenCache = new ConcurrentHashMap<>();
+  private static final long TOKEN_CACHE_DURATION = TimeUnit.MINUTES.toMillis(5);
+
   // to track processed messages and ensure idempotency
   private Set<String> processedCorrelationIds = new HashSet<>();
 
@@ -54,6 +60,18 @@ public class KafkaService {
   }
 
   public TokenValidationResponse validateTokenWithUserMicroservice(TokenValidationRequest request) {
+    // checking the cache first
+    CachedTokenInfo cachedTokenInfo = tokenCache.get(request.getJwtToken());
+    if (cachedTokenInfo != null) {
+      // Check if cached token info is still valid
+      if ((Instant.now().toEpochMilli() - cachedTokenInfo.getCachedAt().toEpochMilli())
+          < TOKEN_CACHE_DURATION) {
+        return cachedTokenInfo.getValidationResponse(); // return cached response
+      } else {
+        tokenCache.remove(request.getJwtToken()); // remove expired token info from cache
+      }
+    }
+
     BlockingQueue<TokenValidationResponse> queue = new ArrayBlockingQueue<>(1);
     if (request.getCorrelationId() != null) {
       responseQueues.put(request.getCorrelationId(), queue);
@@ -67,10 +85,14 @@ public class KafkaService {
     try {
       TokenValidationResponse response = queue.poll(5, TimeUnit.SECONDS);
       responseQueues.remove(request.getCorrelationId());
+      if (response != null && response.getErrorMessage() == null) {
+        tokenCache.put(response.getJwtToken(), new CachedTokenInfo(response, Instant.now()));
+      }
       return response;
     } catch (InterruptedException e) {
-      e.printStackTrace();
+      Thread.currentThread().interrupt();
       responseQueues.remove(request.getCorrelationId());
+      logger.error("Thread was interrupted", e);
       return null;
     }
   }

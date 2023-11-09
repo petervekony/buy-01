@@ -5,7 +5,7 @@
 <div class="product-container">
   <div class="wrapper" #container>
     <ng-container *ngFor="let product of products$ | async; trackBy: trackById">
-      <app-product-card [product]="product"></app-product-card>
+      <app-product-card [currentUser]="currentUser" [product]="product"></app-product-card>
     </ng-container>
   </div>
 </div>

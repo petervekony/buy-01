@@ -25,6 +25,7 @@ export class ProductService {
     {} as Product,
   );
   productAdded$ = this.productAddedSource.asObservable();
+
   private userProductsSource = new BehaviorSubject<Product[]>([]);
   userProducts$ = this.userProductsSource.asObservable();
 
@@ -51,17 +52,6 @@ export class ProductService {
     return this.http.get<Product[]>(address, { withCredentials: true });
   }
 
-  // getProductsById(userId: string): Observable<Product[]> {
-  //   const address = environment.productsURL;
-  //   return this.http
-  //     .get<Product[]>(address, { withCredentials: true })
-  //     .pipe(
-  //       map((products) =>
-  //         products.filter((product) => product.userId == userId)
-  //       ),
-  //     );
-  // }
-
   getOwner(userId: string): Observable<User> {
     const address = environment.productsURL;
     return this.http.get<User>(address, {
@@ -80,7 +70,6 @@ export class ProductService {
     id: string,
     form: ProductRequest,
   ): Observable<Product | null> {
-    console.log('gothere');
     const address = environment.productsURL + '/' + id;
     return this.http.put<Product>(address, form, { withCredentials: true });
   }

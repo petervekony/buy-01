@@ -9,7 +9,7 @@ import {
 import { User } from '../interfaces/user';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
-import { Observable, of, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { FormStateService } from '../service/form-state.service';
 import { CookieService } from 'ngx-cookie-service';
 import { UserService } from '../service/user.service';
@@ -49,7 +49,7 @@ export class ProfilePageComponent implements OnInit {
   currentUser: User = {} as User;
   fileSelected: File | null = null;
   placeholder: string = environment.placeholder;
-  avatar$: Observable<string> = of(this.placeholder);
+  // avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
   private formStateService = inject(FormStateService);
   private cookieService = inject(CookieService);
@@ -60,6 +60,7 @@ export class ProfilePageComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
   private authService = inject(AuthService);
 
+  avatar$ = this.mediaService.avatar$;
   //TODO: fix if clicked outside form, close form!
   // this.renderer.listen('window', 'click', (e: Event) => {
   //   if (
@@ -86,9 +87,34 @@ export class ProfilePageComponent implements OnInit {
 
     this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
-        (data) => this.stateService.setUserState(data),
+        (data) => this.user$.next(data),
       );
+  }
 
+  getAuthAndAvatar() {
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (user) => {
+          this.user$.next(user);
+          this.currentUser = user;
+          if (user.avatar) {
+            this.mediaService.getAvatar(
+              this.currentUser.id,
+            ).pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: (media) => {
+                  if (media && media?.image) {
+                    this.mediaService.updateAvatar(
+                      this.mediaService.formatMedia(media),
+                    );
+                  }
+                },
+                error: (err) => console.log(err),
+              });
+          }
+        },
+        error: (err) => console.error(err),
+      });
     this.formValid = true;
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
@@ -194,7 +220,6 @@ export class ProfilePageComponent implements OnInit {
 
   onSubmit() {
     const request = { ...this.userUpdateForm.value };
-    console.log('onsubmit, profile:', request);
     delete request.confirmPassword;
     formatForm();
     this.formStateService.setFormOpen(false);

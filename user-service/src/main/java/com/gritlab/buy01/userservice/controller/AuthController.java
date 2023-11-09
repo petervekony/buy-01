@@ -1,6 +1,7 @@
 package com.gritlab.buy01.userservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -25,6 +26,9 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/auth")
 public class AuthController {
   @Autowired AuthService authService;
+
+  @Value("${app.cookie.domain}")
+  private String cookieDomain;
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -54,7 +58,7 @@ public class AuthController {
         ResponseCookie.from("buy-01", token)
             .httpOnly(false)
             .sameSite("Lax")
-            .domain("localhost")
+            .domain(cookieDomain)
             .secure(true)
             .path("/")
             .maxAge(0)

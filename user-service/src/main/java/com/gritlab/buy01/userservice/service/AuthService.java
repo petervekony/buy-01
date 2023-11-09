@@ -41,6 +41,9 @@ public class AuthService {
   @Value("${buy01.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
+  @Value("${app.cookie.domain}")
+  private String cookieDomain;
+
   public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
     try {
       Authentication authentication =
@@ -58,7 +61,7 @@ public class AuthService {
           ResponseCookie.from("buy-01", jwtToken)
               .httpOnly(false)
               .sameSite("Lax")
-              .domain("localhost")
+              .domain(cookieDomain)
               .secure(true)
               .path("/")
               .maxAge(jwtExpirationMs / 1000)
@@ -80,6 +83,7 @@ public class AuthService {
                       role));
       return resp;
     } catch (Exception e) {
+      System.out.println(e.getMessage());
       ErrorMessage error =
           new ErrorMessage("Incorrect username or password", HttpStatus.UNAUTHORIZED.value());
       return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);

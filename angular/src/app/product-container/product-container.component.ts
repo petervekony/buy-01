@@ -17,6 +17,7 @@ import { FormStateService } from '../service/form-state.service';
 import { DataService } from '../service/data.service';
 import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
+import { MediaService } from '../service/media.service';
 
 @Component({
   selector: 'app-product-container',
@@ -45,6 +46,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   private formStateService = inject(FormStateService);
   private dataService = inject(DataService);
   private stateService = inject(StateService);
+  private mediaService = inject(MediaService);
 
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
@@ -52,9 +54,25 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
 
     this.showProducts();
 
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.changeDetectorRef.detectChanges();
+      });
+
     this.dataService.dashboard$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
         this.toggleDashboard(data);
+        this.changeDetectorRef.detectChanges();
+      });
+
+    this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.dashboard) {
+          this.showProducts();
+        } else {
+          this.getOwnerProducts();
+        }
+        this.changeDetectorRef.detectChanges();
       });
 
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))

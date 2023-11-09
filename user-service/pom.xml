@@ -90,6 +90,34 @@
     </dependency>
   </dependencies>
 
+  <profiles>
+
+    <!-- Development profile -->
+    <profile>
+      <id>dev</id>
+      <properties>
+        <app.cookie.domain>localhost</app.cookie.domain>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <finalName>user-service-dev</finalName>
+      </build>
+    </profile>
+
+    <!-- Production profile -->
+    <profile>
+      <id>prod</id>
+      <properties>
+        <app.cookie.domain>thewarehouse.rocks</app.cookie.domain>
+      </properties>
+      <build>
+        <finalName>user-service-prod</finalName>
+      </build>
+    </profile>
+  </profiles>
+
   <build>
     <plugins>
 
@@ -152,5 +180,11 @@
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
   </build>
 </project>

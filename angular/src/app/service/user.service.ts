@@ -50,7 +50,18 @@ export class UserService {
   }
 
   logout() {
+    this.cookieService.delete('buy-01');
     this.cookieService.deleteAll();
+    const expirationDate = new Date('Thu, 01 Jan 1970 00:00:00 UTC');
+    this.cookieService.set(
+      'buy-01',
+      '',
+      expirationDate,
+      '/',
+      'thewarehouse.rocks',
+      true,
+      'Lax',
+    );
     this.router.navigate(['/login']);
   }
 

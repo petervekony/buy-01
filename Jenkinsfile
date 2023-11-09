@@ -104,8 +104,9 @@ pipeline {
 
               if (fileExists(dir)) {
                 sh 'cd ${dir}'
-                  sh 'docker-compose down --remove-orphans --volumes'
-                  sleep time: 15, unit: 'SECONDS'
+                  sh 'docker kill $(docker ps -q)'
+                  sh 'docker-compose --env-file .env.prod down --remove-orphans --volumes'
+                  sleep time: 5, unit: 'SECONDS'
                   sh 'cd ..'
                   sh 'cd ..'
                   sh 'rm -rf ~/production/buy-01'
@@ -118,7 +119,7 @@ pipeline {
             sh "git clone git@github.com:petervekony/buy-01.git ~/production/buy-01"
               sh "cd ~/production/buy-01 && git pull origin main"
 
-              sh "docker-compose up -d"
+              sh "docker-compose --env-file .env.prod up -d"
           }
         }
       }
