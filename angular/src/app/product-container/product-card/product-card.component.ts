@@ -71,7 +71,6 @@ export class ProductCardComponent {
         this.mediaService.getProductThumbnail(this.product.id!).pipe(
           takeUntilDestroyed(this.destroyRef),
         ).subscribe((data) => {
-          console.log(data);
           if (data) this.imageSrc = this.mediaService.formatMedia(data);
         });
       });

@@ -20,13 +20,11 @@ export class MediaService {
 
   //eslint-disable-next-line
   updateImageAdded(data: any): void {
-    console.log(data);
     this.imageAddedSource.next(data);
   }
 
   //eslint-disable-next-line
   updateAvatar(data: any): void {
-    console.log(data);
     this.avatarSource.next(data);
   }
 

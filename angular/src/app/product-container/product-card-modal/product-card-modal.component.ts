@@ -233,7 +233,6 @@ export class ProductCardModalComponent implements OnInit {
   }
 
   updateProduct() {
-    console.log(this.product.id);
     if (this.formValid) {
       const prod = {
         name: this.productForm.value.name,

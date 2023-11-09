@@ -215,7 +215,6 @@ export class ProfilePageComponent implements OnInit {
 
   onSubmit() {
     const request = { ...this.userUpdateForm.value };
-    console.log('onsubmit, profile:', request);
     delete request.confirmPassword;
     formatForm();
     this.formStateService.setFormOpen(false);

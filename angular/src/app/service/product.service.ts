@@ -70,7 +70,6 @@ export class ProductService {
     id: string,
     form: ProductRequest,
   ): Observable<Product | null> {
-    console.log('gothere');
     const address = environment.productsURL + '/' + id;
     return this.http.put<Product>(address, form, { withCredentials: true });
   }

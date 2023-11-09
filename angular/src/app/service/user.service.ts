@@ -50,12 +50,18 @@ export class UserService {
   }
 
   logout() {
-    console.log('get buy-01:',this.cookieService.get('buy-01'));
-    console.log('get all:', this.cookieService.getAll());
     this.cookieService.delete('buy-01');
     this.cookieService.deleteAll();
     const expirationDate = new Date('Thu, 01 Jan 1970 00:00:00 UTC');
-    this.cookieService.set('buy-01', '', expirationDate, '/', 'thewarehouse.rocks', true, 'Lax');
+    this.cookieService.set(
+      'buy-01',
+      '',
+      expirationDate,
+      '/',
+      'thewarehouse.rocks',
+      true,
+      'Lax',
+    );
     this.router.navigate(['/login']);
   }
 
