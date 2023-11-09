@@ -366,7 +366,7 @@ describe('ProductCardModalComponent', () => {
   });
 
   it('should set confirm and deleteConfirm to false', () => {
-    component.closeConfirm();
+    component.closeConfirm('tag');
     expect(component.confirm).toBe(false);
     expect(component.imageDeleteConfirm).toBe(false);
   });
