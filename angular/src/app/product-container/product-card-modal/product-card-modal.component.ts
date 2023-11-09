@@ -13,11 +13,9 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { MatTabGroup } from '@angular/material/tabs';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
 import { Media } from 'src/app/interfaces/media';
-// import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { ProductRequest } from 'src/app/interfaces/product-request';
 import { User } from 'src/app/interfaces/user';
-import { AuthService } from 'src/app/service/auth.service';
 import { DataService } from 'src/app/service/data.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
@@ -75,7 +73,6 @@ export class ProductCardModalComponent implements OnInit {
   private validatorService = inject(ValidatorService);
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
-  private authService = inject(AuthService);
   private changeDetector = inject(ChangeDetectorRef);
 
   productForm: FormGroup = new FormGroup({
@@ -94,9 +91,6 @@ export class ProductCardModalComponent implements OnInit {
   ngOnInit(): void {
     this.initFormValues();
 
-    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((user) => this.currentUser = user);
-
     this.mediaService.getProductThumbnail(
       this.product.id!,
     ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((media) => {
@@ -114,7 +108,6 @@ export class ProductCardModalComponent implements OnInit {
       .subscribe(() => {
         this.getProductImages();
         this.getProductOwnerInfo();
-        // this.mediaService.getProductThumbnail(this.product.id!);
       });
 
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
@@ -122,7 +115,6 @@ export class ProductCardModalComponent implements OnInit {
         if (id !== this.product.id) return;
         this.getProductImages();
         this.getProductOwnerInfo();
-        // this.mediaService.getProductThumbnail(this.product.id);
       },
     );
   }

@@ -11,7 +11,7 @@ import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
-import { AuthService } from 'src/app/service/auth.service';
+// import { AuthService } from 'src/app/service/auth.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { environment } from 'src/environments/environment';
 import { DataService } from 'src/app/service/data.service';
@@ -30,14 +30,16 @@ export class ProductCardComponent {
     productModal: ElementRef | undefined;
   @Input()
     product: Product = {} as Product;
+  @Input()
+    currentUser: User = {} as User;
 
   placeholder: string = environment.placeholder;
   imageSrc: string = this.placeholder;
-  currentUser?: User;
+  // currentUser?: User;
   modalVisible = false;
 
   private mediaService = inject(MediaService);
-  private authservice = inject(AuthService);
+  // private authservice = inject(AuthService);
   private formStateService = inject(FormStateService);
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
@@ -75,14 +77,14 @@ export class ProductCardComponent {
         });
       });
 
-    const cookieCheck = this.authservice.getAuth();
-    if (cookieCheck) {
-      cookieCheck.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
-        (user) => {
-          this.currentUser = user;
-        },
-      );
-    }
+    // const cookieCheck = this.authservice.getAuth();
+    // if (cookieCheck) {
+    //   cookieCheck.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
+    //     (user) => {
+    //       this.currentUser = user;
+    //     },
+    //   );
+    // }
   }
 
   private updateThumbnailIfEmpty(id: string) {
