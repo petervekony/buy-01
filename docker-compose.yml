@@ -16,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: user-service/Dockerfile
+      args:
+        BUILD_PROFILE: ${BUILD_PROFILE}
     environment:
       SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
       SPRING_DATA_MONGODB_DB: buy-01-users
@@ -62,8 +64,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/tvntvn/cert:/etc/nginx/ssl:ro
+      - ${CERT_PATH}:/etc/nginx/ssl:ro
+      # - /home/tvntvn/cert:/etc/nginx/ssl:ro
       # - ./angular/cert:/etc/nginx/ssl:ro
+    environment:
+      - SSL_CERT_NAME=${SSL_CERT_NAME}
+      - SSL_CERT_KEY_NAME=${SSL_CERT_KEY_NAME}
     depends_on:
       - user-service
       - product-service

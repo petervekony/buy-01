@@ -1,4 +1,7 @@
+ARG BUILD_PROFILE
+
 FROM maven:3.9.4-eclipse-temurin-17 as build
+ARG BUILD_PROFILE
 
 WORKDIR /app
 
@@ -8,7 +11,8 @@ COPY ./pom.xml .
 
 WORKDIR /app/user-service
 
-RUN mvn clean package -DskipTests -X
+RUN echo "Build profile: ${BUILD_PROFILE}"
+RUN mvn clean package -P${BUILD_PROFILE} -DskipTests -X
 
 FROM bellsoft/liberica-openjdk-alpine:latest 
 
