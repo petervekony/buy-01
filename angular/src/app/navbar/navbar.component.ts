@@ -19,6 +19,8 @@ import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DataService } from '../service/data.service';
 
+// import { Media } from '../interfaces/media';
+
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -67,6 +69,8 @@ export class NavbarComponent implements OnInit {
           this.navbar?.nativeElement.classList.remove('blur-filter');
         }
       });
+
+    this.getAuthAndAvatar();
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {

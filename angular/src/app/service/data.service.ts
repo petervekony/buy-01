@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,7 +9,7 @@ export class DataService {
   private dataSource = new BehaviorSubject<any>(null);
   data$ = this.dataSource.asObservable();
 
-  private idSource = new BehaviorSubject<string>('');
+  private idSource = new Subject<string>();
   ids$ = this.idSource.asObservable();
 
   private deleteImageSource = new BehaviorSubject<number>(0);

@@ -92,13 +92,13 @@ export class ProductCardModalComponent implements OnInit {
   ngOnInit(): void {
     this.initFormValues();
 
-    this.mediaService.getProductThumbnail(
-      this.product.id!,
-    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((media) => {
-      if (media) {
-        this.picture = this.mediaService.formatMedia(media);
-      }
-    });
+    // this.mediaService.getProductThumbnail(
+    //   this.product.id!,
+    // ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((media) => {
+    //   if (media) {
+    //     this.picture = this.mediaService.formatMedia(media);
+    //   }
+    // });
 
     this.dataService.deleteImage$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((index) => {

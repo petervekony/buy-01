@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Media, MediaResponse } from '../interfaces/media';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -13,13 +13,8 @@ export class MediaService {
   private avatarSource = new BehaviorSubject<string>(this.placeholder);
   avatar$ = this.avatarSource.asObservable();
 
-  private imageAddedSource = new BehaviorSubject<Media>({} as Media);
+  private imageAddedSource = new Subject<Media>();
   imageAdded$ = this.imageAddedSource.asObservable();
-
-  placeholder: string = environment.placeholder;
-
-  private avatarSource = new BehaviorSubject<string>(this.placeholder);
-  avatar$ = this.avatarSource.asObservable();
 
   private http = inject(HttpClient);
 
