@@ -1,9 +1,15 @@
 package com.gritlab.buy01.mediaservice.service;
 
+import java.awt.Color;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+
+import javax.imageio.ImageIO;
 
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,15 +86,42 @@ public class MediaService {
     }
     Media media;
     try {
-      byte[] bytes = image.getBytes();
-      String contentType = image.getContentType();
-      media = new Media(new Binary(bytes), productId, userId);
-      media.setMimeType(contentType);
-      media = mediaRepository.save(media);
+      BufferedImage originalImage = ImageIO.read(image.getInputStream());
+
+      // check if the uploaded file is an actual image
+      if (originalImage == null) {
+        return new ResponseEntity<>(
+            new ErrorMessage("Invalid image file.", HttpStatus.BAD_REQUEST.value()),
+            HttpStatus.BAD_REQUEST);
+      }
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+      try {
+        if (originalImage.getTransparency() != Transparency.OPAQUE) {
+          BufferedImage newBufferedImage =
+              new BufferedImage(
+                  originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+          newBufferedImage.createGraphics().drawImage(originalImage, 0, 0, Color.WHITE, null);
+          ImageIO.write(newBufferedImage, "jpg", baos);
+        } else {
+          ImageIO.write(originalImage, "jpg", baos);
+        }
+        baos.flush();
+        byte[] compressedBytes = baos.toByteArray();
+        media = new Media(new Binary(compressedBytes), productId, userId);
+        media.setMimeType("image/jpeg");
+        // byte[] bytes = image.getBytes();
+        // String contentType = image.getContentType();
+        // media = new Media(new Binary(bytes), productId, userId);
+        // media.setMimeType(contentType);
+        media = mediaRepository.save(media);
+        return new ResponseEntity<>(media, HttpStatus.CREATED);
+      } finally {
+        baos.close();
+      }
     } catch (IOException e) {
       return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return new ResponseEntity<>(media, HttpStatus.CREATED);
   }
 
   public void deleteAllUserAvatars(String userId) {
