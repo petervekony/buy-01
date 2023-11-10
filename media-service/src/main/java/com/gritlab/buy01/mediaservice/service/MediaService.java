@@ -9,8 +9,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import javax.imageio.ImageIO;
-
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,6 +31,8 @@ public class MediaService {
   @Autowired private ApplicationEventPublisher eventPublisher;
 
   @Autowired ThumbnailService thumbnailService;
+
+  @Autowired ImageService imageService;
 
   public void requestDeleteAllUserAvatars(String userId) {
     eventPublisher.publishEvent(new DeleteMediaEvent(this, userId, null));
@@ -88,7 +88,8 @@ public class MediaService {
     }
     Media media;
     try {
-      BufferedImage originalImage = ImageIO.read(image.getInputStream());
+      // BufferedImage originalImage = ImageIO.read(image.getInputStream());
+      BufferedImage originalImage = imageService.readImage(image.getInputStream());
 
       // check if the uploaded file is an actual image
       if (originalImage == null) {
@@ -104,9 +105,11 @@ public class MediaService {
               new BufferedImage(
                   originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
           newBufferedImage.createGraphics().drawImage(originalImage, 0, 0, Color.WHITE, null);
-          ImageIO.write(newBufferedImage, "jpg", baos);
+          // ImageIO.write(newBufferedImage, "jpg", baos);
+          imageService.writeImage(newBufferedImage, "jpg", baos);
         } else {
-          ImageIO.write(originalImage, "jpg", baos);
+          // ImageIO.write(originalImage, "jpg", baos);
+          imageService.writeImage(originalImage, "jpg", baos);
         }
         baos.flush();
         byte[] compressedBytes = baos.toByteArray();

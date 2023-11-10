@@ -4,9 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +25,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,12 +38,20 @@ import com.gritlab.buy01.mediaservice.repository.MediaRepository;
 public class MediaServiceTests {
 
   @Mock private MediaRepository mediaRepository;
+  @Mock private ThumbnailService thumbnailService;
+  @Mock private ImageService imageService;
 
   @InjectMocks private MediaService mediaService;
 
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
+    try {
+      when(imageService.readImage(any(InputStream.class)))
+          .thenReturn(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB));
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Test
@@ -141,6 +155,21 @@ public class MediaServiceTests {
 
     when(mediaRepository.findFirstByProductId("product123")).thenReturn(Optional.of(media));
 
+    SingleMediaResponse thumbnailSingleMediaResponse =
+        new SingleMediaResponse("123", "base64Image", "product123", "user123", "image/jpeg");
+
+    ResponseEntity<?> responseEntity =
+        new ResponseEntity<>(thumbnailSingleMediaResponse, HttpStatus.OK);
+
+    when(thumbnailService.getProductThumbnailHelper(anyString(), any(Media.class)))
+        .thenAnswer(
+            new Answer<ResponseEntity<?>>() {
+              @Override
+              public ResponseEntity<?> answer(InvocationOnMock invocation) {
+                return responseEntity;
+              }
+            });
+
     ResponseEntity<?> response = mediaService.getProductThumbnail("product123");
 
     assertNotNull(response, "Response should not be null");
@@ -228,7 +257,9 @@ public class MediaServiceTests {
 
       @Override
       public InputStream getInputStream() throws IOException {
-        return null;
+        // Create a dummy input stream for testing
+        byte[] imageContent = new byte[1024]; // dummy image content
+        return new ByteArrayInputStream(imageContent);
       }
 
       @Override
