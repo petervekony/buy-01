@@ -82,6 +82,11 @@ body {
   pointer-events: none;
 }
 
+.nav-blur {
+  opacity: 1;
+  filter: brightness(0.2);
+}
+
 .close-button:hover {
   box-shadow: 0 0 5px #c3b5fd;
   transform: scale(1.1);
