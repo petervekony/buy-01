@@ -77,15 +77,6 @@ export class ProductCardComponent {
           if (data) this.imageSrc = this.mediaService.formatMedia(data);
         });
       });
-
-    // const cookieCheck = this.authservice.getAuth();
-    // if (cookieCheck) {
-    //   cookieCheck.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
-    //     (user) => {
-    //       this.currentUser = user;
-    //     },
-    //   );
-    // }
   }
 
   private updateThumbnailIfEmpty(id: string) {
@@ -117,6 +108,8 @@ export class ProductCardComponent {
   }
 
   showModal() {
+    this.modalVisible = true;
+    setTimeout(() => this.productModal?.nativeElement.show(), 100);
     if (this.productModal) {
       this.dataService.sendProductId(this.product.id!);
       this.formStateService.setFormOpen(true);

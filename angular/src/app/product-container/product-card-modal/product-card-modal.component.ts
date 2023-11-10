@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
@@ -20,7 +21,6 @@ import { DataService } from 'src/app/service/data.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
 import { ProductService } from 'src/app/service/product.service';
-import { StateService } from 'src/app/service/state.service';
 import { UserService } from 'src/app/service/user.service';
 import { ValidatorService } from 'src/app/service/validator.service';
 import { environment } from 'src/environments/environment';
@@ -30,7 +30,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './product-card-modal.component.html',
   styleUrls: ['./product-card-modal.component.css'],
 })
-export class ProductCardModalComponent implements OnInit {
+export class ProductCardModalComponent implements OnInit, AfterViewInit {
   @ViewChild('tabGroup')
     tabGroup!: MatTabGroup;
   @ViewChild('productModal')
@@ -118,6 +118,11 @@ export class ProductCardModalComponent implements OnInit {
         this.getProductOwnerInfo();
       },
     );
+  }
+
+  ngAfterViewInit(): void {
+    this.getProductImages();
+    this.getProductOwnerInfo();
   }
 
   getProductOwnerInfo() {

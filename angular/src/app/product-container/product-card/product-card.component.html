@@ -10,12 +10,14 @@
     <!-- <div class="owner">{{ owner }}</div> -->
   </div>
   <div class="product-footer">
-    <button id="info-button">
+    <button class="info-button">
       <mat-icon aria-hidden="false" aria-label="info icon" fontIcon="info"></mat-icon>
     </button>
   </div>
 </div>
-<dialog #productModal>
-  <app-product-card-modal [user]="currentUser" [dialog]="productModal" [product]="product"
-    (id)="('productCardModal' + product.id)"></app-product-card-modal>
-</dialog>
+<ng-container *ngIf="modalVisible">
+  <dialog #productModal>
+    <app-product-card-modal [user]="currentUser" [dialog]="productModal" [product]="product"
+      (id)="('productCardModal' + product.id)"></app-product-card-modal>
+  </dialog>
+</ng-container>

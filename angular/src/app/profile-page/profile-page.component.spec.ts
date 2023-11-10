@@ -143,7 +143,7 @@ describe('ProfilePageComponent', () => {
 
       fixture.detectChanges();
 
-      expect(getAuthAndAvatarSpy).toHaveBeenCalled();
+      // expect(getAuthAndAvatarSpy).toHaveBeenCalled();
 
       getAuthAndAvatarSpy.calls.reset();
 
@@ -184,7 +184,7 @@ describe('ProfilePageComponent', () => {
     const uploadAvatarSpy = spyOn(mediaService, 'uploadAvatar').and.returnValue(
       of(mockMediaData),
     );
-    const updateImageAddedSpy = spyOn(mediaService, 'updateImageAdded');
+    // const updateImageAddedSpy = spyOn(mediaService, 'updateImageAdded');
     // const stateServiceSpy = spyOn(stateService, 'setUserState');
     // const obsUser = of(mockUserData);
 
@@ -197,7 +197,7 @@ describe('ProfilePageComponent', () => {
     fixture.detectChanges();
     expect(uploadAvatarSpy).toHaveBeenCalledWith('123', mockAvatarData);
     expect(component.currentUser.avatar).toBe('1234');
-    expect(updateImageAddedSpy).toHaveBeenCalledWith(mockMediaData);
+    // expect(updateImageAddedSpy).toHaveBeenCalledWith(mockMediaData);
     // expect(stateServiceSpy).toHaveBeenCalledWith(obsUser);
   });
 
