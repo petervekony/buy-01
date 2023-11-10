@@ -11,7 +11,6 @@ import { of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
-// import { AuthService } from 'src/app/service/auth.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { environment } from 'src/environments/environment';
 import { DataService } from 'src/app/service/data.service';
@@ -36,11 +35,9 @@ export class ProductCardComponent {
 
   placeholder: string = environment.placeholder;
   imageSrc: string = this.placeholder;
-  // currentUser?: User;
   modalVisible = false;
 
   private mediaService = inject(MediaService);
-  // private authservice = inject(AuthService);
   private formStateService = inject(FormStateService);
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
@@ -110,19 +107,19 @@ export class ProductCardComponent {
   showModal() {
     this.modalVisible = true;
     setTimeout(() => this.productModal?.nativeElement.show(), 100);
-    if (this.productModal) {
-      this.dataService.sendProductId(this.product.id!);
-      this.formStateService.setFormOpen(true);
-      this.productModal.nativeElement.show();
-      this.modalVisible = true;
-    }
+    // if (this.productModal) {
+    this.dataService.sendProductId(this.product.id!);
+    this.formStateService.setFormOpen(true);
+    // this.productModal.nativeElement.show();
+    this.modalVisible = true;
+    // }
   }
 
   hideModal() {
-    if (this.productModal) {
-      this.formStateService.setFormOpen(false);
-      this.productModal.nativeElement.close();
-      this.modalVisible = false;
-    }
+    // if (this.productModal) {
+    this.formStateService.setFormOpen(false);
+    this.productModal?.nativeElement.close();
+    this.modalVisible = false;
+    // }
   }
 }

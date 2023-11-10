@@ -79,7 +79,6 @@ export class ProfilePageComponent implements OnInit {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
 
-    //NOTE: this might need to be reworked
     this.avatar$ = this.mediaService.avatar$;
 
     this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
@@ -89,6 +88,12 @@ export class ProfilePageComponent implements OnInit {
       .subscribe(
         (data) => this.user$.next(data),
       );
+
+    this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((open) => {
+        if (open) this.formOpen = open;
+        else this.closeForms();
+      });
   }
 
   getAuthAndAvatar() {
@@ -204,6 +209,15 @@ export class ProfilePageComponent implements OnInit {
   private setToTrue() {
     this.buttonClicked = true;
     this.formStateService.setFormOpen(true);
+  }
+
+  private closeForms() {
+    this.formOpen = false;
+    this.profileFormOpen = false;
+    this.deleteAvatarFormOpen = false;
+    this.deleteUserFormOpen = false;
+    this.updateAvatarFormOpen = false;
+    this.deleteFormOpen = false;
   }
 
   onValidate() {

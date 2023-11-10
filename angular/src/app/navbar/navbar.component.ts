@@ -64,9 +64,12 @@ export class NavbarComponent implements OnInit {
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isOpen) => {
         if (isOpen) {
-          this.navbar?.nativeElement.classList.add('blur-filter');
+          this.navbar?.nativeElement.classList.add('blur-filter', 'nav-blur');
         } else {
-          this.navbar?.nativeElement.classList.remove('blur-filter');
+          this.navbar?.nativeElement.classList.remove(
+            'blur-filter',
+            'nav-blur',
+          );
         }
       });
 
