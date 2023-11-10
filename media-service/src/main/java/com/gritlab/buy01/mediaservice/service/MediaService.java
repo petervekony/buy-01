@@ -125,7 +125,11 @@ public class MediaService {
         baos.close();
       }
     } catch (IOException e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      return new ResponseEntity<>(
+          new ErrorMessage(
+              "Something went wrong with the image processing",
+              HttpStatus.UNPROCESSABLE_ENTITY.value()),
+          HttpStatus.UNPROCESSABLE_ENTITY);
     }
   }
 
