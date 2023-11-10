@@ -32,6 +32,8 @@ public class MediaService {
 
   @Autowired private ApplicationEventPublisher eventPublisher;
 
+  @Autowired ThumbnailService thumbnailService;
+
   public void requestDeleteAllUserAvatars(String userId) {
     eventPublisher.publishEvent(new DeleteMediaEvent(this, userId, null));
   }
@@ -133,6 +135,17 @@ public class MediaService {
   }
 
   public ResponseEntity<?> getProductThumbnail(String productId) {
+    Optional<Media> mediaQuery = mediaRepository.findFirstByProductId(productId);
+    if (mediaQuery.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    Media media = mediaQuery.get();
+
+    return thumbnailService.getProductThumbnailHelper(media.getId(), media);
+  }
+
+  public ResponseEntity<?> getProductThumbnailOld(String productId) {
     Optional<Media> mediaOpt = mediaRepository.findFirstByProductId(productId);
     return convertAndReturnMedia(mediaOpt);
   }
