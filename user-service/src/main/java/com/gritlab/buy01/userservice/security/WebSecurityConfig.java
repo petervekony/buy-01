@@ -62,6 +62,8 @@ public class WebSecurityConfig {
             auth ->
                 auth.requestMatchers("/api/auth/**")
                     .permitAll()
+                    .requestMatchers("/api/userHealth")
+                    .permitAll()
                     .requestMatchers("/error")
                     .permitAll()
                     .anyRequest()
