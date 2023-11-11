@@ -109,6 +109,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       .subscribe(() => {
         this.getProductImages();
         this.getProductOwnerInfo();
+        this.changeDetector.detectChanges();
       });
 
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
@@ -116,6 +117,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
         if (id !== this.product.id) return;
         this.getProductImages();
         this.getProductOwnerInfo();
+        this.changeDetector.detectChanges();
       },
     );
   }

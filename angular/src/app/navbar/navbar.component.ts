@@ -47,6 +47,7 @@ export class NavbarComponent implements OnInit {
   private dataService = inject(DataService);
 
   avatar$ = this.mediaService.avatar$;
+  dashboard$ = this.dataService.dashboard$;
 
   ngOnInit(): void {
     if (this.router.url === '/profile') {
@@ -93,14 +94,16 @@ export class NavbarComponent implements OnInit {
 
     this.dataService.updateDashboard(dash);
     this.dash = dash;
+    this.home = !dash;
   }
 
   private getAuthAndAvatar() {
-    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
+    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user) => {
           this.user$.next(user);
           this.currentUser = user;
+          this.seller = this.currentUser.role === 'SELLER';
           if (user.avatar) {
             this.getAvatar();
           } else {
@@ -137,7 +140,6 @@ export class NavbarComponent implements OnInit {
       .subscribe((event: NavigationEnd) => {
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
-          this.dash = this.route === '/dashboard';
           this.home = this.route === '/home';
           this.profile = this.route === '/profile';
         }
@@ -157,7 +159,7 @@ export class NavbarComponent implements OnInit {
   }
 
   goToProfile() {
-    this.showDashboard(false);
+    // this.showDashboard(false);
     this.formStateService.setFormOpen(false);
     this.move('profile');
   }

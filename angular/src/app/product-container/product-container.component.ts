@@ -19,6 +19,8 @@ import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
 import { MediaService } from '../service/media.service';
 
+// import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-product-container',
   templateUrl: './product-container.component.html',
@@ -37,6 +39,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   userProducts$: Observable<Product[]> | null = null;
   user$ = new Subject<User>();
   currentUser: User = {} as User;
+  profile: boolean = false;
 
   private changeDetector = inject(ChangeDetectorRef);
   private productService = inject(ProductService);
@@ -47,10 +50,16 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   private dataService = inject(DataService);
   private stateService = inject(StateService);
   private mediaService = inject(MediaService);
+  // private router = inject(Router);
 
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
+
+    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        this.currentUser = user;
+      });
 
     this.showProducts();
 
@@ -113,24 +122,18 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   }
 
   showProducts() {
-    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((user) => {
-        // this.user$.next(user);
-        this.currentUser = user;
-        this.productService.getProducts().pipe(
-          takeUntilDestroyed(this.destroyRef),
-        )
-          .subscribe({
-            next: (products) => {
-              if (products) {
-                this.products$ = of(products?.reverse());
-                this.changeDetector.detectChanges();
-              }
-            },
-            error: (error) => {
-              console.log(error);
-            },
-          });
+    this.productService.getProducts().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    )
+      .subscribe({
+        next: (products) => {
+          if (products) {
+            this.products$ = of(products?.reverse());
+          }
+        },
+        error: (error) => {
+          console.log(error);
+        },
       });
   }
 
@@ -140,7 +143,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
     ).subscribe({
       next: (products) => {
         this.products$ = of(products?.reverse());
-        this.changeDetector.detectChanges();
+        // this.changeDetector.detectChanges();
       },
     });
   }

@@ -8,6 +8,7 @@ import {
   map,
   Observable,
   of,
+  Subject,
   switchMap,
 } from 'rxjs';
 import { User } from '../interfaces/user';
@@ -21,9 +22,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   providedIn: 'root',
 })
 export class ProductService {
-  private productAddedSource = new BehaviorSubject<Product | null>(
-    {} as Product,
-  );
+  private productAddedSource = new Subject<Product>();
   productAdded$ = this.productAddedSource.asObservable();
 
   private userProductsSource = new BehaviorSubject<Product[]>([]);

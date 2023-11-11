@@ -55,7 +55,10 @@ export class ProductCardComponent {
       });
 
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.changeDetectorRef.detectChanges());
+      .subscribe(() => {
+        // this.getProductThumbnail();
+        this.changeDetectorRef.detectChanges();
+      });
 
     this.getProductThumbnail();
 
