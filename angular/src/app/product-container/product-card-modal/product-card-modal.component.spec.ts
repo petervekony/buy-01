@@ -61,7 +61,14 @@ describe('ProductCardModalComponent', () => {
       {
         id: '2',
         image: 'testimage',
-        productId: '2',
+        productId: '123',
+        userId: '',
+        mimeType: 'image/png',
+      },
+      {
+        id: '5',
+        image: 'testimage',
+        productId: '123',
         userId: '',
         mimeType: 'image/png',
       },
@@ -76,13 +83,13 @@ describe('ProductCardModalComponent', () => {
     avatar: 'testimage',
   };
 
-  const mockProductMedia = {
-    id: '2',
-    image: 'testimage',
-    productId: '2',
-    userId: '',
-    mimeType: 'image/png',
-  };
+  // const mockProductMedia = {
+  //   id: '2',
+  //   image: 'testimage',
+  //   productId: '2',
+  //   userId: '',
+  //   mimeType: 'image/png',
+  // };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -111,6 +118,7 @@ describe('ProductCardModalComponent', () => {
     userService = TestBed.inject(UserService);
     productService = TestBed.inject(ProductService);
     component.product = mockProducts[0];
+    component.user = mockUser;
   });
 
   it('should create', () => {
@@ -129,26 +137,21 @@ describe('ProductCardModalComponent', () => {
     expect(component.product).toEqual(testProduct);
   });
 
-  xit('should initialize user data and product thumbnail in ngOnInit', () => {
-    const authService = TestBed.inject(AuthService);
+  it('should initialize user data and product thumbnail in ngOnInit', () => {
     const mediaService = TestBed.inject(MediaService);
 
-    const authSpy = spyOn(authService, 'getAuth').and.returnValue(of(mockUser));
-    const thumbnailSpy = spyOn(mediaService, 'getProductThumbnail').and
+    const prodcutMediaSpy = spyOn(mediaService, 'getProductMedia').and
       .returnValue(
-        of(mockProductMedia),
+        of(mockMediaResponse),
       );
 
-    component.ngOnInit();
+    component.ngAfterViewInit();
 
-    expect(authSpy).toHaveBeenCalled();
-    expect(thumbnailSpy).toHaveBeenCalled();
+    expect(prodcutMediaSpy).toHaveBeenCalled();
 
-    expect(component.currentUser).toEqual(mockUser);
+    expect(component.user).toEqual(mockUser);
 
-    expect(component.picture).toEqual(
-      mediaService.formatMedia(mockProductMedia),
-    );
+    expect(component.picture).toEqual(component.placeholder);
   });
 
   it('should subscribe to DataService and update properties in ngOnInit', () => {

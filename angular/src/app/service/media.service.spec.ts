@@ -207,7 +207,7 @@ describe('MediaService', () => {
     req.flush({});
   });
 
-  xit('should upload avatar', () => {
+  it('should upload avatar', () => {
     const userId = '123';
     const mockImage = new FormData();
     mockImage.append('image', new Blob(['sample image data']));

@@ -19,8 +19,6 @@ import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DataService } from '../service/data.service';
 
-// import { Media } from '../interfaces/media';
-
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -95,7 +93,6 @@ export class NavbarComponent implements OnInit {
 
     this.dataService.updateDashboard(dash);
     this.dash = dash;
-    this.home = !dash;
   }
 
   private getAuthAndAvatar() {
@@ -104,7 +101,6 @@ export class NavbarComponent implements OnInit {
         next: (user) => {
           this.user$.next(user);
           this.currentUser = user;
-          this.seller = user.role === 'SELLER';
           if (user.avatar) {
             this.getAvatar();
           } else {

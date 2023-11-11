@@ -30,7 +30,6 @@
   justify-content: center;
 }
 
-
 #image-container img {
   background-size: contain;
   overflow: hidden;
@@ -41,36 +40,10 @@
   box-shadow: 1px 1px 5px #8d45ce4d;
 }
 
-/* .user-info { */
-/*   display: flex; */
-/*   flex-direction: row; */
-/*   gap: 7px; */
-/*   margin-left: 1rem; */
-/*   align-items: center; */
-/* } */
-
-/* #image-container { */
-/*   display: flex; */
-/*   align-items: center; */
-/*   justify-content: center; */
-/* } */
-
-/* #image-container img { */
-/*   background-size: contain; */
-/*   overflow: hidden; */
-/*   border-radius: 50%; */
-/*   height: 3rem; */
-/*   aspect-ratio: 1; */
-/*   border: 1px solid #8d45ce; */
-/*   box-shadow: 1px 1px 5px #8d45ce4d; */
-/* } */
-
 #title {
   clear: both;
-  /* margin-left: auto; */
   padding-left:1rem;
   padding-right:1rem;
-  /* margin-right: auto; */
   color: #c3b5fd;
   font-size: 1.2rem;
   font-weight: bold;
@@ -81,7 +54,6 @@
 
 #title:hover {
   color: #8d45ce;
-  /* transform: scale(1.05); */
   cursor: pointer;
 }
 
@@ -93,13 +65,12 @@
 }
 
 .buttons button {
-  background-color: #08101c;
+  background-color: #121212;
   width: 2rem;
   height: 2rem;
   outline: none;
   box-shadow: none;
   border: none;
-  /* margin-inline: 0.2rem; */
   color: #c3b5fd;
   cursor: pointer;
 }
@@ -120,7 +91,6 @@
 }
 
 #profile-button:hover {
-  /* transform: scale(1.1); */
   color: #8d45ce;
 }
 
