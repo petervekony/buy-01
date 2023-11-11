@@ -105,6 +105,7 @@ pipeline {
               if (fileExists(dir)) {
                 sh "cd ${dir} && docker-compose --env-file .env.prod down --remove-orphans --volumes"
                   sleep time: 5, unit: 'SECONDS'
+                  sh "docker system prune -f"
                   sh "rm -rf ~/production/buy-01"
               }
 
