@@ -105,7 +105,6 @@ pipeline {
               if (fileExists(dir)) {
                 sh 'cd ${dir}'
                   sh 'docker-compose --env-file .env.prod down --remove-orphans --volumes'
-                  sh 'docker kill $(docker ps -q)'
                   sleep time: 5, unit: 'SECONDS'
                   sh 'cd ..'
                   sh 'cd ..'
