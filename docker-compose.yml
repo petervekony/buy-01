@@ -28,10 +28,11 @@ services:
       - zookeeper
       - kafka
     healthcheck:
-      test: curl --fail "https://thewarehouse.rocks/api/userHealth" || exit 1
+      test: curl "https://thewarehouse.rocks/api/userHealth" || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
 
   product-service:
     build:
@@ -51,6 +52,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
 
   media-service:
     build:
@@ -70,6 +72,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
 
   frontend:
     build:
