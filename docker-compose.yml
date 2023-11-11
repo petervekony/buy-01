@@ -28,11 +28,7 @@ services:
       - zookeeper
       - kafka
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s -o /dev/null -w '$$http_code' http://user-service:8080/api/userHealth | grep -qE '^(200|401)$'",
-        ]
+      test: "CMD-SHELL curl -s -o /dev/null -w '$$http_code' http://user-service:8080/api/userHealth | grep -qE '^(200|401)$'"
       interval: 30s
       timeout: 10s
       retries: 3
@@ -51,11 +47,7 @@ services:
       - zookeeper
       - kafka
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s -o /dev/null -w '$$http_code' http://product-service:8080/api/productHealth | grep -qE '^(200|401)$'",
-        ]
+      test: "CMD-SHELL curl -s -o /dev/null -w '$$http_code' http://product-service:8080/api/productHealth | grep -qE '^(200|401)$'"
       interval: 30s
       timeout: 10s
       retries: 3
@@ -74,11 +66,7 @@ services:
       - zookeeper
       - kafka
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -s -o /dev/null -w '$$http_code' http://media-service:8080/api/mediaHealth | grep -qE '^(200|401)$'",
-        ]
+      test: "CMD-SHELL curl -s -o /dev/null -w '$$http_code' http://media-service:8080/api/mediaHealth | grep -qE '^(200|401)$'"
       interval: 30s
       timeout: 10s
       retries: 3
