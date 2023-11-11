@@ -103,24 +103,15 @@ pipeline {
             def dir = "${env.HOME}/production/buy-01"
 
               if (fileExists(dir)) {
-                sh 'cd ${dir}'
-                  sh 'docker-compose --env-file .env.prod down --remove-orphans --volumes'
+                sh "cd ${dir} && docker-compose --env-file .env.prod down --remove-orphans --volumes"
                   sleep time: 5, unit: 'SECONDS'
-                  sh 'cd ..'
-                  sh 'cd ..'
-                  sh 'rm -rf ~/production/buy-01'
+                  sh "rm -rf ~/production/buy-01"
               }
-            // sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"
-            //   sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"
-            //   sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"
-            //   sh "docker pull ${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"
 
             sh "git clone git@github.com:petervekony/buy-01.git ~/production/buy-01"
-              sh "cd ~/production/buy-01 && git pull origin main"
+              sh "cd ~/production/buy-01 && git pull origin main && docker-compose --env-file .env.prod up -d"
 
-              sh "docker-compose --env-file .env.prod up -d"
-
-              def services = ['user-service', 'product-service', 'media-service']
+              def services = ['buy-01_user-service', 'buy-01_product-service', 'buy-01_media-service']
               def maxWaitTime = 300 // maximum wait time in seconds
 
               // check the health status of each service
