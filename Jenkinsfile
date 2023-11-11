@@ -104,8 +104,8 @@ pipeline {
 
               if (fileExists(dir)) {
                 sh 'cd ${dir}'
-                  sh 'docker kill $(docker ps -q)'
                   sh 'docker-compose --env-file .env.prod down --remove-orphans --volumes'
+                  sh 'docker kill $(docker ps -q)'
                   sleep time: 5, unit: 'SECONDS'
                   sh 'cd ..'
                   sh 'cd ..'
@@ -120,6 +120,36 @@ pipeline {
               sh "cd ~/production/buy-01 && git pull origin main"
 
               sh "docker-compose --env-file .env.prod up -d"
+
+              def services = ['user-service', 'product-service', 'media-service']
+              def maxWaitTime = 300 // maximum wait time in seconds
+
+              // check the health status of each service
+              boolean allHealthy = false
+              int elapsedTime = 0
+              int checkInterval = 10 // seconds
+
+              while(!allHealthy && elapsedTime < maxWaitTime) {
+                allHealthy = true
+
+                  for (service in services) {
+                    def healthStatus = sh(script: "docker inspect --format='{{.State.Health.Status}}' ${service}", returnStdout: true).trim()
+
+                      if (healthStatus != 'healthy') {
+                        allHealthy = false
+                          break
+                      }
+                  }
+
+                if (!allHealthy) {
+                  sleep(checkInterval)
+                    elapsedTime += checkInterval
+                }
+              }
+
+            if (!allHealthy) {
+              error("One or more services did not spin up within the expected time.")
+            }
           }
         }
       }
