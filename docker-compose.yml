@@ -28,7 +28,7 @@ services:
       - zookeeper
       - kafka
     healthcheck:
-      test: curl -sf -o /dev/null https://thewarehouse.rocks/api/userHealth || [ $$? -eq 22 ]
+      test: curl --fail "https://thewarehouse.rocks/api/userHealth" || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
@@ -47,7 +47,7 @@ services:
       - zookeeper
       - kafka
     healthcheck:
-      test: curl -sf -o /dev/null https://thewarehouse.rocks/api/productHealth || [ $$? -eq 22 ]
+      test: curl --fail "https://thewarehouse.rocks/api/productHealth" || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
@@ -66,7 +66,7 @@ services:
       - zookeeper
       - kafka
     healthcheck:
-      test: curl -sf -o /dev/null https://thewarehouse.rocks/api/mediaHealth || [ $$? -eq 22 ]
+      test: curl --fail "https://thewarehouse.rocks/api/mediaHealth" || exit 1
       interval: 30s
       timeout: 10s
       retries: 3
