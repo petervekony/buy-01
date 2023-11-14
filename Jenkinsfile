@@ -103,14 +103,14 @@ pipeline {
             def dir = "${env.HOME}/production/buy-01"
               def gitRepo = "git@github.com:petervekony/buy-01.git"
               def rollbackVersionFile = "${env.HOME}/production/rollback_version.txt"
-
-              // Check if rollback version file exists and read it
+              // check if rollback version file exists and read it
               def lastSuccessfulCommit = ''
               if (fileExists(rollbackVersionFile)) {
                 lastSuccessfulCommit = readFile(rollbackVersionFile).trim()
               }
 
             try {
+              // normal deployment process
               if (fileExists(dir)) {
                 sh "cd ${dir} && docker-compose --env-file .env.prod down --remove-orphans --volumes"
                   sleep time: 5, unit: 'SECONDS'
@@ -121,17 +121,15 @@ pipeline {
               sh "git clone ${gitRepo} ~/production/buy-01"
                 sh "cd ~/production/buy-01 && git pull origin main && docker-compose --env-file .env.prod build --no-cache && docker-compose --env-file .env.prod up -d"
 
+                // health check
                 def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1']
                 def maxWaitTime = 300 // maximum wait time in seconds
-
-                // check the health status of each service
                 boolean allHealthy = false
                 int elapsedTime = 0
                 int checkInterval = 10 // seconds
 
                 while(!allHealthy && elapsedTime < maxWaitTime) {
                   allHealthy = true
-
                     for (service in services) {
                       def healthStatus = ''
                         try {
@@ -141,13 +139,11 @@ pipeline {
                             allHealthy = false
                             break
                         }
-
                       if (healthStatus != 'healthy') {
                         allHealthy = false
                           break
                       }
                     }
-
                   if (!allHealthy) {
                     sleep(checkInterval)
                       elapsedTime += checkInterval
@@ -155,14 +151,14 @@ pipeline {
                 }
 
               if (allHealthy) {
-                // Update the rollback version file with the current commit hash
+                // update the rollback version file with the current commit hash
                 def currentCommit = sh(script: "cd ~/production/buy-01 && git rev-parse HEAD", returnStdout: true).trim()
                   writeFile file: rollbackVersionFile, text: currentCommit
               } else {
                 error("Deployment failed. Rolling back to last successful version.")
               }
             } catch (Exception e) {
-              // Rollback process
+              // rollback
               if (lastSuccessfulCommit) {
                 echo "Rolling back to commit: ${lastSuccessfulCommit}"
                   sh "cd ${dir} && git checkout ${lastSuccessfulCommit}"
@@ -174,7 +170,7 @@ pipeline {
           }
         }
       }
-    } 
+    }
   post {
     always{
       sh 'docker logout'
