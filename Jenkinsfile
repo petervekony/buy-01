@@ -163,7 +163,12 @@ pipeline {
                 echo "Rolling back to commit: ${lastSuccessfulCommit}"
                   sh "cd ${dir} && git checkout ${lastSuccessfulCommit}"
                   sh "cd ${dir} && docker-compose --env-file .env.prod build --no-cache && docker-compose --env-file .env.prod up -d"
+
+                  // mark the build as a failure on rollback
+                  currentBuild.result = 'FAILURE'
+                  error("Rollback to commit ${lastSuccessfulCommit} was successful. Marking build as failure.")
               } else {
+                currentBuild.result = 'FAILURE'
                 error("Rollback failed. No previous successful commit available.")
               }
             }
