@@ -6,48 +6,48 @@ pipeline {
           PROJECT_NAME = "buy01"
     }
   stages {
-    // stage('Media Service') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('media-service') {
-    //       sh 'mvn test'
-    //     }
-    //   }
-    // }
-    // stage('User Service') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('user-service') {
-    //       sh 'mvn test'
-    //     }
-    //   }
-    // }
-    // stage('Product Service') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('product-service') {
-    //       sh 'mvn test'
-    //     }
-    //   }
-    // }
-    // stage('Angular') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('angular') {
-    //       sh 'export CHROME_BIN=/usr/bin/google-chrome'
-    //         sh 'npm install'
-    //         sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
-    //     }
-    //   }
-    // }
+    stage('Media Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('media-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('User Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('user-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Product Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('product-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Angular') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          sh 'export CHROME_BIN=/usr/bin/google-chrome'
+            sh 'npm install'
+            sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
+        }
+      }
+    }
     // stage('Build Docker Images') {
     //   agent {
     //     label 'master'
@@ -112,7 +112,7 @@ pipeline {
             sh "git clone git@github.com:petervekony/buy-01.git ~/production/buy-01"
               sh "cd ~/production/buy-01 && git pull origin main && docker-compose --env-file .env.prod build --no-cache && docker-compose --env-file .env.prod up -d"
 
-              def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1']
+              def services = ['buy-01_user-service', 'buy-01_product-service', 'buy-01_media-service']
               def maxWaitTime = 300 // maximum wait time in seconds
 
               // check the health status of each service
