@@ -124,12 +124,19 @@ pipeline {
                 allHealthy = true
 
                   for (service in services) {
-                    def healthStatus = sh(script: "docker inspect --format='{{.State.Health.Status}}' ${service}", returnStdout: true).trim()
-
-                      if (healthStatus != 'healthy') {
-                        allHealthy = false
+                    def healthStatus = ''
+                      try {
+                        healthStatus = sh(script: "docker inspect --format='{{.State.Health.Status}}' ${service}", returnStdout: true).trim()
+                      } catch (Exception e) {
+                        echo "Error inspecting ${service}: ${e.message}"
+                          allHealthy = false
                           break
                       }
+
+                    if (healthStatus != 'healthy') {
+                      allHealthy = false
+                        break
+                    }
                   }
 
                 if (!allHealthy) {
