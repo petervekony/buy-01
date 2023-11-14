@@ -112,7 +112,7 @@ pipeline {
             sh "git clone git@github.com:petervekony/buy-01.git ~/production/buy-01"
               sh "cd ~/production/buy-01 && git pull origin main && docker-compose --env-file .env.prod build --no-cache && docker-compose --env-file .env.prod up -d"
 
-              def services = ['buy-01_user-service', 'buy-01_product-service', 'buy-01_media-service']
+              def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1']
               def maxWaitTime = 300 // maximum wait time in seconds
 
               // check the health status of each service
