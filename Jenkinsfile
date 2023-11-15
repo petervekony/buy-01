@@ -48,6 +48,12 @@ pipeline {
         }
       }
     }
+    stage('SonarQube Analysis') {
+      def mvn = tool 'maven';
+      withSonarQubeEnv() {
+        sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=buy-01 -Dsonar.projectName='buy-01'"
+      }
+    }
     // stage('Build Docker Images') {
     //   agent {
     //     label 'master'
