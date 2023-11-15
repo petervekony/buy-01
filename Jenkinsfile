@@ -54,8 +54,8 @@ pipeline {
         script {
           sh """
             mvn sonar:sonar \
-            -Dsonar.projectKey=your_project_key \
-            -Dsonar.host.url=http://your.sonarqube.server:9000 \
+            -Dsonar.projectKey=buy-01 \
+            -Dsonar.host.url=http://64.226.78.45:9000 \
             -Dsonar.login=${SONAR_AUTH_TOKEN}
           """
         }
