@@ -4,6 +4,7 @@ pipeline {
       DOCKER_REPO = 'tvntvn'
         DOCKER_PROJECT = 'buy01'
           PROJECT_NAME = "buy01"
+      SONAR_AUTH_TOKEN = credentials('sonarqube_token')
     }
   stages {
     stage('Media Service') {
@@ -49,9 +50,15 @@ pipeline {
       }
     }
     stage('SonarQube Analysis') {
-      def mvn = tool 'maven';
-      withSonarQubeEnv() {
-        sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=buy-01 -Dsonar.projectName='buy-01'"
+      steps {
+        script {
+          sh """
+            mvn sonar:sonar \
+            -Dsonar.projectKey=your_project_key \
+            -Dsonar.host.url=http://your.sonarqube.server:9000 \
+            -Dsonar.login=${SONAR_AUTH_TOKEN}
+          """
+        }
       }
     }
     // stage('Build Docker Images') {
