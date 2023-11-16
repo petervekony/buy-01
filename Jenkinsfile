@@ -52,12 +52,14 @@ pipeline {
     stage('SonarQube Analysis') {
       steps {
         script {
+        withSonarQubeEnv('peter droplet') {
           sh """
             mvn sonar:sonar \
             -Dsonar.projectKey=buy-01 \
             -Dsonar.host.url=http://64.226.78.45:9000 \
             -Dsonar.login=${SONAR_AUTH_TOKEN}
           """
+          }
         }
       }
     }
