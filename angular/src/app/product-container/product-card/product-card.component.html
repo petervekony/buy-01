@@ -1,6 +1,6 @@
 <div class="card-container" (click)="showModal()" #container>
   <div class="picture-container">
-    <img [src]="imageSrc ? imageSrc : placeholder" alt="" class="product-image" />
+    <img [src]="imageSrc$ | async" alt="" class="product-image" />
   </div>
   <div class="body-container">
     <h3 class="product-title">{{ product.name }}</h3>

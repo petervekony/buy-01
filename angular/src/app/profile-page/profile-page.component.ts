@@ -61,19 +61,6 @@ export class ProfilePageComponent implements OnInit {
   private authService = inject(AuthService);
 
   avatar$ = this.mediaService.avatar$;
-  //TODO: fix if clicked outside form, close form!
-  // this.renderer.listen('window', 'click', (e: Event) => {
-  //   if (
-  //     this.buttonClicked &&
-  //     this.profileForm?.nativeElement &&
-  //     this.formOpen
-  //   ) {
-  //     if (this.profileForm?.nativeElement !== e.target) {
-  //       this.formStateService.setFormOpen(false);
-  //       this.buttonClicked = false;
-  //     }
-  //   }
-  // });
 
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
@@ -82,7 +69,10 @@ export class ProfilePageComponent implements OnInit {
     this.avatar$ = this.mediaService.avatar$;
 
     this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((user) => this.user$.next(user));
+      .subscribe((user) => {
+        this.user$.next(user);
+        this.currentUser = user;
+      });
 
     this.userService.usernameAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(

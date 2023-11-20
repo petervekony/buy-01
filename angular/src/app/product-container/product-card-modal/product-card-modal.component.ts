@@ -92,21 +92,15 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.initFormValues();
 
-    // this.mediaService.getProductThumbnail(
-    //   this.product.id!,
-    // ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((media) => {
-    //   if (media) {
-    //     this.picture = this.mediaService.formatMedia(media);
-    //   }
-    // });
-
     this.dataService.deleteImage$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((index) => {
+        console.log('dataService.deleteImage$ on modal, index:', index);
         this.currentDeleteIndex = index;
       });
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        console.log('mediaService.imageAdded$ on modal');
         this.getProductImages();
         this.getProductOwnerInfo();
         this.changeDetector.detectChanges();
@@ -114,6 +108,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
 
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (id) => {
+        console.log('dataService.id$ on modal, id:', id);
         if (id !== this.product.id) return;
         this.getProductImages();
         this.getProductOwnerInfo();
@@ -123,6 +118,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    console.log('modal AfterViewInit');
     this.getProductImages();
     this.getProductOwnerInfo();
   }
@@ -153,6 +149,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
             this.imageIds = [];
             this.images = [this.placeholder];
           }
+          this.changeDetector.detectChanges();
         },
       });
   }
@@ -193,6 +190,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.imageIds.splice(index, 1);
     this.productService.updateProductAdded(this.product);
     this.closeConfirm('image');
+    this.getProductImages();
     this.changeDetector.detectChanges();
   }
 
@@ -278,6 +276,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
           this.success = data !== null;
           this.requestSent = true;
           this.productResult = 'Product added successfully';
+          console.log('submitProduct in modal, product: ', data);
           this.productService.updateProductAdded(data!);
         },
         error: () => {
@@ -324,12 +323,12 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       // this.hideModal();
       // this.dialog?.close();
     } else {
+      console.log('modal deleteProduct');
       this.deletingProduct = true;
       this.productService.deleteProduct(productId);
       this.dialog?.close();
       this.formStateService.setFormOpen(false);
-      //INFO: this might cause issues, try to update the products, to remove the deleted one from the list
-      this.productService.updateProductAdded({} as Product);
+      // this.productService.updateProductAdded({} as Product);
     }
   }
 

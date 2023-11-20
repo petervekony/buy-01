@@ -2,15 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
-import {
-  BehaviorSubject,
-  catchError,
-  map,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-} from 'rxjs';
+import { catchError, map, Observable, of, Subject, switchMap } from 'rxjs';
 import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 import { ProductCreationResponse } from '../interfaces/product-creation-response';
@@ -25,7 +17,7 @@ export class ProductService {
   private productAddedSource = new Subject<Product>();
   productAdded$ = this.productAddedSource.asObservable();
 
-  private userProductsSource = new BehaviorSubject<Product[]>([]);
+  private userProductsSource = new Subject<Product[]>();
   userProducts$ = this.userProductsSource.asObservable();
 
   private http = inject(HttpClient);
@@ -34,6 +26,7 @@ export class ProductService {
   private destroyRef = inject(DestroyRef);
 
   updateProductAdded(product: Product): void {
+    console.log('productService updateProductAdded, product: ', product);
     this.productAddedSource.next(product);
   }
 
@@ -42,11 +35,13 @@ export class ProductService {
   }
 
   getProducts(): Observable<Product[]> {
+    console.log('productService getProducts()');
     const address = environment.productsURL;
     return this.http.get<Product[]>(address, { withCredentials: true });
   }
 
   getProductsById(userId: string): Observable<Product[]> {
+    console.log('product-service, getProductsById');
     const address = environment.userProductsURL + userId;
     return this.http.get<Product[]>(address, { withCredentials: true });
   }
@@ -60,6 +55,7 @@ export class ProductService {
   }
 
   getOwnerProducts() {
+    console.log('product-service getownerProducts()');
     this.userProducts$ = this.authService
       .getAuth()
       .pipe(switchMap((user) => this.getProductsById(user.id)));
@@ -104,6 +100,7 @@ export class ProductService {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: (data) => {
+        this.updateProductAdded({} as Product);
         console.log(data);
       },
       error: (err) => {

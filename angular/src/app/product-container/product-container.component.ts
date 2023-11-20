@@ -1,10 +1,10 @@
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
   inject,
+  OnChanges,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -19,14 +19,12 @@ import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
 import { MediaService } from '../service/media.service';
 
-// import { Router } from '@angular/router';
-
 @Component({
   selector: 'app-product-container',
   templateUrl: './product-container.component.html',
   styleUrls: ['./product-container.component.css'],
 })
-export class ProductContainerComponent implements OnInit, AfterViewInit {
+export class ProductContainerComponent implements OnInit, OnChanges {
   @ViewChild('container')
     container: ElementRef | undefined;
   @ViewChild('productDialog')
@@ -50,14 +48,16 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   private dataService = inject(DataService);
   private stateService = inject(StateService);
   private mediaService = inject(MediaService);
-  // private router = inject(Router);
 
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
 
-    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef))
+    this.stateService.getStateAsObservable().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    )
       .subscribe((user) => {
+        this.user$.next(user);
         this.currentUser = user;
       });
 
@@ -65,17 +65,25 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        console.log('product-container onInit, mediaService.imageAdded$');
         this.changeDetectorRef.detectChanges();
       });
 
     this.dataService.dashboard$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((data) => {
+        console.log('container OnInit, dashboard$, data: ', data);
         this.toggleDashboard(data);
         this.changeDetectorRef.detectChanges();
       });
 
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
+      .subscribe((product) => {
+        console.log(
+          'container OnInit, productAdded$ this.dashboard = ',
+          this.dashboard + 'product: ',
+          product,
+        );
+        // if (!product.id) this.ngOnInit();
         if (!this.dashboard) {
           this.showProducts();
         } else {
@@ -87,6 +95,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(
         (isOpen) => {
+          console.log('container OnInit, formOpen$ isOpen = ', isOpen);
           if (!isOpen && this.dashboard) {
             this.showProductForm = false;
             this.showAddButton = true;
@@ -98,14 +107,24 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
     this.formStateService.setFormOpen(false);
   }
 
-  ngAfterViewInit(): void {
+  ngOnChanges(): void {
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        console.log(
+          'container onChanges, productAdded$ dashboard = ',
+          this.dashboard,
+        );
         if (!this.dashboard) {
           this.showProducts();
         } else {
           this.getOwnerProducts();
         }
+        this.changeDetectorRef.detectChanges();
+      });
+
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        console.log('container onChanges, imageAdded$');
         this.changeDetectorRef.detectChanges();
       });
   }
@@ -122,6 +141,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   }
 
   showProducts() {
+    console.log('container showProducts()');
     this.productService.getProducts().pipe(
       takeUntilDestroyed(this.destroyRef),
     )
@@ -129,6 +149,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
         next: (products) => {
           if (products) {
             this.products$ = of(products?.reverse());
+            console.log('container, showProwducts, products = ', products);
           }
         },
         error: (error) => {
@@ -138,12 +159,17 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   }
 
   getOwnerProducts() {
+    console.log(
+      'container getUserProducts(), currentUser.id = ',
+      this.currentUser.id,
+    );
     this.productService.getProductsById(this.currentUser.id).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: (products) => {
         this.products$ = of(products?.reverse());
-        // this.changeDetector.detectChanges();
+        console.log('getownerProducts, container', products);
+        this.changeDetector.detectChanges();
       },
     });
   }

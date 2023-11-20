@@ -1,13 +1,15 @@
 import {
+  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
   inject,
   Input,
+  OnChanges,
   ViewChild,
 } from '@angular/core';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { Product } from 'src/app/interfaces/product';
 import { MediaService } from 'src/app/service/media.service';
 import { User } from 'src/app/interfaces/user';
@@ -16,14 +18,14 @@ import { environment } from 'src/environments/environment';
 import { DataService } from 'src/app/service/data.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ProductService } from 'src/app/service/product.service';
+// import { ProductService } from 'src/app/service/product.service';
 
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css'],
 })
-export class ProductCardComponent {
+export class ProductCardComponent implements AfterViewInit, OnChanges {
   @ViewChild('container')
     container: ElementRef | undefined;
   @ViewChild('productModal')
@@ -34,7 +36,9 @@ export class ProductCardComponent {
     currentUser: User = {} as User;
 
   placeholder: string = environment.placeholder;
-  imageSrc: string = this.placeholder;
+  imageSrc$: BehaviorSubject<string> = new BehaviorSubject<string>(
+    this.placeholder,
+  );
   modalVisible = false;
 
   private mediaService = inject(MediaService);
@@ -42,9 +46,9 @@ export class ProductCardComponent {
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
   private changeDetectorRef = inject(ChangeDetectorRef);
-  private productService = inject(ProductService);
+  // private productService = inject(ProductService);
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isOpen) => {
         if (isOpen) {
@@ -54,49 +58,58 @@ export class ProductCardComponent {
         }
       });
 
-    this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        // this.getProductThumbnail();
-        this.changeDetectorRef.detectChanges();
-      });
-
-    this.getProductThumbnail();
+    // this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+    //   .subscribe((data) => {
+    //     console.log('card-component productAdded$ data: ', data);
+    //     if (data) {
+    //       this.getProductThumbnail();
+    //       this.changeDetectorRef.detectChanges();
+    //     }
+    //   });
 
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (id) => {
+        console.log('card-component dataservice.id$ id: ', id);
         this.updateThumbnailIfEmpty(id);
       },
     );
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        console.log('card-component mediaService.imageAdded$');
+        this.getProductThumbnail();
         this.changeDetectorRef.detectChanges();
-        this.mediaService.getProductThumbnail(this.product.id!).pipe(
-          takeUntilDestroyed(this.destroyRef),
-        ).subscribe((data) => {
-          if (data) this.imageSrc = this.mediaService.formatMedia(data);
-        });
       });
+  }
+  ngOnChanges(): void {
+    console.log('card-component, ngOnChanges()');
+    this.getProductThumbnail();
   }
 
   private updateThumbnailIfEmpty(id: string) {
+    console.log(
+      'card-component updateThumbIfEmpty id === this.productId: ',
+      id === this.product.id,
+    );
     if (id === this.product.id) {
       this.getProductThumbnail();
     }
   }
 
   private getProductThumbnail() {
+    console.log('card getProductThumbnail, prodId = ', this.product.id);
     this.mediaService
       .getProductThumbnail(this.product.id!).pipe(
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (media) => {
+          console.log('card, getProductthumbnail, media = ', media);
           if (media && media?.image) {
-            this.imageSrc = this.mediaService.formatMedia(media);
-            // this.changeDetectorRef.detectChanges();
+            this.imageSrc$.next(this.mediaService.formatMedia(media));
+            this.changeDetectorRef.detectChanges();
           } else {
-            this.imageSrc = environment.placeholder;
+            this.imageSrc$.next(this.placeholder);
             this.changeDetectorRef.detectChanges();
           }
         },
