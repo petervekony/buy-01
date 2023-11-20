@@ -80,7 +80,7 @@ describe('ProfilePageComponent', () => {
     expect(component.formOpen).toBeFalsy();
   });
 
-  xit('should get user authentication and avatar', () => {
+  it('should get user authentication and avatar', () => {
     const mockUser: User = {
       id: '123',
       name: 'tester',
@@ -102,11 +102,11 @@ describe('ProfilePageComponent', () => {
     );
 
     //eslint-disable-next-line
-    // (component as any).getAuthAndAvatar();
+    (component as any).getAuthAndAvatar();
     // component.avatar$.next(mediaService.formatMedia(mockMedia));
 
     expect(component.currentUser).toEqual(mockUser);
-    // expect(component.avatar$.value).toBe(mediaService.formatMedia(mockMedia));
+    // expect(component.avatar$).toBe(of(mediaService.formatMedia(mockMedia)));
   });
 
   it('should get user authentication and placeholder avatar if user has no avatar', () => {

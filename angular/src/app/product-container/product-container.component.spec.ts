@@ -40,6 +40,15 @@ describe('ProductContainerComponent', () => {
       },
     ])),
     productAdded$: of({} as Product),
+    getProductsById: jasmine.createSpy('getProductById').and.returnValue(of([
+      {
+        id: '2',
+        name: 'Product 2',
+        price: 20.0,
+        quantity: 3,
+        description: 'This is product 2',
+      },
+    ])),
   };
 
   beforeEach(() => {
@@ -70,9 +79,10 @@ describe('ProductContainerComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  xit(
+  it(
     'should display products when there are products',
     () => {
+      component.dashboard = false;
       productServiceMock.getProducts.and.returnValue(of([
         {
           id: '1',
@@ -102,16 +112,26 @@ describe('ProductContainerComponent', () => {
     },
   );
 
-  xit('should call showProducts when productAdded$ emits', () => {
+  it('should call showProducts when productAdded$ emits and dashboard is false', () => {
+    component.dashboard = false;
     const showProductsSpy = spyOn(component, 'showProducts');
     productServiceMock.productAdded$ = of({} as Product);
     component.ngAfterViewInit();
     expect(showProductsSpy).toHaveBeenCalled();
   });
 
-  xit(
-    'should handle the case when there are no products',
+  it('should call getOwnerProduct when productAdded$ emits and dashboard is true', () => {
+    component.dashboard = true;
+    const showProductsSpy = spyOn(component, 'getOwnerProducts');
+    productServiceMock.productAdded$ = of({} as Product);
+    component.ngAfterViewInit();
+    expect(showProductsSpy).toHaveBeenCalled();
+  });
+
+  it(
+    'should handle the case when there are no products and user is at home',
     fakeAsync(() => {
+      component.dashboard = false;
       productServiceMock.getProducts.and.returnValue(of([]));
       productServiceMock.productAdded$ = of({} as Product);
       component.ngAfterViewInit();
@@ -121,6 +141,22 @@ describe('ProductContainerComponent', () => {
         'app-product-card',
       );
       expect(productElements.length).toBe(0);
+    }),
+  );
+
+  it(
+    'should handle the case when there are no products and user is at dashboard',
+    fakeAsync(() => {
+      component.dashboard = true;
+      productServiceMock.getProducts.and.returnValue(of([]));
+      productServiceMock.productAdded$ = of({} as Product);
+      component.ngAfterViewInit();
+      tick();
+      fixture.detectChanges();
+      const productElements = fixture.nativeElement.querySelectorAll(
+        'app-product-card',
+      );
+      expect(productElements.length).toBe(1);
     }),
   );
 });

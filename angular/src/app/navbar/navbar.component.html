@@ -9,7 +9,6 @@
   </div>
   <div id="title" (click)="move('home')">THE PRODUCT WAREHOUSE</div>
   <div class="buttons">
-    <!-- fix the location and buttons to be conditional  -->
     <button class="dashboard" *ngIf="!home || profile || dash" (click)="showDashboard(false)">
       <mat-icon aria-hidden="false" aria-label="home icon" fontIcon="home" matTooltip="Go to home"></mat-icon>
     </button>

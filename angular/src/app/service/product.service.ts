@@ -2,14 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Product } from '../interfaces/product';
-import {
-  BehaviorSubject,
-  catchError,
-  map,
-  Observable,
-  of,
-  switchMap,
-} from 'rxjs';
+import { catchError, map, Observable, of, Subject, switchMap } from 'rxjs';
 import { User } from '../interfaces/user';
 import { ProductRequest } from '../interfaces/product-request';
 import { ProductCreationResponse } from '../interfaces/product-creation-response';
@@ -21,12 +14,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   providedIn: 'root',
 })
 export class ProductService {
-  private productAddedSource = new BehaviorSubject<Product | null>(
-    {} as Product,
-  );
+  private productAddedSource = new Subject<Product>();
   productAdded$ = this.productAddedSource.asObservable();
 
-  private userProductsSource = new BehaviorSubject<Product[]>([]);
+  private userProductsSource = new Subject<Product[]>();
   userProducts$ = this.userProductsSource.asObservable();
 
   private http = inject(HttpClient);
@@ -104,8 +95,8 @@ export class ProductService {
     this.http.delete(address, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
-      next: (data) => {
-        console.log(data);
+      next: () => {
+        this.updateProductAdded({} as Product);
       },
       error: (err) => {
         console.log(err);

@@ -19,8 +19,6 @@ import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DataService } from '../service/data.service';
 
-// import { Media } from '../interfaces/media';
-
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
@@ -49,6 +47,7 @@ export class NavbarComponent implements OnInit {
   private dataService = inject(DataService);
 
   avatar$ = this.mediaService.avatar$;
+  dashboard$ = this.dataService.dashboard$;
 
   ngOnInit(): void {
     if (this.router.url === '/profile') {
@@ -105,7 +104,7 @@ export class NavbarComponent implements OnInit {
         next: (user) => {
           this.user$.next(user);
           this.currentUser = user;
-          this.seller = user.role === 'SELLER';
+          this.seller = this.currentUser.role === 'SELLER';
           if (user.avatar) {
             this.getAvatar();
           } else {
@@ -142,7 +141,6 @@ export class NavbarComponent implements OnInit {
       .subscribe((event: NavigationEnd) => {
         if (event && event.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
-          this.dash = this.route === '/dashboard';
           this.home = this.route === '/home';
           this.profile = this.route === '/profile';
         }
@@ -162,7 +160,7 @@ export class NavbarComponent implements OnInit {
   }
 
   goToProfile() {
-    this.showDashboard(false);
+    // this.showDashboard(false);
     this.formStateService.setFormOpen(false);
     this.move('profile');
   }

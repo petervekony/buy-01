@@ -1,10 +1,10 @@
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
   inject,
+  OnChanges,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -24,7 +24,7 @@ import { MediaService } from '../service/media.service';
   templateUrl: './product-container.component.html',
   styleUrls: ['./product-container.component.css'],
 })
-export class ProductContainerComponent implements OnInit, AfterViewInit {
+export class ProductContainerComponent implements OnInit, OnChanges {
   @ViewChild('container')
     container: ElementRef | undefined;
   @ViewChild('productDialog')
@@ -37,6 +37,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   userProducts$: Observable<Product[]> | null = null;
   user$ = new Subject<User>();
   currentUser: User = {} as User;
+  profile: boolean = false;
 
   private changeDetector = inject(ChangeDetectorRef);
   private productService = inject(ProductService);
@@ -51,6 +52,14 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     const cookie = this.cookieService.get('buy-01');
     if (!cookie) return;
+
+    this.stateService.getStateAsObservable().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    )
+      .subscribe((user) => {
+        this.user$.next(user);
+        this.currentUser = user;
+      });
 
     this.showProducts();
 
@@ -67,6 +76,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
 
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        // if (!product.id) this.ngOnInit();
         if (!this.dashboard) {
           this.showProducts();
         } else {
@@ -89,7 +99,7 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
     this.formStateService.setFormOpen(false);
   }
 
-  ngAfterViewInit(): void {
+  ngOnChanges(): void {
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (!this.dashboard) {
@@ -97,6 +107,11 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
         } else {
           this.getOwnerProducts();
         }
+        this.changeDetectorRef.detectChanges();
+      });
+
+    this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.changeDetectorRef.detectChanges();
       });
   }
@@ -113,24 +128,18 @@ export class ProductContainerComponent implements OnInit, AfterViewInit {
   }
 
   showProducts() {
-    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((user) => {
-        // this.user$.next(user);
-        this.currentUser = user;
-        this.productService.getProducts().pipe(
-          takeUntilDestroyed(this.destroyRef),
-        )
-          .subscribe({
-            next: (products) => {
-              if (products) {
-                this.products$ = of(products?.reverse());
-                this.changeDetector.detectChanges();
-              }
-            },
-            error: (error) => {
-              console.log(error);
-            },
-          });
+    this.productService.getProducts().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    )
+      .subscribe({
+        next: (products) => {
+          if (products) {
+            this.products$ = of(products?.reverse());
+          }
+        },
+        error: (error) => {
+          console.log(error);
+        },
       });
   }
 

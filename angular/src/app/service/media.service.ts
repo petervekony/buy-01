@@ -66,9 +66,7 @@ export class MediaService {
 
   deleteProductImage(mediaId: string): void {
     const address = environment.mediaURL + '/' + mediaId;
-    this.http.delete(address, { withCredentials: true }).subscribe((item) =>
-      console.log(item)
-    );
+    this.http.delete(address, { withCredentials: true }).subscribe(() => 0);
   }
 
   uploadAvatar(userId: string, image: FormData): Observable<Media> {
