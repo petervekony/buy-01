@@ -146,7 +146,6 @@ export class ProfilePageComponent implements OnInit {
       next: (data) => {
         this.currentUser.avatar = data.id;
         this.stateService.setUserState(this.currentUser);
-        console.log(data);
         this.mediaService.updateAvatar(
           this.mediaService.formatMultipleMedia(data),
         );
@@ -249,9 +248,7 @@ export class ProfilePageComponent implements OnInit {
     this.mediaService.deleteAvatar(
       this.currentUser.id,
       //eslint-disable-next-line
-    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data: any) =>
-      console.log(data)
-    );
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => 0);
     this.mediaService.updateImageAdded({} as Media);
     this.mediaService.updateAvatar(this.placeholder);
     this.hideModal();

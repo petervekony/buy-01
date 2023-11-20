@@ -18,8 +18,6 @@ import { environment } from 'src/environments/environment';
 import { DataService } from 'src/app/service/data.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-// import { ProductService } from 'src/app/service/product.service';
-
 @Component({
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
@@ -46,7 +44,6 @@ export class ProductCardComponent implements AfterViewInit, OnChanges {
   private dataService = inject(DataService);
   private destroyRef = inject(DestroyRef);
   private changeDetectorRef = inject(ChangeDetectorRef);
-  // private productService = inject(ProductService);
 
   ngAfterViewInit(): void {
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
@@ -58,15 +55,6 @@ export class ProductCardComponent implements AfterViewInit, OnChanges {
         }
       });
 
-    // this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
-    //   .subscribe((data) => {
-    //     console.log('card-component productAdded$ data: ', data);
-    //     if (data) {
-    //       this.getProductThumbnail();
-    //       this.changeDetectorRef.detectChanges();
-    //     }
-    //   });
-
     this.dataService.ids$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (id) => {
         console.log('card-component dataservice.id$ id: ', id);
@@ -76,13 +64,12 @@ export class ProductCardComponent implements AfterViewInit, OnChanges {
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        console.log('card-component mediaService.imageAdded$');
         this.getProductThumbnail();
         this.changeDetectorRef.detectChanges();
       });
   }
+
   ngOnChanges(): void {
-    console.log('card-component, ngOnChanges()');
     this.getProductThumbnail();
   }
 
@@ -123,19 +110,14 @@ export class ProductCardComponent implements AfterViewInit, OnChanges {
   showModal() {
     this.modalVisible = true;
     setTimeout(() => this.productModal?.nativeElement.show(), 100);
-    // if (this.productModal) {
     this.dataService.sendProductId(this.product.id!);
     this.formStateService.setFormOpen(true);
-    // this.productModal.nativeElement.show();
     this.modalVisible = true;
-    // }
   }
 
   hideModal() {
-    // if (this.productModal) {
     this.formStateService.setFormOpen(false);
     this.productModal?.nativeElement.close();
     this.modalVisible = false;
-    // }
   }
 }

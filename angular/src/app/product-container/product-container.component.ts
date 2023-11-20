@@ -77,12 +77,7 @@ export class ProductContainerComponent implements OnInit, OnChanges {
       });
 
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((product) => {
-        console.log(
-          'container OnInit, productAdded$ this.dashboard = ',
-          this.dashboard + 'product: ',
-          product,
-        );
+      .subscribe(() => {
         // if (!product.id) this.ngOnInit();
         if (!this.dashboard) {
           this.showProducts();
@@ -124,7 +119,6 @@ export class ProductContainerComponent implements OnInit, OnChanges {
 
     this.mediaService.imageAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        console.log('container onChanges, imageAdded$');
         this.changeDetectorRef.detectChanges();
       });
   }
@@ -168,7 +162,6 @@ export class ProductContainerComponent implements OnInit, OnChanges {
     ).subscribe({
       next: (products) => {
         this.products$ = of(products?.reverse());
-        console.log('getownerProducts, container', products);
         this.changeDetector.detectChanges();
       },
     });

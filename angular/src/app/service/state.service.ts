@@ -78,7 +78,6 @@ export class StateService implements OnInit {
       true,
       'Lax',
     );
-    console.log('resetState, this shouldnt happen');
     this.initialize();
   }
 

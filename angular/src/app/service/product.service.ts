@@ -99,9 +99,8 @@ export class ProductService {
     this.http.delete(address, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
-      next: (data) => {
+      next: () => {
         this.updateProductAdded({} as Product);
-        console.log(data);
       },
       error: (err) => {
         console.log(err);

@@ -84,6 +84,7 @@ export class NavbarComponent implements OnInit {
       .subscribe((data) => {
         this.user$.next(data);
       });
+
     this.checkRoutes();
   }
 
@@ -94,7 +95,7 @@ export class NavbarComponent implements OnInit {
 
     this.dataService.updateDashboard(dash);
     this.dash = dash;
-    this.home = !dash;
+    // this.home = !dash;
   }
 
   private getAuthAndAvatar() {
