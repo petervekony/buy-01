@@ -98,7 +98,7 @@ export class NavbarComponent implements OnInit {
   }
 
   private getAuthAndAvatar() {
-    this.stateService.state.pipe(takeUntilDestroyed(this.destroyRef))
+    this.authService.getAuth().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (user) => {
           this.user$.next(user);

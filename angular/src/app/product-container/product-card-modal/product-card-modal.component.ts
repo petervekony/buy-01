@@ -92,14 +92,6 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.initFormValues();
 
-    // this.mediaService.getProductThumbnail(
-    //   this.product.id!,
-    // ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((media) => {
-    //   if (media) {
-    //     this.picture = this.mediaService.formatMedia(media);
-    //   }
-    // });
-
     this.dataService.deleteImage$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((index) => {
         this.currentDeleteIndex = index;
@@ -153,6 +145,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
             this.imageIds = [];
             this.images = [this.placeholder];
           }
+          this.changeDetector.detectChanges();
         },
       });
   }
@@ -193,6 +186,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.imageIds.splice(index, 1);
     this.productService.updateProductAdded(this.product);
     this.closeConfirm('image');
+    this.getProductImages();
     this.changeDetector.detectChanges();
   }
 
@@ -328,8 +322,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       this.productService.deleteProduct(productId);
       this.dialog?.close();
       this.formStateService.setFormOpen(false);
-      //INFO: this might cause issues, try to update the products, to remove the deleted one from the list
-      this.productService.updateProductAdded({} as Product);
+      // this.productService.updateProductAdded({} as Product);
     }
   }
 
