@@ -47,6 +47,10 @@ public class KafkaService {
   private ConcurrentMap<String, CachedTokenInfo> tokenCache = new ConcurrentHashMap<>();
   private static final long TOKEN_CACHE_DURATION = TimeUnit.MINUTES.toMillis(5);
 
+  public ConcurrentMap<String, CachedTokenInfo> getTokenCache() {
+    return tokenCache;
+  }
+
   // to track processed messages and ensure idempotency
   private Set<String> processedCorrelationIds = new HashSet<>();
 

@@ -27,6 +27,12 @@ services:
       # - mongodb
       - zookeeper
       - kafka
+    # healthcheck:
+    #   test: ./healthcheck.sh user
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
 
   product-service:
     build:
@@ -41,6 +47,12 @@ services:
       # - mongodb
       - zookeeper
       - kafka
+    # healthcheck:
+    #   test: ./healthcheck.sh product
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
 
   media-service:
     build:
@@ -55,6 +67,12 @@ services:
       # - mongodb
       - zookeeper
       - kafka
+    # healthcheck:
+    #   test: ./healthcheck.sh media
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
 
   frontend:
     build:
@@ -77,6 +95,7 @@ services:
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
+    restart: always
     ports:
       - "2181:2181"
     volumes:
@@ -88,6 +107,7 @@ services:
 
   kafka:
     image: wurstmeister/kafka:latest
+    restart: always
     ports:
       - "9092:9092"
     expose:
