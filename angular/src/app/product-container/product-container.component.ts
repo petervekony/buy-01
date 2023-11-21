@@ -76,7 +76,6 @@ export class ProductContainerComponent implements OnInit, OnChanges {
 
     this.productService.productAdded$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        // if (!product.id) this.ngOnInit();
         if (!this.dashboard) {
           this.showProducts();
         } else {

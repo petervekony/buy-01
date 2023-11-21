@@ -9,6 +9,7 @@ import { ProductCreationResponse } from '../interfaces/product-creation-response
 import { AuthService } from './auth.service';
 import { MediaService } from './media.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Media } from '../interfaces/media';
 
 @Injectable({
   providedIn: 'root',
@@ -78,12 +79,12 @@ export class ProductService {
             this.mediaService.addMedia(data.product.id!, mediaForm).pipe(
               takeUntilDestroyed(this.destroyRef),
             ).subscribe({
+              next: () => this.mediaService.updateImageAdded({} as Media),
               error: ((err) => console.log(err)),
             });
             mediaForm.append('name', '');
             return data.product;
           }
-          this.updateProductAdded(data.product);
           return data.product;
         }),
         catchError(() => of(null)),

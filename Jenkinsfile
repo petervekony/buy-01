@@ -7,7 +7,7 @@ pipeline {
       SONAR_AUTH_TOKEN = credentials('sonarqube_token')
     }
   stages {
-    stage('Media Service') {
+    stage('Run Tests: Media Service') {
       agent {
         label 'master'
       }
@@ -17,7 +17,7 @@ pipeline {
         }
       }
     }
-    stage('User Service') {
+    stage('Run Tests: User Service') {
       agent {
         label 'master'
       }
@@ -27,7 +27,7 @@ pipeline {
         }
       }
     }
-    stage('Product Service') {
+    stage('Run Tests: Product Service') {
       agent {
         label 'master'
       }
@@ -37,7 +37,7 @@ pipeline {
         }
       }
     }
-    stage('Angular') {
+    stage('Run Tests: Angular') {
       agent {
         label 'master'
       }
