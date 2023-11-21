@@ -44,6 +44,14 @@ Running them:
 docker-compose --env-file .env.dev up
 ```
 
+<a id="arm64note"></a>
+
+### Note about running the project on ARM64 architecture
+
+If you are running the project on an Apple Silicon (M1, M2, M3), because of the
+lack of the imageio-webp support, only jpeg file upload works. On any other
+architecture jpeg, png and webp files can be uploaded.
+
 ## Kafka
 
 Backend microservices communicate with each other via Apache Kafka to handle JWT
@@ -165,6 +173,8 @@ cached in the backend to save processing time.
 Gets the avatar of the user specified by the {userId}.
 
 #### POST: /api/media?userId={userId}&productId={productId}
+
+**[Apple Silicon: see the note](#arm64note)**
 
 Media can be created belonging to the user (avatar) or product. For product, 6
 images can be uploaded. Supported file types are jpeg, png and non-animated
