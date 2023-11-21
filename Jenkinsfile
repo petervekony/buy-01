@@ -199,10 +199,10 @@ pipeline {
     //   }
     // }
   }
-  post {
-    always{
-      sh 'docker logout'
-    }
+  // post {
+    // always{
+    //   sh 'docker logout'
+    // }
     // success {
     //   mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
     //        subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
@@ -213,5 +213,5 @@ pipeline {
     //        subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
     //        body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
     // }
-  }
+  // }
 }
