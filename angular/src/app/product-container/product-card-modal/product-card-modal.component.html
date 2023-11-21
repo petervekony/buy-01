@@ -103,8 +103,9 @@
                   <div class="upload-container">
                     <label for="image" class="block text-900 font-medium mb-2">Upload image</label>
 
-                    <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" name="image" accept="image/*"
-                      (onSelect)="onFileSelected($event)" class="w-full half"></p-fileUpload>
+                    <p-fileUpload mode="basic" #imageUpload chooseLabel="Choose" name="image"
+                      accept="image/jpeg, image/webp, image/png, image/jpg" (onSelect)="onFileSelected($event)"
+                      class="w-full half"></p-fileUpload>
                     <input type="file" #fileInput style="display:none" />
                   </div>
                 </div>

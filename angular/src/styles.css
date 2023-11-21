@@ -138,23 +138,3 @@ body {
 .register {
   min-height: 550px;
 }
-
-/* .third { */
-/*   height: 30vh; */
-/* } */
-
-/* .half { */
-/*   width: 50vw; */
-/* } */
-
-/* @media screen and (width <= 700px) { */
-/*   .half { */
-/*     width: 75vw; */
-/*   } */
-/* } */
-
-/* @media (width >= 600px) { */
-/* .modal-container { */
-/*     width: 30vw; */
-/*   } */
-/* } */

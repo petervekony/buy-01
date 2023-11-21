@@ -38,6 +38,7 @@ dialog {
   flex-wrap: column-wrap;
   justify-content: center;
   width: 100vw;
+  gap: 0.5rem;
 }
 
 @media screen and (width >= 700px){
@@ -69,17 +70,3 @@ dialog {
     top: 10;
   }
 }
-
-/* .footer button { */
-/*   justify-content: center; */
-/* } */
-
-/* .footer { */
-/*   position: absolute; */
-/*   bottom: 1rem; */
-/*   display: flex; */
-/*   flex-direction: row; */
-/*   gap: 1rem; */
-/*   width: 100vw; */
-/*   justify-content: center; */
-/* } */
