@@ -81,15 +81,15 @@ class ProductModelTest {
     assertFalse(violations.isEmpty());
     assertEquals(1, violations.size());
     assertEquals(
-        "Description has to be between 3 and 150 characters long",
+        "Description has to be between 3 and 300 characters long",
         violations.iterator().next().getMessage());
 
-    product.setDescription("T".repeat(151)); // more than 150 characters
+    product.setDescription("T".repeat(320)); // more than 300 characters
     violations = validator.validate(product);
     assertFalse(violations.isEmpty());
     assertEquals(1, violations.size());
     assertEquals(
-        "Description has to be between 3 and 150 characters long",
+        "Description has to be between 3 and 300 characters long",
         violations.iterator().next().getMessage());
   }
 
