@@ -1,11 +1,11 @@
 pipeline {
   agent any
-    // environment {
-    //   DOCKER_REPO = 'tvntvn'
-    //     DOCKER_PROJECT = 'buy01'
-    //       PROJECT_NAME = "buy01"
-    //   SONAR_AUTH_TOKEN = credentials('sonarqube_token')
-    // }
+    environment {
+      DOCKER_REPO = 'tvntvn'
+        DOCKER_PROJECT = 'buy01'
+          PROJECT_NAME = "buy01"
+      SONAR_AUTH_TOKEN = credentials('sonarqube')
+    }
   stages {
     stage('Run Tests: Media Service') {
       agent {
@@ -49,27 +49,46 @@ pipeline {
         }
       }
     }
-    // stage('SonarQube Analysis') {
-    //   steps {
-    //     script {
-    //     withSonarQubeEnv('peter droplet') {
-    //       sh """
-    //         mvn sonar:sonar \
-    //         -Dsonar.projectKey=buy-01 \
-    //         -Dsonar.host.url=http://64.226.78.45:9000 \
-    //         -Dsonar.login=${SONAR_AUTH_TOKEN}
-    //       """
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Quality Gate') {
-    //   steps {
-    //     timeout(time: 1, unit: 'HOURS') {
-    //       waitForQualityGate abortPipeline: true
-    //     }
-    //   }
-    // }   
+    stage('SonarQube Analysis') {
+      steps {
+        script {
+        withSonarQubeEnv('peter droplet') {
+          sh """
+            mvn sonar:sonar \
+            -Dsonar.projectKey=buy-01 \
+            -Dsonar.host.url=http://64.226.78.45:9000 \
+            -Dsonar.login=${SONAR_AUTH_TOKEN}
+          """
+          }
+        }
+      }
+    }
+    stage('Angular Analysis') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          sh 'npm install'
+            sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
+            sh """
+            sonar-scanner \
+            -Dsonar.projectKey=buy-01-frontend \
+            -Dsonar.host.url=http://64.226.78.45:9000 \
+            -Dsonar.login=${SONAR_AUTH_TOKEN} \
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+            -Dsonar.testExecutionReportPaths=test-results/test-report.xml
+            """
+        }
+      }
+    }
+    stage('Quality Gate') {
+      steps {
+        timeout(time: 1, unit: 'HOURS') {
+          waitForQualityGate abortPipeline: true
+        }
+      }
+    }   
     // stage('Build Docker Images') {
     //   agent {
     //     label 'master'
