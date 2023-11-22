@@ -14,6 +14,6 @@ public class HealthController {
 
   @GetMapping("/mediaHealth")
   public ResponseEntity<HttpStatus> healthCheck() {
-    return new ResponseEntity<HttpStatus>(HttpStatus.OK);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

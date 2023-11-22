@@ -2,7 +2,6 @@ package com.gritlab.buy01.mediaservice.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.bson.types.Binary;
 import org.junit.jupiter.api.Test;
@@ -46,7 +45,8 @@ public class MediaTests {
     media.setId("id123");
     media.setMimeType("image/jpeg");
 
-    assertNotNull(media.hashCode());
+    int hashCode = media.hashCode();
+    assertNotEquals(0, hashCode);
   }
 
   @Test
@@ -98,6 +98,7 @@ public class MediaTests {
     media.setId("id123");
     media.setMimeType("image/jpeg");
 
-    assertNotNull(media.hashCode());
+    int hashCode = media.hashCode();
+    assertNotEquals(0, hashCode);
   }
 }

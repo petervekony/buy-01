@@ -118,7 +118,7 @@ pipeline {
 
                 // health check
                 def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1']
-                def maxWaitTime = 300 // maximum wait time in seconds
+                def maxWaitTime = 180 // maximum wait time in seconds
                 boolean allHealthy = false
                 int elapsedTime = 0
                 int checkInterval = 10 // seconds
