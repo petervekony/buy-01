@@ -2,7 +2,6 @@ package com.gritlab.buy01.mediaservice.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +31,7 @@ public class UserTests {
   public void testHashCode() {
     User user = new User("id123", "Alice", "ADMIN");
 
-    assertNotNull(user.hashCode());
+    int hashCode = user.hashCode();
+    assertNotEquals(0, hashCode);
   }
 }

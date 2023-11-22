@@ -153,7 +153,6 @@ public class KafkaService {
       ProductOwnershipResponse response = responseQueue.poll(5, TimeUnit.SECONDS);
       return response;
     } catch (InterruptedException e) {
-      e.printStackTrace();
       return null;
     } finally {
       productOwnershipResponseQueues.remove(correlationId);

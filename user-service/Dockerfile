@@ -11,7 +11,7 @@ COPY ./pom.xml .
 
 WORKDIR /app/user-service
 
-RUN mvn clean package -P${BUILD_PROFILE} -DskipTests -X
+RUN mvn clean package -P${BUILD_PROFILE} -DskipTests
 
 FROM bellsoft/liberica-openjdk-alpine:latest 
 

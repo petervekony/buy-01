@@ -8,7 +8,7 @@ COPY pom.xml .
 
 WORKDIR /app/media-service
 
-RUN mvn clean package -DskipTests -X
+RUN mvn clean package -DskipTests
 
 FROM bellsoft/liberica-openjdk-alpine:latest 
 
