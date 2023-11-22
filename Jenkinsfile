@@ -1,10 +1,8 @@
 pipeline {
   agent any
     environment {
-      DOCKER_REPO = 'tvntvn'
-        DOCKER_PROJECT = 'buy01'
-          PROJECT_NAME = "buy01"
-      SONAR_AUTH_TOKEN = credentials('sonarqube')
+      PROJECT_NAME = "buy01"
+        // SONAR_AUTH_TOKEN = credentials('sonarqube')
     }
   stages {
     stage('Run Tests: Media Service') {
@@ -49,91 +47,47 @@ pipeline {
         }
       }
     }
-    stage('SonarQube Analysis') {
-      steps {
-        script {
-        withSonarQubeEnv('peter droplet') {
-          sh """
-            mvn sonar:sonar \
-            -Dsonar.projectKey=buy-01 \
-            -Dsonar.host.url=http://64.226.78.45:9000 \
-            -Dsonar.login=${SONAR_AUTH_TOKEN}
-          """
-          }
-        }
-      }
-    }
-    stage('Angular Analysis') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('angular') {
-          sh 'npm install'
-            sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
-            sh """
-            sonar-scanner \
-            -Dsonar.projectKey=buy-01-frontend \
-            -Dsonar.host.url=http://64.226.78.45:9000 \
-            -Dsonar.login=${SONAR_AUTH_TOKEN} \
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-            -Dsonar.testExecutionReportPaths=test-results/test-report.xml
-            """
-        }
-      }
-    }
-    stage('Quality Gate') {
-      steps {
-        timeout(time: 1, unit: 'HOURS') {
-          waitForQualityGate abortPipeline: true
-        }
-      }
-    }   
-    // stage('Build Docker Images') {
+    // THIS PART FOR THE SONARQUBE, NOT NEEDED FOR MR-JENK
+    // stage('SonarQube Analysis') {
+    //   steps {
+    //     script {
+    //     withSonarQubeEnv('peter droplet') {
+    //       sh """
+    //         mvn sonar:sonar \
+    //         -Dsonar.projectKey=buy-01 \
+    //         -Dsonar.host.url=http://64.226.78.45:9000 \
+    //         -Dsonar.login=${SONAR_AUTH_TOKEN}
+    //       """
+    //       }
+    //     }
+    //   }
+    // }
+    // stage('Angular Analysis') {
     //   agent {
     //     label 'master'
     //   }
     //   steps {
-    //     script {
-    //       sh 'docker build -f media-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest" .'
-    //         sh 'docker build -f user-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest" .'
-    //         sh 'docker build -f product-service/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest" .'
-    //         sh 'docker build -f angular/Dockerfile -t "${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest" .'
+    //     dir('angular') {
+    //       sh 'npm install'
+    //         sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
+    //         sh """
+    //         sonar-scanner \
+    //         -Dsonar.projectKey=buy-01-frontend \
+    //         -Dsonar.host.url=http://64.226.78.45:9000 \
+    //         -Dsonar.login=${SONAR_AUTH_TOKEN} \
+    //         -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+    //         -Dsonar.testExecutionReportPaths=test-results/test-report.xml
+    //         """
     //     }
     //   }
     // }
-    // stage('Push to docker hub'){
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps{
-    //     withCredentials([usernamePassword(credentialsId: 'dockerhub2', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-    //       sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-    //         sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:media_latest"'
-    //         sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:user_latest"'
-    //         sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:product_latest"'
-    //         sh 'docker push "${DOCKER_REPO}/${DOCKER_PROJECT}:angular_latest"'
-    //     }
-    //   }
-    // }
-    // stage('Cleaning up'){
-    //   agent {
-    //     label 'master'
-    //   }
+    // stage('Quality Gate') {
     //   steps {
-    //     script {
-    //       def images = sh(script: 'docker images -q "${DOCKER_REPO}/${DOCKER_PROJECT}*"', returnStdout: true).trim()
-    //         images.split('\n').each { imageId ->
-    //           try {
-    //             sh "docker rmi $imageId"
-    //           } catch (Exception e) {
-    //             echo "Failed to remove image $imageId: ${e.message}"
-    //               // do something or just log it
-    //           }
-    //         }
+    //     timeout(time: 1, unit: 'HOURS') {
+    //       waitForQualityGate abortPipeline: true
     //     }
     //   }
-    // }
+    // }   
     stage('Deploy to Production') {
       agent {
         label 'deploy'
@@ -210,7 +164,7 @@ pipeline {
                   error("Rollback to commit ${lastSuccessfulCommit} was successful. Marking build as failure.")
               } else {
                 currentBuild.result = 'FAILURE'
-                error("Rollback failed. No previous successful commit available.")
+                  error("Rollback failed. No previous successful commit available.")
               }
             }
           }
@@ -218,19 +172,16 @@ pipeline {
       }
     }
   }
-  // post {
-    // always{
-    //   sh 'docker logout'
-    // }
-    // success {
-    //   mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
-    //        subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
-    //        body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
-    // }
-    // failure {
-    //   mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
-    //        subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
-    //        body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
-    // }
-  // }
+  post {
+    success {
+      mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
+           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - SUCCESS",
+           body: "The pipeline was a SUCCESS. Check console output at ${env.BUILD_URL} to view the results."
+    }
+    failure {
+      mail to: 'tnlmkhnn@me.com,peter.vekony@protonmail.com', 
+           subject: "Pipeline ${env.PROJECT_NAME} - Build # ${env.BUILD_NUMBER} - FAILURE",
+           body: "The pipeline was a FAILURE. Check console output at ${env.BUILD_URL} to view the results."
+    }
+  }
 }
