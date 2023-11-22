@@ -122,12 +122,16 @@ public class ProductControllerTests {
 
   @Test
   public void testUpdateProduct() {
-    ProductModel product = new ProductModel();
+    ProductDTO product = new ProductDTO();
     product.setName("testProduct");
     product.setUserId("123");
-    when(productService.getProductById(anyString())).thenReturn(Optional.of(product));
-    when(productService.updateProduct(anyString(), any(ProductModel.class)))
-        .thenReturn(Optional.of(product));
+    ProductModel productModel = new ProductModel();
+    productModel.setName(product.getName());
+    productModel.setUserId(product.getUserId());
+
+    when(productService.getProductById(anyString())).thenReturn(Optional.of(productModel));
+    when(productService.updateProduct(anyString(), any(ProductDTO.class)))
+        .thenReturn(Optional.of(productModel));
 
     simulateSecurityContext("123", "testUser", "SELLER");
 
