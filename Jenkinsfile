@@ -53,6 +53,7 @@ pipeline {
         script {
           dir('user-service') {
             withSonarQubeEnv('peter droplet') {
+              sh 'mvn clean compile'
               sh """
                 mvn sonar:sonar \
                 -Dsonar.projectKey=buy-01-user-service \
@@ -72,6 +73,7 @@ pipeline {
         script {
           dir('product-service') {
             withSonarQubeEnv('peter droplet') {
+              sh 'mvn clean compile'
               sh """
                 mvn sonar:sonar \
                 -Dsonar.projectKey=buy-01-product-service \
@@ -91,6 +93,7 @@ pipeline {
         script {
           dir('media-service') {
             withSonarQubeEnv('peter droplet') {
+              sh 'mvn clean compile'
               sh """
                 mvn sonar:sonar \
                 -Dsonar.projectKey=buy-01-media-service \
