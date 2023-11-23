@@ -122,7 +122,7 @@ pipeline {
             -Dsonar.host.url=http://64.226.78.45:9000 \
             -Dsonar.token=${SONAR_AUTH_TOKEN} \
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-            -Dsonar.testExecutionReportPaths=test-results/test-report.xml
+            -Dsonar.testExecutionReportPaths=reports/test-report.xml
             """
         }
       }
