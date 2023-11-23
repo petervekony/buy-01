@@ -2,7 +2,7 @@ pipeline {
   agent any
     environment {
       PROJECT_NAME = "buy01"
-        // SONAR_AUTH_TOKEN = credentials('sonarqube')
+        SONAR_AUTH_TOKEN = credentials('sonarqube')
     }
   stages {
     stage('Run Tests: Media Service') {
@@ -48,39 +48,82 @@ pipeline {
       }
     }
     // THIS PART FOR THE SONARQUBE, NOT NEEDED FOR MR-JENK
-    // stage('SonarQube Analysis') {
-    //   steps {
-    //     script {
-    //     withSonarQubeEnv('peter droplet') {
-    //       sh """
-    //         mvn sonar:sonar \
-    //         -Dsonar.projectKey=buy-01 \
-    //         -Dsonar.host.url=http://64.226.78.45:9000 \
-    //         -Dsonar.login=${SONAR_AUTH_TOKEN}
-    //       """
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Angular Analysis') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('angular') {
-    //       sh 'npm install'
-    //         sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
-    //         sh """
-    //         sonar-scanner \
-    //         -Dsonar.projectKey=buy-01-frontend \
-    //         -Dsonar.host.url=http://64.226.78.45:9000 \
-    //         -Dsonar.login=${SONAR_AUTH_TOKEN} \
-    //         -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-    //         -Dsonar.testExecutionReportPaths=test-results/test-report.xml
-    //         """
-    //     }
-    //   }
-    // }
+    stage('User Service SonarQube Analysis') {
+      steps {
+        script {
+          dir('user-service') {
+            withSonarQubeEnv('peter droplet') {
+              sh """
+                mvn sonar:sonar \
+                -Dsonar.projectKey=buy-01-user-service \
+                -Dsonar.host.url=http://64.226.78.45:9000 \
+                -Dsonar.token=${SONAR_AUTH_TOKEN}
+              """
+            }
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+    }
+    stage('Product Service SonarQube Analysis') {
+      steps {
+        script {
+          dir('product-service') {
+            withSonarQubeEnv('peter droplet') {
+              sh """
+                mvn sonar:sonar \
+                -Dsonar.projectKey=buy-01-product-service \
+                -Dsonar.host.url=http://64.226.78.45:9000 \
+                -Dsonar.token=${SONAR_AUTH_TOKEN}
+              """
+            }
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+    }
+    stage('Media Service SonarQube Analysis') {
+      steps {
+        script {
+          dir('media-service') {
+            withSonarQubeEnv('peter droplet') {
+              sh """
+                mvn sonar:sonar \
+                -Dsonar.projectKey=buy-01-media-service \
+                -Dsonar.host.url=http://64.226.78.45:9000 \
+                -Dsonar.token=${SONAR_AUTH_TOKEN}
+              """
+            }
+          }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
+        }
+      }
+    }
+    stage('Angular Analysis') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          sh 'npm install'
+            sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
+            sh """
+            sonar-scanner \
+            -Dsonar.projectKey=buy-01-frontend \
+            -Dsonar.host.url=http://64.226.78.45:9000 \
+            -Dsonar.login=${SONAR_AUTH_TOKEN} \
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+            -Dsonar.testExecutionReportPaths=test-results/test-report.xml
+            """
+        }
+      }
+    }
     // stage('Quality Gate') {
     //   steps {
     //     timeout(time: 1, unit: 'HOURS') {
