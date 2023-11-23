@@ -1,3 +1,5 @@
+const { LOG_DEBUG } = require('karma/lib/constants');
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -27,7 +29,8 @@ module.exports = function (config) {
     },
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
+    // logLevel: config.LOG_INFO,
+    logLevel: LOG_DEBUG,
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     singleRun: false,
