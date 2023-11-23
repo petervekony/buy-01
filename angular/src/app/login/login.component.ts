@@ -1,8 +1,7 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, NavigationExtras } from '@angular/router';
 import { UserService } from '../service/user.service';
-import { NavigationExtras } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { LoginRequest } from '../interfaces/login-request';
 import { StateService } from '../service/state.service';
