@@ -124,6 +124,9 @@ pipeline {
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
             -Dsonar.testExecutionReportPaths=reports/test-report.xml
             """
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
         }
       }
     }
