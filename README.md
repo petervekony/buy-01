@@ -1,7 +1,5 @@
 ## MR-JENK
 
-sdfsdf
-
 #### About
 
 Mr-jenk is the fourth project in the java track of 01Edu's curriculum. The goal
