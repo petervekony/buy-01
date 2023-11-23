@@ -48,7 +48,7 @@ pipeline {
       }
     }
     // THIS PART FOR THE SONARQUBE, NOT NEEDED FOR MR-JENK
-    stage('User Service SonarQube Analysis') {
+    stage('User Service SonarQube Analysis & Quality Gate') {
       steps {
         script {
           dir('user-service') {
@@ -68,7 +68,7 @@ pipeline {
         }
       }
     }
-    stage('Product Service SonarQube Analysis') {
+    stage('Product Service SonarQube Analysis & Quality Gate') {
       steps {
         script {
           dir('product-service') {
@@ -88,7 +88,7 @@ pipeline {
         }
       }
     }
-    stage('Media Service SonarQube Analysis') {
+    stage('Media Service SonarQube Analysis & Quality Gate') {
       steps {
         script {
           dir('media-service') {
@@ -108,7 +108,7 @@ pipeline {
         }
       }
     }
-    stage('Angular Analysis') {
+    stage('Angular SonarQube Analysis & Quality Gate') {
       agent {
         label 'master'
       }
@@ -130,13 +130,6 @@ pipeline {
         }
       }
     }
-    // stage('Quality Gate') {
-    //   steps {
-    //     timeout(time: 1, unit: 'HOURS') {
-    //       waitForQualityGate abortPipeline: true
-    //     }
-    //   }
-    // }   
     stage('Deploy to Production') {
       agent {
         label 'deploy'
