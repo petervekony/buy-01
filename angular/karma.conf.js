@@ -18,10 +18,10 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [{ type: 'html' }, { type: 'lcovonly' }],
     },
-    reporters: ['progress', 'kjhtml', 'coverage', 'junit'],
-    junitReporter: {
-      outputDir: require('path').join(__dirname, './test-results'),
-      outputFile: 'test-report.xml',
+    reporters: ['progress', 'kjhtml', 'coverage', 'sonarqubeUnit'],
+    sonarQubeUnitReporter: {
+      sonarQubeVersion: 'LATEST',
+      outputFile: 'reports/test-report.xml',
       useBrowserName: false,
     },
     port: 9876,
