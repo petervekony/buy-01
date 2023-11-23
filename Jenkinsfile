@@ -117,10 +117,10 @@ pipeline {
           sh 'npm install'
             sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
             sh """
-            sonar-scanner \
+            sonar-scanner -X \
             -Dsonar.projectKey=buy-01-frontend \
             -Dsonar.host.url=http://64.226.78.45:9000 \
-            -Dsonar.login=${SONAR_AUTH_TOKEN} \
+            -Dsonar.token=${SONAR_AUTH_TOKEN} \
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
             -Dsonar.testExecutionReportPaths=test-results/test-report.xml
             """
