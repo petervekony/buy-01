@@ -8,7 +8,7 @@ module.exports = function (config) {
       require('karma-sonarqube-unit-reporter'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
-      require('karma-junit-reporter'),
+      // require('karma-junit-reporter'),
       require('@angular-devkit/build-angular/plugins/karma'),
     ],
     client: {
