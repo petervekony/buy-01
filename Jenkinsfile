@@ -2,7 +2,7 @@ pipeline {
   agent any
     environment {
       PROJECT_NAME = "buy01"
-        SONAR_AUTH_TOKEN = credentials('sonarqube')
+        // SONAR_AUTH_TOKEN = credentials('sonarqube')
     }
   stages {
     stage('Run Tests: Media Service') {
@@ -52,14 +52,16 @@ pipeline {
       steps {
         script {
           dir('user-service') {
-            withSonarQubeEnv('peter droplet') {
-              sh 'mvn clean compile'
-              sh """
-                mvn sonar:sonar \
-                -Dsonar.projectKey=buy-01-user-service \
-                -Dsonar.host.url=http://64.226.78.45:9000 \
-                -Dsonar.token=${SONAR_AUTH_TOKEN}
-              """
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-user-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
             }
             timeout(time: 1, unit: 'HOURS') {
               waitForQualityGate abortPipeline: true
@@ -72,14 +74,16 @@ pipeline {
       steps {
         script {
           dir('product-service') {
-            withSonarQubeEnv('peter droplet') {
-              sh 'mvn clean compile'
-              sh """
-                mvn sonar:sonar \
-                -Dsonar.projectKey=buy-01-product-service \
-                -Dsonar.host.url=http://64.226.78.45:9000 \
-                -Dsonar.token=${SONAR_AUTH_TOKEN}
-              """
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-product-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
             }
             timeout(time: 1, unit: 'HOURS') {
               waitForQualityGate abortPipeline: true
@@ -92,14 +96,16 @@ pipeline {
       steps {
         script {
           dir('media-service') {
-            withSonarQubeEnv('peter droplet') {
-              sh 'mvn clean compile'
-              sh """
-                mvn sonar:sonar \
-                -Dsonar.projectKey=buy-01-media-service \
-                -Dsonar.host.url=http://64.226.78.45:9000 \
-                -Dsonar.token=${SONAR_AUTH_TOKEN}
-              """
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-media-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
             }
           }
           timeout(time: 1, unit: 'HOURS') {
@@ -116,17 +122,19 @@ pipeline {
         dir('angular') {
           sh 'npm install'
             sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
-            sh """
-            sonar-scanner -X \
-            -Dsonar.projectKey=buy-01-frontend \
-            -Dsonar.host.url=http://64.226.78.45:9000 \
-            -Dsonar.token=${SONAR_AUTH_TOKEN} \
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-            -Dsonar.testExecutionReportPaths=reports/test-report.xml
-            """
-            timeout(time: 1, unit: 'HOURS') {
-              waitForQualityGate abortPipeline: true
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              sh """
+                sonar-scanner -X \
+                -Dsonar.projectKey=buy-01-frontend \
+                -Dsonar.host.url=http://64.226.78.45:9000 \
+                -Dsonar.token=$SONAR_AUTH_TOKEN \
+                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                -Dsonar.testExecutionReportPaths=reports/test-report.xml
+                """
             }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
         }
       }
     }
