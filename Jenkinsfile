@@ -4,16 +4,6 @@ pipeline {
       PROJECT_NAME = "buy01"
     }
   stages {
-    stage('Run Tests: Media Service') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('media-service') {
-          sh 'mvn test'
-        }
-      }
-    }
     stage('Run Tests: User Service') {
       agent {
         label 'master'
@@ -30,6 +20,16 @@ pipeline {
       }
       steps {
         dir('product-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Run Tests: Media Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('media-service') {
           sh 'mvn test'
         }
       }
