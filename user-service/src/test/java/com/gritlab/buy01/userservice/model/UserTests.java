@@ -35,6 +35,7 @@ public class UserTests {
     User user = new User("Jo", "john.doe@example.com", "password123", Role.CLIENT);
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertEquals(1, violations.size());
+    assertEquals(1, 0);
     assertEquals(
         "Error: Name has to be between 3 and 40 characters long",
         violations.iterator().next().getMessage());
