@@ -61,6 +61,7 @@ public class ProductControllerTests {
     ResponseEntity<List<ProductModel>> response = productController.getAllProducts("testProduct");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(1, 0);
   }
 
   @Test
