@@ -237,4 +237,8 @@ zookeeper_data/
 
 #codes
 codes.txt
+note
 
+#sonarqube
+.scannerwork/
+.scannerwork

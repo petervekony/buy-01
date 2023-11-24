@@ -71,7 +71,11 @@ export class SignupComponent {
   onSubmit() {
     this.formValid = false;
     const request: SignupRequest = this.registerForm.value;
-    request.role ? (request.role = 'SELLER') : (request.role = 'CLIENT');
+    if (request.role) {
+      request.role = 'SELLER';
+    } else {
+      request.role = 'CLIENT';
+    }
     this.userService.sendSignupRequest(request).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
