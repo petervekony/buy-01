@@ -7,13 +7,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { SignupComponent } from './signup/signup.component';
+import { ShoppingCartComponent } from './shopping-cart/shopping-cart.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { SearchComponent } from './search/search.component';
 import { StyleClassModule } from 'primeng/styleclass';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { InputTextModule } from 'primeng/inputtext';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { AddProductComponent } from './add-product/add-product.component';
 import { ProductContainerComponent } from './product-container/product-container.component';
@@ -37,13 +39,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     LoginComponent,
     SignupComponent,
     HomeComponent,
-    DashboardComponent,
     NavbarComponent,
     AddProductComponent,
     ProductContainerComponent,
     ProductCardModalComponent,
     ProductCardComponent,
     ProfilePageComponent,
+    ShoppingCartComponent,
+    DashboardComponent,
+    SearchComponent,
   ],
   imports: [
     BrowserModule,

@@ -24,6 +24,9 @@ export const authGuard: CanActivateFn = (route) => {
           return false;
         }
       }
+      case 'search':
+      case 'shopcart':
+      case 'dashboard':
       case 'profile':
       case 'home': {
         if (user?.name) {

@@ -60,6 +60,11 @@
                     <h3>You own this product</h3>
                   </div>
                 </div>
+                <div class="footer" *ngIf="user?.id !== owner?.id">
+                  <button class="buy" pButton pRiple>
+                    <mat-icon aria-hidden="false" aria-label="buy icon" fontIcon="shopping_cart"></mat-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </ng-template>

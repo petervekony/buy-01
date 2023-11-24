@@ -135,7 +135,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       )
       .subscribe({
         next: (data) => {
-          if (data && data.media && data.media.length > 0) {
+          if (data?.media?.length > 0) {
             this.imageIds = [];
             this.images = data.media.map((item) => {
               this.imageIds.push(item.id);
@@ -252,7 +252,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       mediaData.append(
         'image',
         this.fileToBlob(this.fileSelected),
-        this.filename as string,
+        this.filename,
       );
     } else {
       mediaData = null;

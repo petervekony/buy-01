@@ -110,7 +110,6 @@ export class NavbarComponent implements OnInit {
             this.mediaService.updateAvatar(this.placeholder);
           }
         },
-        error: (error) => console.error(error),
       });
   }
 
@@ -126,7 +125,6 @@ export class NavbarComponent implements OnInit {
           this.mediaService.updateAvatar(this.placeholder);
         }
       },
-      error: (err) => console.log(err),
     });
   }
 

@@ -135,6 +135,12 @@
   color:#8d6ff3;
 }
 
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 1rem;
+}
+
 #submit-button {
   margin-top: 3rem;
 }

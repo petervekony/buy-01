@@ -19,8 +19,7 @@ services:
       args:
         BUILD_PROFILE: ${BUILD_PROFILE}
     environment:
-      # SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
-      SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozaklsdmsjdalpob.mongodb.net/?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
       SPRING_DATA_MONGODB_DB: buy-01-users
       JWT_SECRET: ${JWT_SECRET}
     ports:
