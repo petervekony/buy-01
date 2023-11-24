@@ -71,6 +71,7 @@ public class MediaControllerTests {
     ResponseEntity<?> response = mediaController.getMediaByProductId("testProduct");
 
     assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(1, 2);
   }
 
   @Test
