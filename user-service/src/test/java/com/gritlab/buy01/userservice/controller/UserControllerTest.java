@@ -1,5 +1,6 @@
 package com.gritlab.buy01.userservice.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.reset;
@@ -30,11 +31,16 @@ import com.gritlab.buy01.userservice.service.UserService;
 
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
-  @Autowired private MockMvc mockMvc;
+  private final MockMvc mockMvc;
 
   @MockBean private UserService userService;
 
   @MockBean private PrincipalData principalData;
+
+  @Autowired
+  public UserControllerTest(MockMvc mockMvc) {
+    this.mockMvc = mockMvc;
+  }
 
   @BeforeEach
   public void setUp() {
@@ -43,8 +49,14 @@ public class UserControllerTest {
   }
 
   @Test
+  void contextLoads() throws Exception {
+    assertThat(mockMvc).isNotNull();
+    assertThat(userService).isNotNull();
+  }
+
+  @Test
   @WithMockUser
-  public void testGetAllUsers_found() throws Exception {
+  public void testGetAllUsersFound() throws Exception {
     List<User> users =
         Arrays.asList(
             new User("First", "first@email.com", "firstPassword", Role.CLIENT),
@@ -64,7 +76,7 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void testGetAllUsers_notFound() throws Exception {
+  public void testGetAllUsersNotFound() throws Exception {
     when(userService.getAllUsers(anyString())).thenReturn(Collections.emptyList());
 
     mockMvc.perform(get("/api/users")).andExpect(status().isNoContent());
@@ -74,7 +86,7 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void testGetUserById_found() throws Exception {
+  public void testGetUserByIdFound() throws Exception {
     User user = new User("a", "a@b.com", "pass", Role.CLIENT);
     when(userService.getUserById("someId")).thenReturn(Optional.of(user));
 
@@ -85,38 +97,11 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void testGetUserById_notFound() throws Exception {
+  public void testGetUserByIdNotFound() throws Exception {
     when(userService.getUserById("someId")).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/api/users/someId")).andExpect(status().isNotFound());
 
     verify(userService).getUserById("someId");
   }
-
-  // TODO: this test should work, but it doesn't
-  /*
-  @Test
-  @WithMockUser(roles="ADMIN")
-  public void testUpdateUser() throws Exception {
-    UserUpdateRequest userUpdateRequest = new UserUpdateRequest("newName", "newEmail", "newPass", Role.CLIENT);
-
-    Authentication auth = new UsernamePasswordAuthenticationToken("admin", "password", Collections.singletonList(new SimpleGrantedAuthority("ADMIN")));
-    SecurityContextHolder.getContext().setAuthentication(auth);
-
-
-    when(principalData.authCheck(anyString())).thenReturn(true);
-    when(principalData.isAdmin()).thenReturn(true);
-    when(principalData.isSelf(anyString())).thenReturn(true);
-
-    when(userService.updateUser(anyString(), any(UserUpdateRequest.class), anyBoolean())).thenReturn(new ResponseEntity<>(HttpStatus.OK));
-
-    mockMvc.perform(put("/api/users/someId")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(new ObjectMapper().writeValueAsString(userUpdateRequest)))
-        .andExpect(status().isOk())
-        .andDo(print());
-
-    verify(userService).updateUser(anyString(), any(UserUpdateRequest.class), anyBoolean());
-  }
-   */
 }

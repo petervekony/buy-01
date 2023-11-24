@@ -29,16 +29,21 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 public class UserService {
-  @Autowired public UserRepository userRepository;
+  public final UserRepository userRepository;
 
-  @Autowired private ApplicationEventPublisher eventPublisher;
-  // @Autowired
-  // public ProductRepository productRepository;
+  private final ApplicationEventPublisher eventPublisher;
 
-  // @Autowired
-  // public AuthService authService;
+  public final UserDetailsServiceImpl userDetailsServiceImpl;
 
-  @Autowired public UserDetailsServiceImpl userDetailsServiceImpl;
+  @Autowired
+  public UserService(
+      UserRepository userRepository,
+      ApplicationEventPublisher eventPublisher,
+      UserDetailsServiceImpl userDetailsServiceImpl) {
+    this.userRepository = userRepository;
+    this.eventPublisher = eventPublisher;
+    this.userDetailsServiceImpl = userDetailsServiceImpl;
+  }
 
   private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -69,22 +74,21 @@ public class UserService {
       String id, UserUpdateRequest userUpdateRequest, boolean isSelf) {
     Optional<User> userData = userRepository.findById(id);
     if (userData.isPresent()) {
-      User _user = userData.get();
+      User user = userData.get();
 
       // if username is not updated, ignore it
       if (userUpdateRequest.getName() != null
-          && !userUpdateRequest.getName().equals(_user.getName())) {
+          && !userUpdateRequest.getName().equals(user.getName())) {
         if (userRepository.existsByName(userUpdateRequest.getName())) {
           return ResponseEntity.badRequest()
               .body(new MessageResponse("Error: Username is already taken!"));
         }
-        _user.setName(userUpdateRequest.getName());
+        user.setName(userUpdateRequest.getName());
       }
-      ;
 
       // if email is not updated, or it is the same as before, ignore it
       if (userUpdateRequest.getEmail() != null
-          && !_user.getEmail().equals(userUpdateRequest.getEmail())) {
+          && !user.getEmail().equals(userUpdateRequest.getEmail())) {
         userUpdateRequest.setEmail(userUpdateRequest.getEmail().toLowerCase(Locale.ROOT));
         if (userRepository.existsByEmail(userUpdateRequest.getEmail())) {
           return ResponseEntity.badRequest()
@@ -94,14 +98,14 @@ public class UserService {
           return ResponseEntity.badRequest()
               .body(new MessageResponse("Error: Invalid email format"));
         }
-        _user.setEmail(userUpdateRequest.getEmail());
+        user.setEmail(userUpdateRequest.getEmail());
       }
 
       // if password is not updated, ignore it
       if (userUpdateRequest.getPassword() != null)
-        _user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
+        user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
 
-      User savedUser = userRepository.save(_user);
+      User savedUser = userRepository.save(user);
 
       if (isSelf && !savedUser.getName().equals(userUpdateRequest.getName())) {
         UserDetails newDetails = userDetailsServiceImpl.loadUserById(savedUser.getId());
