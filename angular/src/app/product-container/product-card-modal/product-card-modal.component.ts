@@ -314,17 +314,11 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.dataService.sendProductId(this.product.id!);
   }
 
-  deleteProduct(productId: string, isDeletingProduct: boolean = false): void {
-    if (isDeletingProduct) {
-      // this.hideModal();
-      // this.dialog?.close();
-    } else {
-      this.deletingProduct = true;
-      this.productService.deleteProduct(productId);
-      this.dialog?.close();
-      this.formStateService.setFormOpen(false);
-      // this.productService.updateProductAdded({} as Product);
-    }
+  deleteProduct(productId: string): void {
+    this.deletingProduct = true;
+    this.productService.deleteProduct(productId);
+    this.dialog?.close();
+    this.formStateService.setFormOpen(false);
   }
 
   openConfirm(form: string) {

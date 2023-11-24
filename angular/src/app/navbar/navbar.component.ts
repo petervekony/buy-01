@@ -95,7 +95,6 @@ export class NavbarComponent implements OnInit {
 
     this.dataService.updateDashboard(dash);
     this.dash = dash;
-    // this.home = !dash;
   }
 
   private getAuthAndAvatar() {
@@ -139,7 +138,7 @@ export class NavbarComponent implements OnInit {
         ),
       ).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((event: NavigationEnd) => {
-        if (event && event.urlAfterRedirects) {
+        if (event?.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
           this.home = this.route === '/home';
           this.profile = this.route === '/profile';
@@ -160,7 +159,6 @@ export class NavbarComponent implements OnInit {
   }
 
   goToProfile() {
-    // this.showDashboard(false);
     this.formStateService.setFormOpen(false);
     this.move('profile');
   }

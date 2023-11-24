@@ -127,7 +127,7 @@
               </div>
               <div class="button-container">
                 <button *ngIf="confirm" class="confirm-button" pButton pRiple label="Yes"
-                  (click)="deleteProduct(product.id!,false)"></button>
+                  (click)="deleteProduct(product.id!)"></button>
                 <button *ngIf="confirm" class="confirm-button" pButton pRiple label="No"
                   (click)="closeConfirm('product')" id="no-button"></button>
               </div>
@@ -138,11 +138,3 @@
     </div>
   </div>
 </div>
-<!-- <dialog #confirmDelete> -->
-<!--   <div class="confirm-container"> -->
-<!--     <button class="confirm-button" pButton pRiple label="Yes" (click)="deleteProduct(product.id!)"></button> -->
-<!--     <button class="confirm-button" pButton pRiple label="No" (click)="closeConfirm('product')"></button> -->
-<!--   </div> -->
-<!-- </dialog> -->
-<!-- <dialog #confirmImageDelete> -->
-<!-- </dialog> -->
