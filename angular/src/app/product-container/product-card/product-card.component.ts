@@ -92,7 +92,7 @@ export class ProductCardComponent implements AfterViewInit, OnChanges {
       .subscribe({
         next: (media) => {
           console.log('card, getProductthumbnail, media = ', media);
-          if (media && media?.image) {
+          if (media?.image) {
             this.imageSrc$.next(this.mediaService.formatMedia(media));
             this.changeDetectorRef.detectChanges();
           } else {

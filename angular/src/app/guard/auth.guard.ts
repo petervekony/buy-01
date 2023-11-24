@@ -17,7 +17,7 @@ export const authGuard: CanActivateFn = (route) => {
       switch (path) {
       case 'register':
       case 'login': {
-        if (!user || !user.name) {
+        if (!user?.name) {
           return true;
         } else {
           router.navigate(['home']);
@@ -26,7 +26,7 @@ export const authGuard: CanActivateFn = (route) => {
       }
       case 'profile':
       case 'home': {
-        if (user && user.name) {
+        if (!user?.name) {
           return true;
         } else {
           router.navigate(['login']);

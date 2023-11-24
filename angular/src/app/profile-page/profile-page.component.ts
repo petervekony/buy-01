@@ -27,7 +27,6 @@ import { Media } from '../interfaces/media';
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit {
-  //TODO: check if we can delete these viewChilds!
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
   @ViewChild('profile')
@@ -98,7 +97,7 @@ export class ProfilePageComponent implements OnInit {
             ).pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe({
                 next: (media) => {
-                  if (media && media?.image) {
+                  if (media?.image) {
                     this.mediaService.updateAvatar(
                       this.mediaService.formatMedia(media),
                     );
@@ -183,10 +182,6 @@ export class ProfilePageComponent implements OnInit {
       break;
     case 'deleteAvatar':
       this.deleteAvatarFormOpen = true;
-      this.setToTrue();
-      break;
-    case 'deleteUser':
-      this.deleteUserFormOpen = true;
       this.setToTrue();
       break;
     default:

@@ -139,7 +139,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       )
       .subscribe({
         next: (data) => {
-          if (data && data.media && data.media.length > 0) {
+          if (data?.media?.length > 0) {
             this.imageIds = [];
             this.images = data.media.map((item) => {
               this.imageIds.push(item.id);
@@ -319,18 +319,12 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.dataService.sendProductId(this.product.id!);
   }
 
-  deleteProduct(productId: string, isDeletingProduct: boolean = false): void {
-    if (isDeletingProduct) {
-      // this.hideModal();
-      // this.dialog?.close();
-    } else {
+  deleteProduct(productId: string): void {
       console.log('modal deleteProduct');
       this.deletingProduct = true;
       this.productService.deleteProduct(productId);
       this.dialog?.close();
       this.formStateService.setFormOpen(false);
-      // this.productService.updateProductAdded({} as Product);
-    }
   }
 
   openConfirm(form: string) {

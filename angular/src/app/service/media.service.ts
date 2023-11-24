@@ -87,7 +87,7 @@ export class MediaService {
   }
 
   formatMultipleMedia(media: Media): string {
-    if (!media.image || !media.image.data) return this.placeholder;
+    if (!media?.image?.data) return this.placeholder;
     return 'data:' + media.mimeType + ';base64,' + media.image.data;
   }
 }
