@@ -62,14 +62,7 @@ public class MediaController {
   @DeleteMapping("/media/{id}")
   public ResponseEntity<?> deleteById(@PathVariable String id) {
     try {
-      UserDetailsImpl userDetails = null;
-
-      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      if (principal instanceof UserDetailsImpl) {
-        userDetails = (UserDetailsImpl) principal;
-      } else {
-        throw new Exception("Unexpected principal type");
-      }
+      UserDetailsImpl userDetails = getPrincipal();
 
       Optional<Media> mediaQuery = mediaService.getMediaById(id);
       Media media = null;
@@ -110,15 +103,7 @@ public class MediaController {
     if (userId != null && productId != null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     try {
-      UserDetailsImpl userDetails = null;
-
-      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-      if (principal instanceof UserDetailsImpl) {
-        userDetails = (UserDetailsImpl) principal;
-      } else {
-        throw new Exception("Unexpected principal type");
-      }
+      UserDetailsImpl userDetails = getPrincipal();
 
       if (productId != null) {
         ProductOwnershipRequest ownershipRequest =
@@ -165,77 +150,14 @@ public class MediaController {
     if (userId != null && productId != null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     try {
-      Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-      UserDetailsImpl userDetails = null;
-
-      if (principal instanceof UserDetailsImpl) {
-        userDetails = (UserDetailsImpl) principal;
-      } else {
-        throw new Exception("Unexpected principal type");
-      }
+      UserDetailsImpl userDetails = getPrincipal();
 
       if (productId != null) {
-        ProductOwnershipRequest ownershipRequest =
-            new ProductOwnershipRequest(productId, userDetails.getId());
-        ProductOwnershipResponse ownershipResponse =
-            kafkaService.sendProductOwnershipRequestAndWaitForResponse(ownershipRequest);
-
-        if (!ownershipResponse.isOwner()) {
-          ErrorMessage error =
-              new ErrorMessage(
-                  "Media can only be added to your own products", HttpStatus.FORBIDDEN.value());
-          return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
-        }
-
-        return mediaService.createMedia(image, userId, productId);
+        return handleProductMediaUpload(userId, productId, image, userDetails);
       }
 
       if (userId != null) {
-        if (!userDetails.getId().equals(userId)) {
-          ErrorMessage error =
-              new ErrorMessage(
-                  "You can only upload avatar to your user profile", HttpStatus.FORBIDDEN.value());
-          return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
-        }
-
-        ResponseEntity<?> mediaResponse = mediaService.createMedia(image, userId, productId);
-        Object responseBody = mediaResponse.getBody();
-
-        if (responseBody instanceof Media) {
-          Media responseMedia = (Media) responseBody;
-
-          // delete all other images
-          mediaService.deletePreviousUserAvatars(userId, responseMedia.getId());
-
-          String avatarId = responseMedia.getId();
-          UserAvatarUpdateRequest userAvatarUpdateRequest =
-              new UserAvatarUpdateRequest(UUID.randomUUID().toString(), userId, avatarId);
-          UserAvatarUpdateResponse userAvatarUpdateResponse =
-              kafkaService.sendUserAvatarUpdateRequestAndWaitForResponse(userAvatarUpdateRequest);
-
-          if (userAvatarUpdateResponse == null) {
-            ErrorMessage error =
-                new ErrorMessage(
-                    "Timeout while waiting for user avatar update response",
-                    HttpStatus.REQUEST_TIMEOUT.value());
-            mediaService.deleteMediaById(userId, productId);
-            return new ResponseEntity<>(error, HttpStatus.REQUEST_TIMEOUT);
-          }
-
-          if (!userAvatarUpdateResponse.isAllowed()) {
-            ErrorMessage error =
-                new ErrorMessage(
-                    String.format(
-                        "An error was encountered during user avatar update: %s",
-                        userAvatarUpdateResponse.getMessage()),
-                    HttpStatus.FORBIDDEN.value());
-            mediaService.deleteMediaById(userId, productId);
-            return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
-          }
-          return new ResponseEntity<>(responseMedia, HttpStatus.CREATED);
-        } else {
-          return mediaResponse;
-        }
+        return handleUserAvatarUpload(userId, productId, image, userDetails);
       }
     } catch (Exception e) {
       System.out.println("Exception caught: " + e.toString());
@@ -260,5 +182,82 @@ public class MediaController {
   @GetMapping("/media/user/{userId}")
   public ResponseEntity<?> getUserAvatar(@PathVariable("userId") String userId) {
     return mediaService.getUserAvatar(userId);
+  }
+
+  private UserDetailsImpl getPrincipal() throws Exception {
+    UserDetailsImpl userDetails = null;
+
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (principal instanceof UserDetailsImpl userDetailsImpl) {
+      userDetails = userDetailsImpl;
+    } else {
+      throw new Exception("Unexpected principal type");
+    }
+    return userDetails;
+  }
+
+  private ResponseEntity<?> handleUserAvatarUpload(
+      String userId, String productId, MultipartFile image, UserDetailsImpl userDetails) {
+    if (!userDetails.getId().equals(userId)) {
+      ErrorMessage error =
+          new ErrorMessage(
+              "You can only upload avatar to your user profile", HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    ResponseEntity<?> mediaResponse = mediaService.createMedia(image, userId, productId);
+    Object responseBody = mediaResponse.getBody();
+
+    if (responseBody instanceof Media responseMedia) {
+
+      // delete all other images
+      mediaService.deletePreviousUserAvatars(userId, responseMedia.getId());
+
+      String avatarId = responseMedia.getId();
+      UserAvatarUpdateRequest userAvatarUpdateRequest =
+          new UserAvatarUpdateRequest(UUID.randomUUID().toString(), userId, avatarId);
+      UserAvatarUpdateResponse userAvatarUpdateResponse =
+          kafkaService.sendUserAvatarUpdateRequestAndWaitForResponse(userAvatarUpdateRequest);
+
+      if (userAvatarUpdateResponse == null) {
+        ErrorMessage error =
+            new ErrorMessage(
+                "Timeout while waiting for user avatar update response",
+                HttpStatus.REQUEST_TIMEOUT.value());
+        mediaService.deleteMediaById(userId, productId);
+        return new ResponseEntity<>(error, HttpStatus.REQUEST_TIMEOUT);
+      }
+
+      if (!userAvatarUpdateResponse.isAllowed()) {
+        ErrorMessage error =
+            new ErrorMessage(
+                String.format(
+                    "An error was encountered during user avatar update: %s",
+                    userAvatarUpdateResponse.getMessage()),
+                HttpStatus.FORBIDDEN.value());
+        mediaService.deleteMediaById(userId, productId);
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+      }
+      return new ResponseEntity<>(responseMedia, HttpStatus.CREATED);
+    } else {
+      return mediaResponse;
+    }
+  }
+
+  private ResponseEntity<?> handleProductMediaUpload(
+      String userId, String productId, MultipartFile image, UserDetailsImpl userDetails) {
+    ProductOwnershipRequest ownershipRequest =
+        new ProductOwnershipRequest(productId, userDetails.getId());
+    ProductOwnershipResponse ownershipResponse =
+        kafkaService.sendProductOwnershipRequestAndWaitForResponse(ownershipRequest);
+
+    if (!ownershipResponse.isOwner()) {
+      ErrorMessage error =
+          new ErrorMessage(
+              "Media can only be added to your own products", HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    return mediaService.createMedia(image, userId, productId);
   }
 }

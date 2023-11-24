@@ -153,6 +153,7 @@ public class KafkaService {
       ProductOwnershipResponse response = responseQueue.poll(5, TimeUnit.SECONDS);
       return response;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       return null;
     } finally {
       productOwnershipResponseQueues.remove(correlationId);
@@ -173,6 +174,7 @@ public class KafkaService {
       UserAvatarUpdateResponse response = responseQueue.poll(5, TimeUnit.SECONDS);
       return response;
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       return null;
     } finally {
       userAvatarUpdateResponseQueues.remove(correlationId);
