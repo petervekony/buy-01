@@ -245,6 +245,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
           this.productService.updateProductAdded(data!);
         },
       });
+      this.tabGroup.selectedIndex = 0;
     }
   }
 

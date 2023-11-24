@@ -2,7 +2,6 @@ package com.gritlab.buy01.mediaservice.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -64,6 +63,7 @@ public class ProductTests {
     product.setQuantity(5);
     product.setUserId("user456");
 
-    assertNotNull(product.hashCode());
+    int hashCode = product.hashCode();
+    assertNotEquals(0, hashCode);
   }
 }

@@ -1,4 +1,4 @@
-FROM maven:3.9.4-eclipse-temurin-17 as build
+FROM --platform=linux/amd64 maven:3.9.4-eclipse-temurin-17 as build
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY pom.xml .
 
 WORKDIR /app/media-service
 
-RUN mvn clean package -DskipTests -X
+RUN mvn clean package -DskipTests
 
 FROM bellsoft/liberica-openjdk-alpine:latest 
 

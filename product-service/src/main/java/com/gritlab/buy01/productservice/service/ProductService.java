@@ -1,15 +1,13 @@
 package com.gritlab.buy01.productservice.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.gritlab.buy01.productservice.model.ProductDTO;
 import com.gritlab.buy01.productservice.model.ProductModel;
 import com.gritlab.buy01.productservice.repository.ProductRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProductService {
@@ -48,6 +46,18 @@ public class ProductService {
             productModel.getPrice(),
             productModel.getQuantity(),
             productModel.getUserId()));
+  }
+
+  public Optional<ProductModel> updateProduct(String id, ProductDTO productDTO) {
+    ProductModel productModel =
+        new ProductModel(
+            productDTO.getName(),
+            productDTO.getDescription(),
+            productDTO.getPrice(),
+            productDTO.getQuantity(),
+            productDTO.getUserId());
+
+    return updateProduct(id, productModel);
   }
 
   public Optional<ProductModel> updateProduct(String id, ProductModel productModel) {

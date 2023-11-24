@@ -1,3 +1,60 @@
+## MR-JENK
+
+#### About
+
+Mr-jenk is the fourth project in the java track of 01Edu's curriculum. The goal
+of the project is to create a CI/CD pipeline for the
+[**buy-01**](https://github.com/petervekony/buy-01) project we created earlier.
+The project uses Jenkins, JUnit, Karma, Jasmine, Github webhooks and Docker to
+fully automate the process of testing and deploying the code to
+[**production environment.**](https://thewarehouse.rocks)
+
+#### Prerequisites
+
+To run and view the project you'll need:
+
+- Access to the [**Jenkins dashboard**](http://164.90.167.77:8080)
+- Access to the repository, to push changes to main branch
+
+#### Running the project
+
+- You can go to [**Jenkins dashboard**](http://164.90.167.77:8080) to manually
+  trigger build & deployment
+- You can make changes to the codebase and push the changes to main to trigger
+  the build & deployment
+
+#### Pipeline design
+
+- When there's a push to main, github sends notification to the Jenkins server
+  and that triggers the build
+- You can see all the steps in the [**Jenkinsfile**](Jenkinsfile)
+- First step is to pull the new code from the repo
+- Then run the tests to make sure everything works
+- If tests pass, Jenkins switches to deploy server, pulls the code, builds the
+  images and spins up the containers
+- Deploy server waits that all the containers are up and running (healthy),
+  before marking the build succesfull.
+- If something goes wrong in deployment, the rollback will kick in and build the
+  images and spin up containers from the last succesfull build
+- After build has completed, Jenkins will send email notifications to team
+  members, with the status of the build
+
+#### Infrastructure
+
+- For this fairly simple pipeline, we are using two Digital Ocean Droplets. One
+  for the Jenkins and one for the deployment. All communication between the
+  machines take place using SSH.
+
+---
+
+#### Authors
+
+--- tvntvn and petervekony
+
+#### Licence
+
+[GNU GPL v3](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
 # buy-01
 
 ## About
@@ -43,6 +100,14 @@ Running them:
 ```bash
 docker-compose --env-file .env.dev up
 ```
+
+<a id="arm64note"></a>
+
+### Note about running the project on ARM64 architecture
+
+If you are running the project on an Apple Silicon (M1, M2, M3), because of the
+lack of the imageio-webp support, only jpeg file upload works. On any other
+architecture jpeg, png and webp files can be uploaded.
 
 ## Kafka
 
@@ -165,6 +230,8 @@ cached in the backend to save processing time.
 Gets the avatar of the user specified by the {userId}.
 
 #### POST: /api/media?userId={userId}&productId={productId}
+
+**[Apple Silicon: see the note](#arm64note)**
 
 Media can be created belonging to the user (avatar) or product. For product, 6
 images can be uploaded. Supported file types are jpeg, png and non-animated

@@ -120,7 +120,7 @@ public class ProductController {
   @PreAuthorize("isAuthenticated()")
   @PutMapping("/products/{id}")
   public ResponseEntity<?> updateProduct(
-      @PathVariable("id") String id, @Valid @RequestBody ProductModel productModel) {
+      @PathVariable("id") String id, @Valid @RequestBody ProductDTO productModel) {
     try {
       Optional<ProductModel> existingProduct = productService.getProductById(id);
       if (existingProduct.isEmpty()) {

@@ -2,6 +2,7 @@
   min-width: calc(100vw - 20px);
   width: 20vw;
   min-height: 100px !important;
+  height: 100%;
   padding: 10px;
   margin: 10px;
   background-color: #08101c;
@@ -24,9 +25,12 @@
 }
 
 .body-container {
+  margin-top: 10%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  flex: 1;
+  gap: 1.5rem;
+  /* overflow: hidden; */
 }
 
 .product-image {
@@ -109,17 +113,29 @@ dialog {
   .card-container {
     min-width: 30vw;
   }
+
+.body-container {
+  margin-top: 15%;
+  }
 }
 
 @media screen and (width >= 1000px) {
   .card-container {
     min-width: 23vw;
   }
+
+.body-container {
+  margin-top: 18%;
+  }
 }
 
 @media screen and (width >= 1200px) {
   .card-container {
     min-width: 20vw;
+  }
+
+.body-container {
+  margin-top: 18%;
   }
 }
 
@@ -151,10 +167,18 @@ dialog {
   .card-container {
     min-width: calc(50vw - 40px);
   }
+
+.body-container {
+  margin-top: 12%;
+  }
 }
 
 @media screen and (width <= 500px) {
   .card-container {
     min-width: calc(100vw - 20px);
+  }
+
+.body-container {
+  margin-top: 20%;
   }
 }

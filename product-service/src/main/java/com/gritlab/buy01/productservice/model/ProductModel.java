@@ -23,7 +23,7 @@ public class ProductModel {
 
   @Field
   @NotNull
-  @Size(min = 3, max = 150, message = "Description has to be between 3 and 150 characters long")
+  @Size(min = 3, max = 300, message = "Description has to be between 3 and 300 characters long")
   private String description;
 
   @Field
