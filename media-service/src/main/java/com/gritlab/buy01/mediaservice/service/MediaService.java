@@ -72,13 +72,15 @@ public class MediaService {
 
   public ResponseEntity<?> createMedia(MultipartFile image, String userId, String productId) {
     ErrorMessage errorMessage;
-    Optional<List<Media>> productMedia = mediaRepository.findAllByProductId(productId);
-    if (productMedia.isPresent() && productMedia.get().size() >= 6) {
-      errorMessage =
-          new ErrorMessage(
-              "Error: product has maximum number of media already",
-              HttpStatus.UNPROCESSABLE_ENTITY.value());
-      return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
+    if (productId != null) {
+      Optional<List<Media>> productMedia = mediaRepository.findAllByProductId(productId);
+      if (productMedia.isPresent() && productMedia.get().size() >= 6) {
+        errorMessage =
+            new ErrorMessage(
+                "Error: product has maximum number of media already",
+                HttpStatus.UNPROCESSABLE_ENTITY.value());
+        return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
+      }
     }
     if (image.getSize() > 2 * 1024 * 1024) {
       errorMessage =
