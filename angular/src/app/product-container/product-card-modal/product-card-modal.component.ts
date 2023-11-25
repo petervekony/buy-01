@@ -328,7 +328,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   }
 
   closeConfirm(tag: string) {
-    if (tag == 'image') {
+    if (tag === 'image') {
       this.imageDeleteConfirm = false;
     } else {
       this.confirm = false;

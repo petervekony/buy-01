@@ -27,10 +27,7 @@
 
 }
 
-
 .footer button {
-  /* width: 50%; */
-  /* margin-left: 25%; */
   justify-self: center;
   max-width: 250px;
   min-width: 200px;
