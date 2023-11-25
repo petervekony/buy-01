@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.gritlab.buy01.mediaservice.exception.ForbiddenException;
+import com.gritlab.buy01.mediaservice.exception.NotFoundException;
+import com.gritlab.buy01.mediaservice.exception.UnexpectedPrincipalTypeException;
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.mediaservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.mediaservice.kafka.message.UserAvatarUpdateRequest;
@@ -38,11 +40,15 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/api")
 public class MediaController {
-  @Autowired MediaService mediaService;
+  private final MediaService mediaService;
 
-  @Autowired RestTemplate restTemplate;
+  private final KafkaService kafkaService;
 
-  @Autowired KafkaService kafkaService;
+  @Autowired
+  public MediaController(MediaService mediaService, KafkaService kafkaService) {
+    this.mediaService = mediaService;
+    this.kafkaService = kafkaService;
+  }
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/media/{productId}")
@@ -70,11 +76,11 @@ public class MediaController {
       if (mediaQuery.isPresent()) {
         media = mediaQuery.get();
       } else {
-        throw new Exception("Media not found by id");
+        throw new NotFoundException("Media not found by id");
       }
 
       if (media.getUserId() != null && !userDetails.getId().equals(media.getUserId())) {
-        throw new Exception("Only the owner can delete user avatar");
+        throw new ForbiddenException("Only the owner can delete user avatar");
       }
 
       if (media.getProductId() != null) {
@@ -84,10 +90,13 @@ public class MediaController {
             kafkaService.sendProductOwnershipRequestAndWaitForResponse(ownershipRequest);
 
         if (!ownershipResponse.isOwner()) {
-          throw new Exception("Media can only be deleted from own products");
+          throw new ForbiddenException("Media can only be deleted from own products");
         }
       }
-    } catch (Exception e) {
+    } catch (NotFoundException e) {
+      ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.NOT_FOUND.value());
+      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    } catch (ForbiddenException e) {
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
@@ -119,15 +128,12 @@ public class MediaController {
         }
       }
 
-      if (userId != null) {
-
-        if (!userDetails.getId().equals(userId)) {
-          ErrorMessage error =
-              new ErrorMessage(
-                  "You can only delete avatar belonging to your profile",
-                  HttpStatus.FORBIDDEN.value());
-          return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
-        }
+      if (userId != null && (!userDetails.getId().equals(userId))) {
+        ErrorMessage error =
+            new ErrorMessage(
+                "You can only delete avatar belonging to your profile",
+                HttpStatus.FORBIDDEN.value());
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
       }
     } catch (Exception e) {
       ErrorMessage error =
@@ -167,7 +173,6 @@ public class MediaController {
               "An error was encountered during media upload", HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
-    System.out.println("Returning 400 Bad Request");
 
     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
   }
@@ -184,16 +189,13 @@ public class MediaController {
     return mediaService.getUserAvatar(userId);
   }
 
-  private UserDetailsImpl getPrincipal() throws Exception {
-    UserDetailsImpl userDetails = null;
-
+  private UserDetailsImpl getPrincipal() throws UnexpectedPrincipalTypeException {
     Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     if (principal instanceof UserDetailsImpl userDetailsImpl) {
-      userDetails = userDetailsImpl;
+      return userDetailsImpl;
     } else {
-      throw new Exception("Unexpected principal type");
+      throw new UnexpectedPrincipalTypeException("Unexpected principal type");
     }
-    return userDetails;
   }
 
   private ResponseEntity<?> handleUserAvatarUpload(
