@@ -46,97 +46,96 @@ pipeline {
         }
       }
     }
-    // THIS PART FOR THE SONARQUBE, NOT NEEDED FOR MR-JENK
-    // stage('User Service SonarQube Analysis & Quality Gate') {
-    //   steps {
-    //     script {
-    //       dir('user-service') {
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           withSonarQubeEnv('peter droplet') {
-    //             sh 'mvn clean compile'
-    //               sh """
-    //               mvn sonar:sonar \
-    //               -Dsonar.projectKey=buy-01-user-service \
-    //               -Dsonar.host.url=http://64.226.78.45:9000 \
-    //               -Dsonar.token=$SONAR_AUTH_TOKEN
-    //               """
-    //           }
-    //         }
-    //         timeout(time: 1, unit: 'HOURS') {
-    //           waitForQualityGate abortPipeline: true
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Product Service SonarQube Analysis & Quality Gate') {
-    //   steps {
-    //     script {
-    //       dir('product-service') {
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           withSonarQubeEnv('peter droplet') {
-    //             sh 'mvn clean compile'
-    //               sh """
-    //               mvn sonar:sonar \
-    //               -Dsonar.projectKey=buy-01-product-service \
-    //               -Dsonar.host.url=http://64.226.78.45:9000 \
-    //               -Dsonar.token=$SONAR_AUTH_TOKEN
-    //               """
-    //           }
-    //         }
-    //         timeout(time: 1, unit: 'HOURS') {
-    //           waitForQualityGate abortPipeline: true
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Media Service SonarQube Analysis & Quality Gate') {
-    //   steps {
-    //     script {
-    //       dir('media-service') {
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           withSonarQubeEnv('peter droplet') {
-    //             sh 'mvn clean compile'
-    //               sh """
-    //               mvn sonar:sonar \
-    //               -Dsonar.projectKey=buy-01-media-service \
-    //               -Dsonar.host.url=http://64.226.78.45:9000 \
-    //               -Dsonar.token=$SONAR_AUTH_TOKEN
-    //               """
-    //           }
-    //         }
-    //       }
-    //       timeout(time: 1, unit: 'HOURS') {
-    //         waitForQualityGate abortPipeline: true
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Angular SonarQube Analysis & Quality Gate') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('angular') {
-    //       sh 'npm install'
-    //         sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           sh """
-    //             sonar-scanner -X \
-    //             -Dsonar.projectKey=buy-01-frontend \
-    //             -Dsonar.host.url=http://64.226.78.45:9000 \
-    //             -Dsonar.token=$SONAR_AUTH_TOKEN \
-    //             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-    //             -Dsonar.testExecutionReportPaths=reports/test-report.xml
-    //             """
-    //         }
-    //       timeout(time: 1, unit: 'HOURS') {
-    //         waitForQualityGate abortPipeline: true
-    //       }
-    //     }
-    //   }
-    // }
+    stage('User Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('user-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-user-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+    }
+    stage('Product Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('product-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-product-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+    }
+    stage('Media Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('media-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-media-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+          }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
+        }
+      }
+    }
+    stage('Angular SonarQube Analysis & Quality Gate') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          sh 'npm install'
+            sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              sh """
+                sonar-scanner -X \
+                -Dsonar.projectKey=buy-01-frontend \
+                -Dsonar.host.url=http://64.226.78.45:9000 \
+                -Dsonar.token=$SONAR_AUTH_TOKEN \
+                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                -Dsonar.testExecutionReportPaths=reports/test-report.xml
+                """
+            }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
+        }
+      }
+    }
     stage('Deploy to Production') {
       agent {
         label 'deploy'
