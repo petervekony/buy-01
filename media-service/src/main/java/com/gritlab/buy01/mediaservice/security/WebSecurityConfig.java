@@ -1,6 +1,5 @@
 package com.gritlab.buy01.mediaservice.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,12 +20,9 @@ import com.gritlab.buy01.mediaservice.service.KafkaService;
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {
-  @Autowired private AuthEntryPointJwt unauthorizedHandler;
-
-  @Autowired private KafkaService kafkaService;
 
   @Bean
-  public AuthTokenFilter authenticationJwtTokenFilter() {
+  public AuthTokenFilter authenticationJwtTokenFilter(KafkaService kafkaService) {
     return new AuthTokenFilter(kafkaService);
   }
 
@@ -37,7 +33,9 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(
+      HttpSecurity http, AuthEntryPointJwt unauthorizedHandler, KafkaService kafkaService)
+      throws Exception {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(
@@ -52,7 +50,7 @@ public class WebSecurityConfig {
                     .authenticated());
 
     http.addFilterBefore(
-        authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        authenticationJwtTokenFilter(kafkaService), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
