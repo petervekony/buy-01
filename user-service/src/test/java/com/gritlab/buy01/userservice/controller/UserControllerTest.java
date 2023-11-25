@@ -56,7 +56,7 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void testGetAllUsersFound() throws Exception {
+  void testGetAllUsersFound() throws Exception {
     List<User> users =
         Arrays.asList(
             new User("First", "first@email.com", "firstPassword", Role.CLIENT),
@@ -76,7 +76,7 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void testGetAllUsersNotFound() throws Exception {
+  void testGetAllUsersNotFound() throws Exception {
     when(userService.getAllUsers(anyString())).thenReturn(Collections.emptyList());
 
     mockMvc.perform(get("/api/users")).andExpect(status().isNoContent());
@@ -86,7 +86,7 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void testGetUserByIdFound() throws Exception {
+  void testGetUserByIdFound() throws Exception {
     User user = new User("a", "a@b.com", "pass", Role.CLIENT);
     when(userService.getUserById("someId")).thenReturn(Optional.of(user));
 
@@ -97,7 +97,7 @@ public class UserControllerTest {
 
   @Test
   @WithMockUser
-  public void testGetUserByIdNotFound() throws Exception {
+  void testGetUserByIdNotFound() throws Exception {
     when(userService.getUserById("someId")).thenReturn(Optional.empty());
 
     mockMvc.perform(get("/api/users/someId")).andExpect(status().isNotFound());
