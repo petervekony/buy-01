@@ -1,6 +1,9 @@
 name: SonarQube Analysis
 
-on: [push]
+on:
+  push:
+    branches:
+      - "**"
 
 jobs:
   sonarqube_scan:
@@ -58,7 +61,8 @@ jobs:
           if [ -f reports/test-report.xml ]; then
             TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
           fi
-          ./run_sonar_scanner.sh user-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+          ./run_sonar_scanner.sh user-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.branch.name=$BRANCH_NAME $TEST_REPORT_PATH
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
@@ -70,7 +74,8 @@ jobs:
           if [ -f reports/test-report.xml ]; then
             TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
           fi
-          ./run_sonar_scanner.sh product-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+          ./run_sonar_scanner.sh product-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.branch.name=$BRANCH_NAME $TEST_REPORT_PATH
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
@@ -82,7 +87,8 @@ jobs:
           if [ -f reports/test-report.xml ]; then
             TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
           fi
-          ./run_sonar_scanner.sh media-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+          ./run_sonar_scanner.sh media-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.branch.name=$BRANCH_NAME $TEST_REPORT_PATH
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
@@ -94,7 +100,8 @@ jobs:
           if [ -f reports/test-report.xml ]; then
             TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
           fi
-          ./run_sonar_scanner.sh angular -Dsonar.projectKey=buy-01-angular -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+          ./run_sonar_scanner.sh angular -Dsonar.projectKey=buy-01-angular -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.branch.name=$BRANCH_NAME $TEST_REPORT_PATH
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
