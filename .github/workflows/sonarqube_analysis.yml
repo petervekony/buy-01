@@ -54,7 +54,6 @@ jobs:
             -Dsonar.login=${{ SONAR_TOKEN }}
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.testExecutionReportPaths=reports/test-report.xml
-            -Dsonar.exclusions=**/*.java
         if: matrix.project == 'angular'
 
       - name: SonarQube Scan (Java Projects)
