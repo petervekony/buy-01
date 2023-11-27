@@ -50,8 +50,8 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=buy-01-${{ matrix.project }}
-            -Dsonar.host.url=${{ SONAR_HOST_URL }}
-            -Dsonar.login=${{ SONAR_TOKEN }}
+            -Dsonar.host.url= http://64.226.78.45:9000
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.testExecutionReportPaths=reports/test-report.xml
         if: matrix.project == 'angular'
