@@ -31,6 +31,7 @@ jobs:
         if: matrix.project != 'angular'
         run: |
           cd ${{ matrix.project }}
+          mvn package
           mvn test
 
       - name: Build and Test (Angular Project)
@@ -60,4 +61,5 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=buy-01-${{ matrix.project }}
+            -Dsonar.java.binaries=target/classes
         if: matrix.project != 'angular'
