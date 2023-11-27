@@ -60,6 +60,7 @@ jobs:
           SONAR_HOST_URL: http://64.226.78.45:9000
         with:
           args: >
+            -X
             -Dsonar.projectKey=buy-01-${{ matrix.project }}
-            -Dsonar.java.binaries=target/classes
+            -Dsonar.java.binaries=${{ matrix.project }}/target/classes
         if: matrix.project != 'angular'
