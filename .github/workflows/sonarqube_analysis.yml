@@ -1,6 +1,9 @@
 name: SonarQube Analysis
 
-on: [push]
+on:
+  push:
+    branches:
+      - "**"
 
 jobs:
   sonarqube_scan:
@@ -13,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17 for Java Projects
         if: matrix.project != 'angular'
@@ -58,7 +63,7 @@ jobs:
           if [ -f reports/test-report.xml ]; then
             TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
           fi
-          ./run_sonar_scanner.sh user-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+          ./run_sonar_scanner.sh user-service -Dsonar.projectKey=user-service-github -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
@@ -70,7 +75,7 @@ jobs:
           if [ -f reports/test-report.xml ]; then
             TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
           fi
-          ./run_sonar_scanner.sh product-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+          ./run_sonar_scanner.sh product-service -Dsonar.projectKey=product-service-github -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
@@ -82,12 +87,12 @@ jobs:
           if [ -f reports/test-report.xml ]; then
             TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
           fi
-          ./run_sonar_scanner.sh media-service -Dsonar.projectKey=buy-01-media-service -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+          ./run_sonar_scanner.sh media-service -Dsonar.projectKey=mediaservice-github -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
 
-      - name: SonarQube Scan (Angular Project)
+      - name: SonarQube Scan (Angular)
         if: matrix.project == 'angular'
         run: |
           TEST_REPORT_PATH=""
