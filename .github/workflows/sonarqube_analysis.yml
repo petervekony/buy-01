@@ -48,17 +48,9 @@ jobs:
           unzip sonar-scanner-cli-4.6.2.2472-linux.zip
           echo "$PWD/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
 
-      - name: Run SonarQube Scan (Custom Script)
-        run: |
-          chmod +x ./run_sonar_scanner.sh
-          ./run_sonar_scanner.sh ${{ matrix.project }} "SONAR_SCANNER_ARGUMENTS"
+      - name: SonarQube Scan (Java Projects)
+        if: matrix.project == 'media-service'
+        run: ./run_sonar_scanner.sh media-service -Dsonar.projectKey=buy-01-${{ matrix.project }} -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=media-service/target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.testExecutionReportPaths=reports/test-report.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
-          SONAR_SCANNER_ARGUMENTS: >
-            -Dsonar.projectKey=buy-01-${{ matrix.project }}
-            -Dsonar.host.url=http://64.226.78.45:9000
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.testExecutionReportPaths=reports/test-report.xml
-            -Dsonar.java.binaries=target/classes
