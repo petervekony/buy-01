@@ -54,9 +54,10 @@ jobs:
 
       - name: SonarQube Scan (Java Projects)
         uses: SonarSource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
             -Dsonar.projectKey=buy-01-${{ matrix.project }}
             -Dsonar.host.url=http://64.226.78.45:9000
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         if: matrix.project != 'angular'
