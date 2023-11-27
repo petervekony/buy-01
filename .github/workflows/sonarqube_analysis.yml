@@ -38,7 +38,7 @@ jobs:
         run: |
           cd angular
           npm install
-          npm install @angular/cli
+          npm install -g @angular/cli
           ng test --watch=false --progress=false --browsers ChromeHeadless
 
       - name: SonarQube Scan
