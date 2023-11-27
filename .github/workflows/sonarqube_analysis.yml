@@ -42,6 +42,12 @@ jobs:
           npm install -g @angular/cli
           ng test --watch=false --progress=false --browsers ChromeHeadless
 
+      - name: Install SonarScanner
+        run: |
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+          echo "$PWD/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
+
       - name: Run SonarQube Scan (Custom Script)
         run: |
           chmod +x ./run_sonar_scanner.sh
