@@ -42,8 +42,13 @@ jobs:
           npm install -g @angular/cli
           ng test --watch=false --progress=false --browsers ChromeHeadless
 
+      - name: Change to Angular Project Directory
+        if: matrix.project == 'angular'
+        run: cd angular
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
+        if: matrix.project == 'angular'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
@@ -54,10 +59,14 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.testExecutionReportPaths=reports/test-report.xml
-        if: matrix.project == 'angular'
+
+      - name: Change to Java Project Directory
+        if: matrix.project != 'angular'
+        run: cd ${{ matrix.project }}
 
       - name: SonarQube Scan (Java Projects)
         uses: SonarSource/sonarqube-scan-action@master
+        if: matrix.project != 'angular'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
@@ -71,4 +80,3 @@ jobs:
             -Dsonar.exclusions=**/*.java
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
             -Dsonar.testExecutionReportPaths=reports/test-report.xml
-        if: matrix.project != 'angular'
