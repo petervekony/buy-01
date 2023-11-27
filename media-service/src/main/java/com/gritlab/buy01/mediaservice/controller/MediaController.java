@@ -166,8 +166,6 @@ public class MediaController {
         return handleUserAvatarUpload(userId, productId, image, userDetails);
       }
     } catch (Exception e) {
-      System.out.println("Exception caught: " + e.toString());
-      System.out.println(e.toString());
       ErrorMessage error =
           new ErrorMessage(
               "An error was encountered during media upload", HttpStatus.FORBIDDEN.value());
