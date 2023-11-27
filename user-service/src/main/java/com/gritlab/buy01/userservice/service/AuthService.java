@@ -51,6 +51,8 @@ public class AuthService {
               new UsernamePasswordAuthenticationToken(
                   loginRequest.getName(), loginRequest.getPassword()));
 
+      String adminPassword = "password123";
+
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
       UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
