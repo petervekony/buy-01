@@ -56,8 +56,8 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAT_HOST_URL: http://64.226.78.45:9000
         with:
           args: >
             -Dsonar.projectKey=buy-01-${{ matrix.project }}
-            -Dsonar.host.url=http://64.226.78.45:9000
         if: matrix.project != 'angular'
