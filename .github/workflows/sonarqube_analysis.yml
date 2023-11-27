@@ -92,7 +92,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
 
-      - name: SonarQube Scan (Angular Project)
+      - name: SonarQube Scan (Angular)
         if: matrix.project == 'angular'
         run: |
           TEST_REPORT_PATH=""
