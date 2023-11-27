@@ -47,8 +47,7 @@ public class MediaService {
   }
 
   public Optional<List<Media>> getAllMediaByProductId(String productId) {
-    Optional<List<Media>> media = mediaRepository.findAllByProductId(productId);
-    return media;
+    return mediaRepository.findAllByProductId(productId);
   }
 
   public ResponseEntity<?> deleteById(String id) {
@@ -90,7 +89,6 @@ public class MediaService {
     }
     Media media;
     try {
-      // BufferedImage originalImage = ImageIO.read(image.getInputStream());
       BufferedImage originalImage = imageService.readImage(image.getInputStream());
 
       // check if the uploaded file is an actual image
@@ -107,20 +105,14 @@ public class MediaService {
               new BufferedImage(
                   originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
           newBufferedImage.createGraphics().drawImage(originalImage, 0, 0, Color.WHITE, null);
-          // ImageIO.write(newBufferedImage, "jpg", baos);
           imageService.writeImage(newBufferedImage, "jpg", baos);
         } else {
-          // ImageIO.write(originalImage, "jpg", baos);
           imageService.writeImage(originalImage, "jpg", baos);
         }
         baos.flush();
         byte[] compressedBytes = baos.toByteArray();
         media = new Media(new Binary(compressedBytes), productId, userId);
         media.setMimeType("image/jpeg");
-        // byte[] bytes = image.getBytes();
-        // String contentType = image.getContentType();
-        // media = new Media(new Binary(bytes), productId, userId);
-        // media.setMimeType(contentType);
         media = mediaRepository.save(media);
         return new ResponseEntity<>(media, HttpStatus.CREATED);
       } finally {

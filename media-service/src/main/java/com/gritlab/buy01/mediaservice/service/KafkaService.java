@@ -75,7 +75,6 @@ public class KafkaService {
     if (request.getCorrelationId() != null) {
       responseQueues.put(request.getCorrelationId(), queue);
     } else {
-      System.out.println("Error: Correlation ID is null");
       return null;
     }
     kafkaTemplate.send(TOPIC_REQUEST, request);
@@ -150,8 +149,7 @@ public class KafkaService {
     productOwnerShipKafkaTemplate.send("product-ownership-requests", request);
 
     try {
-      ProductOwnershipResponse response = responseQueue.poll(5, TimeUnit.SECONDS);
-      return response;
+      return responseQueue.poll(5, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return null;
@@ -171,8 +169,7 @@ public class KafkaService {
     userAvatarUpdateRequestKafkaTemplate.send("user-avatar-update-requests", request);
 
     try {
-      UserAvatarUpdateResponse response = responseQueue.poll(5, TimeUnit.SECONDS);
-      return response;
+      return responseQueue.poll(5, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       return null;
