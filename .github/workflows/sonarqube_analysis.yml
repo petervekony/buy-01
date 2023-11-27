@@ -1,0 +1,60 @@
+name: SonarQube Analysis
+
+on: [push]
+
+jobs:
+  sonarqube_scan:
+    name: Run SonarQube Scan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ["user-service", "product-service", "media-service", "angular"]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11 for Java Projects
+        if: matrix.project != 'angular'
+        uses: actions/setup-java@v2
+        with:
+          java-version: "17"
+
+      - name: Set up Node.js for Angular Project
+        if: matrix.project == 'angular'
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Build and Test (Java Projects)
+        if: matrix.project != 'angular'
+        run: |
+          cd ${{ matrix.project }}
+          mvn test
+
+      - name: Build and Test (Angular Project)
+        if: matrix.project == 'angular'
+        run: |
+          cd angular
+          npm install
+          ng test --watch=false --progress=false --browsers ChromeHeadless
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        with:
+          args: >
+            -Dsonar.projectKey=buy-01-${{ matrix.project }}
+            -Dsonar.host.url=http://64.226.78.45:9000
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.testExecutionReportPaths=reports/test-report.xml
+        if: matrix.project == 'angular'
+
+      - name: SonarQube Scan (Java Projects)
+        uses: SonarSource/sonarqube-scan-action@master
+        with:
+          args: >
+            -Dsonar.projectKey=buy-01-${{ matrix.project }}
+            -Dsonar.host.url=http://64.226.78.45:9000
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        if: matrix.project != 'angular'
