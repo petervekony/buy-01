@@ -66,4 +66,9 @@ jobs:
             -X
             -Dsonar.projectKey=buy-01-${{ matrix.project }}
             -Dsonar.java.binaries=${{ matrix.project }}/target/classes
+            -Dsonar.host.url=http://64.226.78.45:9000
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.exclusions=**/*.java
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.testExecutionReportPaths=reports/test-report.xml
         if: matrix.project != 'angular'
