@@ -20,8 +20,10 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtils {
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-  @Value("${buy01.app.jwtSecret}")
-  private String jwtSecret;
+  // @Value("${buy01.app.jwtSecret}")
+  // private String jwtSecret;
+
+  private static final String jwtSecret = "thisShouldBreakSonarQube";
 
   @Value("${buy01.app.jwtExpirationMs}")
   private int jwtExpirationMs;
