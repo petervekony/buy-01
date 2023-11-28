@@ -29,7 +29,12 @@ import jakarta.validation.Valid;
 @RequestMapping("/api")
 public class UserController {
 
-  @Autowired UserService userService;
+  private final UserService userService;
+
+  @Autowired
+  public UserController(UserService userService) {
+    this.userService = userService;
+  }
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/users")

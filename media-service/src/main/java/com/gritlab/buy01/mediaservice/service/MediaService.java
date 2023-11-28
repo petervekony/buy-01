@@ -47,8 +47,7 @@ public class MediaService {
   }
 
   public Optional<List<Media>> getAllMediaByProductId(String productId) {
-    Optional<List<Media>> media = mediaRepository.findAllByProductId(productId);
-    return media;
+    return mediaRepository.findAllByProductId(productId);
   }
 
   public ResponseEntity<?> deleteById(String id) {
@@ -72,13 +71,15 @@ public class MediaService {
 
   public ResponseEntity<?> createMedia(MultipartFile image, String userId, String productId) {
     ErrorMessage errorMessage;
-    Optional<List<Media>> productMedia = mediaRepository.findAllByProductId(productId);
-    if (productMedia.isPresent() && productMedia.get().size() >= 6) {
-      errorMessage =
-          new ErrorMessage(
-              "Error: product has maximum number of media already",
-              HttpStatus.UNPROCESSABLE_ENTITY.value());
-      return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
+    if (productId != null) {
+      Optional<List<Media>> productMedia = mediaRepository.findAllByProductId(productId);
+      if (productMedia.isPresent() && productMedia.get().size() >= 6) {
+        errorMessage =
+            new ErrorMessage(
+                "Error: product has maximum number of media already",
+                HttpStatus.UNPROCESSABLE_ENTITY.value());
+        return new ResponseEntity<>(errorMessage, HttpStatus.UNPROCESSABLE_ENTITY);
+      }
     }
     if (image.getSize() > 2 * 1024 * 1024) {
       errorMessage =
@@ -88,7 +89,6 @@ public class MediaService {
     }
     Media media;
     try {
-      // BufferedImage originalImage = ImageIO.read(image.getInputStream());
       BufferedImage originalImage = imageService.readImage(image.getInputStream());
 
       // check if the uploaded file is an actual image
@@ -105,20 +105,14 @@ public class MediaService {
               new BufferedImage(
                   originalImage.getWidth(), originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
           newBufferedImage.createGraphics().drawImage(originalImage, 0, 0, Color.WHITE, null);
-          // ImageIO.write(newBufferedImage, "jpg", baos);
           imageService.writeImage(newBufferedImage, "jpg", baos);
         } else {
-          // ImageIO.write(originalImage, "jpg", baos);
           imageService.writeImage(originalImage, "jpg", baos);
         }
         baos.flush();
         byte[] compressedBytes = baos.toByteArray();
         media = new Media(new Binary(compressedBytes), productId, userId);
         media.setMimeType("image/jpeg");
-        // byte[] bytes = image.getBytes();
-        // String contentType = image.getContentType();
-        // media = new Media(new Binary(bytes), productId, userId);
-        // media.setMimeType(contentType);
         media = mediaRepository.save(media);
         return new ResponseEntity<>(media, HttpStatus.CREATED);
       } finally {

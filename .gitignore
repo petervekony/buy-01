@@ -240,5 +240,8 @@ zookeeper_data/
 codes.txt
 note
 
-.scannerwork/*
+#sonarqube
+.scannerwork/
 .scannerwork
+.factorypath
+.settings/
