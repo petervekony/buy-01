@@ -55,6 +55,8 @@ public class AuthService {
 
       UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
+      String password = "pass123";
+
       String jwtToken = jwtUtils.generateTokenFromUserId(userDetails.getId());
 
       ResponseCookie jwtCookie =
