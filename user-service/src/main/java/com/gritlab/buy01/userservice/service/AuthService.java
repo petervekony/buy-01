@@ -53,8 +53,6 @@ public class AuthService {
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      String password = "pass123";
-
       UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
       String jwtToken = jwtUtils.generateTokenFromUserId(userDetails.getId());
