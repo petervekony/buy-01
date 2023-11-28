@@ -20,6 +20,7 @@ import { User } from 'src/app/interfaces/user';
 import { DataService } from 'src/app/service/data.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
+import { OrderService } from 'src/app/service/order.service';
 import { ProductService } from 'src/app/service/product.service';
 import { UserService } from 'src/app/service/user.service';
 import { ValidatorService } from 'src/app/service/validator.service';
@@ -73,6 +74,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   private userService = inject(UserService);
   private validatorService = inject(ValidatorService);
   private dataService = inject(DataService);
+  private orderService = inject(OrderService);
   private destroyRef = inject(DestroyRef);
   private changeDetector = inject(ChangeDetectorRef);
 
@@ -188,6 +190,10 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.closeConfirm('image');
     this.getProductImages();
     this.changeDetector.detectChanges();
+  }
+
+  addToCart() {
+    this.orderService.addToCart(this.product, this.user!.id);
   }
 
   initFormValues() {

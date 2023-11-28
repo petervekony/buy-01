@@ -75,8 +75,8 @@ export class ProductService {
       .post<ProductCreationResponse>(address, form, { withCredentials: true })
       .pipe(
         map((data: ProductCreationResponse) => {
-          if (mediaForm?.get('image') !== null) {
-            this.mediaService.addMedia(data.product.id!, mediaForm!).pipe(
+          if (mediaForm && mediaForm?.get('image') !== null) {
+            this.mediaService.addMedia(data.product.id!, mediaForm).pipe(
               takeUntilDestroyed(this.destroyRef),
             ).subscribe({
               next: () => this.mediaService.updateImageAdded({} as Media),

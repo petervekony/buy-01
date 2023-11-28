@@ -61,7 +61,7 @@
                   </div>
                 </div>
                 <div class="footer" *ngIf="user?.id !== owner?.id">
-                  <button class="buy" pButton pRiple>
+                  <button class="buy" pButton pRiple (click)="addToCart()">
                     <mat-icon aria-hidden="false" aria-label="buy icon" fontIcon="shopping_cart"></mat-icon>
                   </button>
                 </div>

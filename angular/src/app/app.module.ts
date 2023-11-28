@@ -10,6 +10,7 @@ import { SignupComponent } from './signup/signup.component';
 import { ShoppingCartComponent } from './shopping-cart/shopping-cart.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SearchComponent } from './search/search.component';
+import { OrderCardComponent } from './order-card/order-card.component';
 import { StyleClassModule } from 'primeng/styleclass';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
@@ -48,6 +49,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ShoppingCartComponent,
     DashboardComponent,
     SearchComponent,
+    OrderCardComponent,
   ],
   imports: [
     BrowserModule,

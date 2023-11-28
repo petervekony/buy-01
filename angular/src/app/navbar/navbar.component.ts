@@ -50,7 +50,10 @@ export class NavbarComponent implements OnInit {
   dashboard$ = this.dataService.dashboard$;
 
   ngOnInit(): void {
-    if (this.router.url === '/profile') {
+    if (
+      this.router.url === '/profile' || this.router.url === '/shopcart' ||
+      this.router.url === '/search'
+    ) {
       this.home = false;
       this.dash = false;
       this.profile = true;

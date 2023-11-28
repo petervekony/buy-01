@@ -1,0 +1,15 @@
+<div class="order-container">
+  <div class="header">
+    {{ card.name }}
+  </div>
+  <div class="body">
+    quantity: {{ card.quantity }}
+  </div>
+  <div class="footer">
+    <div class="buttons">
+      <button id="remove-button" (click)="removeItem()">
+        <mat-icon aria-hidden="false" aria-label="remove icon" fontIcon="delete" matTooltip="Remove item"></mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
