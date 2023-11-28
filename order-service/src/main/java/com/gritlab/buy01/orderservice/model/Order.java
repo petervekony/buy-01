@@ -1,5 +1,7 @@
 package com.gritlab.buy01.orderservice.model;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -24,6 +26,8 @@ public class Order {
   private OrderStatus status;
 
   private Double totalPrice;
+
+  private LocalDateTime orderPlacedAt;
 
   public Order(String sellerId, String buyerId, ProductDTO[] products) {
     this.sellerId = sellerId;
