@@ -1,5 +1,7 @@
 ## Safe-Zone
 
+this is an audit
+
 Safe-Zone is the fifth project in the java track of 01Edu's curriculum. The goal
 of the project is to set up SonarQube for static code analysis for the
 [**buy-01**](https://github.com/petervekony/buy-01) project we created earlier
