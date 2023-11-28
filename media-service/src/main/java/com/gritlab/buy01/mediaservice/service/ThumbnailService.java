@@ -26,7 +26,6 @@ public class ThumbnailService {
   }
 
   private ResponseEntity<?> getCachedThumbnail(String mediaId, Media media) {
-    System.out.println("Processing thumbnail for mediaId: " + mediaId);
     try {
       BufferedImage originalImage =
           ImageIO.read(new ByteArrayInputStream(media.getImage().getData()));

@@ -1,3 +1,5 @@
+const { LOG_DEBUG } = require('karma/lib/constants');
+
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -5,9 +7,10 @@ module.exports = function (config) {
     plugins: [
       require('karma-jasmine'),
       require('karma-chrome-launcher'),
+      require('karma-sonarqube-unit-reporter'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
-      require('karma-junit-reporter'),
+      // require('karma-junit-reporter'),
       require('@angular-devkit/build-angular/plugins/karma'),
     ],
     client: {
@@ -18,15 +21,16 @@ module.exports = function (config) {
       subdir: '.',
       reporters: [{ type: 'html' }, { type: 'lcovonly' }],
     },
-    reporters: ['progress', 'kjhtml', 'coverage', 'junit'],
-    junitReporter: {
-      outputDir: require('path').join(__dirname, './test-results'),
-      outputFile: 'test-report.xml',
+    reporters: ['progress', 'kjhtml', 'coverage', 'sonarqubeUnit'],
+    sonarQubeUnitReporter: {
+      sonarQubeVersion: 'LATEST',
+      outputFile: 'reports/test-report.xml',
       useBrowserName: false,
     },
     port: 9876,
     colors: true,
-    logLevel: config.LOG_INFO,
+    // logLevel: config.LOG_INFO,
+    logLevel: LOG_DEBUG,
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     singleRun: false,

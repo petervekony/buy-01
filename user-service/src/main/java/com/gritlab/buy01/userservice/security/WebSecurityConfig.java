@@ -1,6 +1,5 @@
 package com.gritlab.buy01.userservice.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,17 +22,14 @@ import com.gritlab.buy01.userservice.security.jwt.AuthTokenFilter;
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {
-  @Autowired UserDetailsServiceImpl userDetailsService;
-
-  @Autowired private AuthEntryPointJwt unauthorizedHandler;
-
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
     return new AuthTokenFilter();
   }
 
   @Bean
-  public DaoAuthenticationProvider authenticationProvider() {
+  public DaoAuthenticationProvider authenticationProvider(
+      UserDetailsServiceImpl userDetailsService) {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
     authProvider.setUserDetailsService(userDetailsService);
@@ -54,7 +50,11 @@ public class WebSecurityConfig {
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(
+      HttpSecurity http,
+      AuthEntryPointJwt unauthorizedHandler,
+      UserDetailsServiceImpl userDetailsService)
+      throws Exception {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(
@@ -70,7 +70,7 @@ public class WebSecurityConfig {
                     .anyRequest()
                     .authenticated());
 
-    http.authenticationProvider(authenticationProvider());
+    http.authenticationProvider(authenticationProvider(userDetailsService));
 
     http.addFilterBefore(
         authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
