@@ -29,9 +29,8 @@ public class KafkaService {
 
   private static final Logger logger = LoggerFactory.getLogger(KafkaService.class);
 
-  @Autowired private AuthService authService;
-
-  @Autowired private UserService userService;
+  private final AuthService authService;
+  private final UserService userService;
 
   @EventListener
   public void handleUserDeletionEvent(UserDeletionEvent event) {
@@ -39,27 +38,41 @@ public class KafkaService {
     deleteUserItems(user);
   }
 
-  @Autowired
   @Qualifier("tokenValidationResponseKafkaTemplate")
-  private KafkaTemplate<String, TokenValidationResponse> tokenValidationResponseKafkaTemplate;
+  private final KafkaTemplate<String, TokenValidationResponse> tokenValidationResponseKafkaTemplate;
 
-  @Autowired
   @Qualifier("userProfileDeleteMessageKafkaTemplate")
-  private KafkaTemplate<String, UserProfileDeleteMessage> userProfileDeleteMessageKafkaTemplate;
+  private final KafkaTemplate<String, UserProfileDeleteMessage>
+      userProfileDeleteMessageKafkaTemplate;
 
-  @Autowired
   @Qualifier("userAvatarDeleteMessageKafkaTemplate")
-  private KafkaTemplate<String, UserAvatarDeleteMessage> UserAvatarDeleteMessageKafkaTemplate;
+  private KafkaTemplate<String, UserAvatarDeleteMessage> userAvatarDeleteMessageKafkaTemplate;
 
-  @Autowired
   @Qualifier("userAvatarUpdateResponseKafkaTemplate")
-  private KafkaTemplate<String, UserAvatarUpdateResponse> userAvatarUpdateResponseKafkaTemplate;
+  private final KafkaTemplate<String, UserAvatarUpdateResponse>
+      userAvatarUpdateResponseKafkaTemplate;
 
   @Value("${kafka.topic.token-validation-response}")
   private String responseTopic;
 
   // To track processed messages and ensure idempotency
   private Set<String> processedCorrelationIds = new HashSet<>();
+
+  @Autowired
+  public KafkaService(
+      AuthService authService,
+      UserService userService,
+      KafkaTemplate<String, TokenValidationResponse> tokenValidationResponseKafkaTemplate,
+      KafkaTemplate<String, UserProfileDeleteMessage> userProfileDeleteMessageKafkaTemplate,
+      KafkaTemplate<String, UserAvatarDeleteMessage> userAvatarDeleteMessageKafkaTemplate,
+      KafkaTemplate<String, UserAvatarUpdateResponse> userAvatarUpdateResponseKafkaTemplate) {
+    this.authService = authService;
+    this.userService = userService;
+    this.tokenValidationResponseKafkaTemplate = tokenValidationResponseKafkaTemplate;
+    this.userProfileDeleteMessageKafkaTemplate = userProfileDeleteMessageKafkaTemplate;
+    this.userAvatarDeleteMessageKafkaTemplate = userAvatarDeleteMessageKafkaTemplate;
+    this.userAvatarUpdateResponseKafkaTemplate = userAvatarUpdateResponseKafkaTemplate;
+  }
 
   public void sendMessage(TokenValidationResponse message) {
     tokenValidationResponseKafkaTemplate.send(responseTopic, message);
@@ -114,7 +127,7 @@ public class KafkaService {
       String avatarCorrelationId = UUID.randomUUID().toString();
       UserAvatarDeleteMessage avatarDeleteMessage =
           new UserAvatarDeleteMessage(avatarCorrelationId, user.getId());
-      UserAvatarDeleteMessageKafkaTemplate.send("user-avatar-deletion", avatarDeleteMessage);
+      userAvatarDeleteMessageKafkaTemplate.send("user-avatar-deletion", avatarDeleteMessage);
       processedCorrelationIds.add(avatarCorrelationId);
     }
 
