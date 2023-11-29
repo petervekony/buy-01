@@ -1,6 +1,6 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { Order } from '../interfaces/order';
 import { OrderService } from '../service/order.service';
+import { Product } from '../interfaces/product';
 
 @Component({
   selector: 'app-order-card',
@@ -9,7 +9,7 @@ import { OrderService } from '../service/order.service';
 })
 export class OrderCardComponent implements OnInit {
   @Input()
-    card: Order = {} as Order;
+    card: Product = {} as Product;
 
   private orderService = inject(OrderService);
 
@@ -18,7 +18,7 @@ export class OrderCardComponent implements OnInit {
   }
 
   removeItem() {
-    console.log('delete item:', this.card.productId); //NOSONAR
-    this.orderService.removeItem(this.card.productId);
+    console.log('delete item:', this.card.id); //NOSONAR
+    this.orderService.removeItem(this.card.id!);
   }
 }

@@ -1,8 +1,17 @@
+import { Product } from './product';
+
 export interface Order {
+  id?: string;
   name: string;
   status: 'PENDING' | 'CANCELLED' | 'CONFIRMED';
-  customerId: string;
+  buyerId: string;
   sellerId: string;
-  productId: string;
-  quantity: number;
+  products: Product[];
+  totalPrice: number;
+  timestamp?: Date;
 }
+
+// export interface OrderGroup {
+//   seller: string;
+//   products: Product[];
+// }
