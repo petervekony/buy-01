@@ -16,6 +16,8 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.orderservice.cache.CachedTokenInfo;
+import com.gritlab.buy01.orderservice.kafka.message.CartValidationRequest;
+import com.gritlab.buy01.orderservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationResponse;
 
@@ -24,21 +26,32 @@ public class KafkaService {
   private static final Logger logger = LoggerFactory.getLogger(KafkaService.class);
   private static final String TOPIC_REQUEST = "token-validation-request";
   private static final String TOPIC_RESPONSE = "token-validation-response";
+  private static final String CART_VALIDATION_REQUEST = "cart-validation-request";
+  private static final String CART_VALIDATION_RESPONSE = "cart-validation-response";
   private static final long TOKEN_CACHE_DURATION = TimeUnit.MINUTES.toMillis(5);
 
   @Qualifier("kafkaTemplate")
   private final KafkaTemplate<String, TokenValidationRequest> kafkaTemplate;
 
+  @Qualifier("cartValidationKafkaTemplate")
+  private final KafkaTemplate<String, CartValidationRequest> cartValidationKafkaTemplate;
+
   // token validation responses are cached to limit the number of kafka messages
   private ConcurrentMap<String, CachedTokenInfo> tokenCache = new ConcurrentHashMap<>();
 
   @Autowired
-  public KafkaService(KafkaTemplate<String, TokenValidationRequest> kafkaTemplate) {
+  public KafkaService(
+      KafkaTemplate<String, TokenValidationRequest> kafkaTemplate,
+      KafkaTemplate<String, CartValidationRequest> cartValidationKafkaTemplate) {
     this.kafkaTemplate = kafkaTemplate;
+    this.cartValidationKafkaTemplate = cartValidationKafkaTemplate;
   }
 
   private ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> responseQueues =
       new ConcurrentHashMap<>();
+
+  private ConcurrentMap<String, BlockingQueue<CartValidationResponse>>
+      cartValidationResponseQueues = new ConcurrentHashMap<>();
 
   public TokenValidationResponse validateTokenWithUserMicroservice(TokenValidationRequest request) {
     // checking the cache first
@@ -80,6 +93,35 @@ public class KafkaService {
   @KafkaListener(topics = TOPIC_RESPONSE, groupId = "order-service-group")
   public void consumeTokenValidationResponse(TokenValidationResponse response) {
     BlockingQueue<TokenValidationResponse> queue = responseQueues.get(response.getCorrelationId());
+    if (queue != null) {
+      queue.offer(response);
+    }
+  }
+
+  public CartValidationResponse sendCartValidationRequestAndWaitForResponse(
+      CartValidationRequest request) {
+    BlockingQueue<CartValidationResponse> responseQueue = new ArrayBlockingQueue<>(1);
+
+    String correlationId = request.getCorrelationId();
+
+    cartValidationResponseQueues.put(correlationId, responseQueue);
+
+    cartValidationKafkaTemplate.send(CART_VALIDATION_REQUEST, request);
+
+    try {
+      return responseQueue.poll(5, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      return null;
+    } finally {
+      cartValidationResponseQueues.remove(correlationId);
+    }
+  }
+
+  @KafkaListener(topics = CART_VALIDATION_RESPONSE, groupId = "cart-validation-group")
+  public void consumeCartValidationResponse(CartValidationResponse response) {
+    BlockingQueue<CartValidationResponse> queue =
+        cartValidationResponseQueues.get(response.getCorrelationId());
     if (queue != null) {
       queue.offer(response);
     }

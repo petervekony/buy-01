@@ -20,7 +20,6 @@ services:
         BUILD_PROFILE: ${BUILD_PROFILE}
     environment:
       SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
-      # SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozaklsdmsjdalpob.mongodb.net/?authSource=admin
       SPRING_DATA_MONGODB_DB: buy-01-users
       JWT_SECRET: ${JWT_SECRET}
     ports:
@@ -122,7 +121,7 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_LOG_DIRS: "/kafka/kafka-logs-1"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "token-validation-request:1:1,token-validation-response:1:1,user-products-deletion:1:1,user-avatar-deletion:1:1,product-media-deletion:1:1,product-ownership-requests:1:1,product-ownership-responses:1:1,user-avatar-update-requests:1:1,user-avatar-update-responses:1:1"
+      KAFKA_CREATE_TOPICS: "token-validation-request:1:1,token-validation-response:1:1,user-products-deletion:1:1,user-avatar-deletion:1:1,product-media-deletion:1:1,product-ownership-requests:1:1,product-ownership-responses:1:1,user-avatar-update-requests:1:1,user-avatar-update-responses:1:1,cart-validation-request:1:1,cart-validation-response:1:1"
     depends_on:
       - zookeeper
     volumes:

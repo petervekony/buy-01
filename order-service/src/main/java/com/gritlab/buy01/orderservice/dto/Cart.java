@@ -8,7 +8,5 @@ import lombok.Data;
 
 @Data
 public class Cart {
-  private String buyerId;
-
   private HashMap<String, Order> order;
 }

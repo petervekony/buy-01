@@ -14,6 +14,7 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
+import com.gritlab.buy01.orderservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationResponse;
 
 @Configuration
@@ -51,6 +52,17 @@ public class KafkaConsumerConfig {
     factory.setConsumerFactory(consumerFactory());
     factory.setConcurrency(3); // set the amount of concurrent threads
     return factory;
+  }
+
+  @Bean
+  public ConsumerFactory<String, CartValidationResponse> cartValidationResponseConsumerFactory() {
+    Map<String, Object> configs = consumerConfigs();
+    configs.put(ConsumerConfig.GROUP_ID_CONFIG, "cart-validation-group");
+    JsonDeserializer<CartValidationResponse> deserializer =
+        new JsonDeserializer<>(CartValidationResponse.class);
+    deserializer.setUseTypeHeaders(false);
+
+    return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
   }
 
   // @Bean

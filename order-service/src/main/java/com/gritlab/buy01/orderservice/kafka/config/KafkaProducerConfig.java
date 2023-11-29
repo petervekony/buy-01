@@ -13,6 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import com.gritlab.buy01.orderservice.kafka.message.CartValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationRequest;
 
 @Configuration
@@ -38,6 +39,16 @@ public class KafkaProducerConfig {
   @Bean
   public KafkaTemplate<String, TokenValidationRequest> kafkaTemplate() {
     return new KafkaTemplate<>(producerFactory());
+  }
+
+  @Bean
+  public ProducerFactory<String, CartValidationRequest> cartValidationProducerFactory() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
+
+  @Bean
+  public KafkaTemplate<String, CartValidationRequest> cartValidationKafkaTemplate() {
+    return new KafkaTemplate<>(cartValidationProducerFactory());
   }
 
   // // ProductRequest before media upload

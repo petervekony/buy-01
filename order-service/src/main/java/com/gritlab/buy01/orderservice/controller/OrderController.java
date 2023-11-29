@@ -1,7 +1,5 @@
 package com.gritlab.buy01.orderservice.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.OrderStatusUpdate;
+import com.gritlab.buy01.orderservice.dto.PersonalOrders;
 import com.gritlab.buy01.orderservice.exception.UnexpectedPrincipalTypeException;
-import com.gritlab.buy01.orderservice.model.Order;
 import com.gritlab.buy01.orderservice.payload.response.ErrorMessage;
 import com.gritlab.buy01.orderservice.security.UserDetailsImpl;
 import com.gritlab.buy01.orderservice.service.OrderService;
@@ -27,7 +25,6 @@ import com.gritlab.buy01.orderservice.service.OrderService;
 @RestController
 @RequestMapping("/api")
 public class OrderController {
-  // TODO: WIP
 
   private final OrderService orderService;
 
@@ -42,12 +39,12 @@ public class OrderController {
     try {
       UserDetailsImpl principal = getPrincipal();
 
-      Optional<Order[]> orders = orderService.getOrders(principal);
-      if (orders.isEmpty()) {
+      PersonalOrders orders = orderService.getOrders(principal);
+      if (orders == null) {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       }
 
-      return new ResponseEntity<>(orders.get(), HttpStatus.OK);
+      return new ResponseEntity<>(orders, HttpStatus.OK);
     } catch (Exception e) {
       ErrorMessage error =
           new ErrorMessage(
@@ -61,6 +58,13 @@ public class OrderController {
   @PostMapping("/orders")
   public ResponseEntity<?> placeOrder(@RequestBody Cart cart) {
     // send cart over to product service for validation
+    UserDetailsImpl principal = getPrincipal();
+
+    if (!principal.hasRole("ROLE_CLIENT")) {
+      ErrorMessage error =
+          new ErrorMessage("Error: only clients can place orders", HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
 
     return new ResponseEntity<>(HttpStatus.OK);
   }
