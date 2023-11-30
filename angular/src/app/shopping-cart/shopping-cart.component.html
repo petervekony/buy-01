@@ -1,0 +1,6 @@
+<div class="order-container">
+  <ng-container *ngFor="let card of cards$ | async">
+    <app-order-card [card]="card"></app-order-card>
+  </ng-container>
+  <h2 *ngIf="empty">Your cart is empty</h2>
+</div>

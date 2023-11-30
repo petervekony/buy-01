@@ -17,16 +17,19 @@ export const authGuard: CanActivateFn = (route) => {
       switch (path) {
       case 'register':
       case 'login': {
-        if (!user || !user.name) {
+        if (!user?.name) {
           return true;
         } else {
           router.navigate(['home']);
           return false;
         }
       }
+      case 'search':
+      case 'shopcart':
+      case 'dashboard':
       case 'profile':
       case 'home': {
-        if (user && user.name) {
+        if (user?.name) {
           return true;
         } else {
           router.navigate(['login']);

@@ -20,6 +20,7 @@ import { User } from 'src/app/interfaces/user';
 import { DataService } from 'src/app/service/data.service';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { MediaService } from 'src/app/service/media.service';
+import { OrderService } from 'src/app/service/order.service';
 import { ProductService } from 'src/app/service/product.service';
 import { UserService } from 'src/app/service/user.service';
 import { ValidatorService } from 'src/app/service/validator.service';
@@ -73,6 +74,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   private userService = inject(UserService);
   private validatorService = inject(ValidatorService);
   private dataService = inject(DataService);
+  private orderService = inject(OrderService);
   private destroyRef = inject(DestroyRef);
   private changeDetector = inject(ChangeDetectorRef);
 
@@ -135,7 +137,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       )
       .subscribe({
         next: (data) => {
-          if (data && data.media && data.media.length > 0) {
+          if (data?.media?.length > 0) {
             this.imageIds = [];
             this.images = data.media.map((item) => {
               this.imageIds.push(item.id);
@@ -188,6 +190,10 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.closeConfirm('image');
     this.getProductImages();
     this.changeDetector.detectChanges();
+  }
+
+  addToCart() {
+    this.orderService.addToCart(this.product, this.user!.id);
   }
 
   initFormValues() {
@@ -252,7 +258,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
       mediaData.append(
         'image',
         this.fileToBlob(this.fileSelected),
-        this.filename as string,
+        this.filename,
       );
     } else {
       mediaData = null;
@@ -314,17 +320,11 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.dataService.sendProductId(this.product.id!);
   }
 
-  deleteProduct(productId: string, isDeletingProduct: boolean = false): void {
-    if (isDeletingProduct) {
-      // this.hideModal();
-      // this.dialog?.close();
-    } else {
-      this.deletingProduct = true;
-      this.productService.deleteProduct(productId);
-      this.dialog?.close();
-      this.formStateService.setFormOpen(false);
-      // this.productService.updateProductAdded({} as Product);
-    }
+  deleteProduct(productId: string): void {
+    this.deletingProduct = true;
+    this.productService.deleteProduct(productId);
+    this.dialog?.close();
+    this.formStateService.setFormOpen(false);
   }
 
   openConfirm(form: string) {
@@ -334,7 +334,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   }
 
   closeConfirm(tag: string) {
-    if (tag == 'image') {
+    if (tag === 'image') {
       this.imageDeleteConfirm = false;
     } else {
       this.confirm = false;

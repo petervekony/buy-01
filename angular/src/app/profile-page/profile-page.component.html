@@ -6,6 +6,7 @@
       <p>{{ user.email }}</p>
       <p>{{ user.role }}</p>
       <div class="footer">
+        <button pButton pRipple label="ORDER HISTORY" icon="pi pi-user" (click)="move('dashboard')"></button>
         <button pButton pRipple label="EDIT PROFILE" icon="pi pi-user" (click)="openForm('profile')"></button>
         <button pButton pRipple label="UPDATE AVATAR" icon="pi pi-user" (click)="openForm('avatar')"></button>
         <button *ngIf="(avatar$ | async) !== placeholder" pButton pRipple label="DELETE AVATAR" icon="pi pi-user"

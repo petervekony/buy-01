@@ -127,17 +127,12 @@ export class ProductContainerComponent implements OnInit, OnChanges {
   }
 
   showProducts() {
-    this.productService.getProducts().pipe(
-      takeUntilDestroyed(this.destroyRef),
-    )
+    this.productService.getProducts().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (products) => {
           if (products) {
-            this.products$ = of(products?.reverse());
+            this.products$ = of(products?.reverse()); //NOSONAR
           }
-        },
-        error: (error) => {
-          console.log(error);
         },
       });
   }
@@ -147,8 +142,7 @@ export class ProductContainerComponent implements OnInit, OnChanges {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: (products) => {
-        this.products$ = of(products?.reverse());
-        this.changeDetector.detectChanges();
+        this.products$ = of(products?.reverse()); //NOSONAR
       },
     });
   }

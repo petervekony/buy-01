@@ -60,6 +60,11 @@
                     <h3>You own this product</h3>
                   </div>
                 </div>
+                <div class="footer" *ngIf="user?.id !== owner?.id">
+                  <button class="buy" pButton pRiple (click)="addToCart()">
+                    <mat-icon aria-hidden="false" aria-label="buy icon" fontIcon="shopping_cart"></mat-icon>
+                  </button>
+                </div>
               </div>
             </div>
           </ng-template>
@@ -127,7 +132,7 @@
               </div>
               <div class="button-container">
                 <button *ngIf="confirm" class="confirm-button" pButton pRiple label="Yes"
-                  (click)="deleteProduct(product.id!,false)"></button>
+                  (click)="deleteProduct(product.id!)"></button>
                 <button *ngIf="confirm" class="confirm-button" pButton pRiple label="No"
                   (click)="closeConfirm('product')" id="no-button"></button>
               </div>
@@ -138,11 +143,3 @@
     </div>
   </div>
 </div>
-<!-- <dialog #confirmDelete> -->
-<!--   <div class="confirm-container"> -->
-<!--     <button class="confirm-button" pButton pRiple label="Yes" (click)="deleteProduct(product.id!)"></button> -->
-<!--     <button class="confirm-button" pButton pRiple label="No" (click)="closeConfirm('product')"></button> -->
-<!--   </div> -->
-<!-- </dialog> -->
-<!-- <dialog #confirmImageDelete> -->
-<!-- </dialog> -->

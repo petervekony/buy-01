@@ -75,14 +75,13 @@ export class ProductService {
       .post<ProductCreationResponse>(address, form, { withCredentials: true })
       .pipe(
         map((data: ProductCreationResponse) => {
-          if (mediaForm && mediaForm.get('image') !== null) {
+          if (mediaForm && mediaForm?.get('image') !== null) {
             this.mediaService.addMedia(data.product.id!, mediaForm).pipe(
               takeUntilDestroyed(this.destroyRef),
             ).subscribe({
               next: () => this.mediaService.updateImageAdded({} as Media),
-              error: ((err) => console.log(err)),
             });
-            mediaForm.append('name', '');
+            mediaForm?.append('name', '');
             return data.product;
           }
           return data.product;
@@ -98,9 +97,6 @@ export class ProductService {
     ).subscribe({
       next: () => {
         this.updateProductAdded({} as Product);
-      },
-      error: (err) => {
-        console.log(err);
       },
     });
   }

@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup.component';
 import { of } from 'rxjs';
 import { CheckboxModule } from 'primeng/checkbox';
 import { UserService } from '../service/user.service';
-import { Router } from '@angular/router';
 import { AuthService } from '../service/auth.service';
 import { User } from '../interfaces/user';
 

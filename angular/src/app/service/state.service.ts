@@ -54,7 +54,7 @@ export class StateService implements OnInit {
   }
 
   setUserState(user: User) {
-    this._state.next(user);
+    this._state?.next(user);
   }
 
   get cookie(): string | undefined {
