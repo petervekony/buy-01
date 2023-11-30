@@ -21,24 +21,17 @@ public class Order {
 
   private String buyerId;
 
-  private ProductDTO[] products;
+  private ProductDTO product;
 
   private OrderStatus status;
 
-  private Double totalPrice;
-
   private Date orderPlacedAt;
 
-  public Order(String sellerId, String buyerId, ProductDTO[] products) {
+  public Order(String sellerId, String buyerId, ProductDTO product) {
     this.sellerId = sellerId;
     this.buyerId = buyerId;
-    this.products = products;
+    this.product = product;
 
     this.status = OrderStatus.PENDING;
-
-    this.totalPrice = 0.0;
-    for (ProductDTO product : this.products) {
-      totalPrice += product.getPrice();
-    }
   }
 }

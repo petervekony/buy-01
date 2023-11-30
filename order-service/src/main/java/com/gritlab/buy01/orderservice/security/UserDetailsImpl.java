@@ -7,8 +7,10 @@ import java.util.Objects;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.gritlab.buy01.orderservice.exception.UnexpectedPrincipalTypeException;
 import com.gritlab.buy01.orderservice.model.User;
 
 public class UserDetailsImpl implements UserDetails {
@@ -93,5 +95,14 @@ public class UserDetailsImpl implements UserDetails {
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + ((authorities == null) ? 0 : authorities.hashCode());
     return result;
+  }
+
+  public static UserDetailsImpl getPrincipal() throws UnexpectedPrincipalTypeException {
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (principal instanceof UserDetailsImpl userDetailsImpl) {
+      return userDetailsImpl;
+    } else {
+      throw new UnexpectedPrincipalTypeException("Unexpected principal type");
+    }
   }
 }

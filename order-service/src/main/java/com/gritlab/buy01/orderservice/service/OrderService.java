@@ -9,10 +9,14 @@ import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartResponse;
+import com.gritlab.buy01.orderservice.dto.OrderStatusUpdate;
 import com.gritlab.buy01.orderservice.dto.PersonalOrders;
+import com.gritlab.buy01.orderservice.exception.ForbiddenException;
+import com.gritlab.buy01.orderservice.exception.NotFoundException;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.orderservice.model.Order;
+import com.gritlab.buy01.orderservice.model.enums.OrderStatus;
 import com.gritlab.buy01.orderservice.repository.OrderRepository;
 import com.gritlab.buy01.orderservice.security.UserDetailsImpl;
 
@@ -78,5 +82,33 @@ public class OrderService {
         cartValidationResponse.getProcessedOrders(),
         cartValidationResponse.getUnprocessedOrders(),
         cartValidationResponse.getOrderModifications());
+  }
+
+  public Order changeOrderStatus(OrderStatusUpdate update, String userId, String role)
+      throws NotFoundException, ForbiddenException {
+    Optional<Order> orderQuery = orderRepository.findById(update.getId());
+    if (orderQuery.isEmpty()) {
+      throw new NotFoundException("Error: order not found");
+    }
+
+    if (update.getStatus() == OrderStatus.PENDING
+        || (role.equals("ROLE_CLIENT") && update.getStatus() != OrderStatus.CANCELLED)) {
+      throw new ForbiddenException("Error: unauthorized status update");
+    }
+
+    Order order = orderQuery.get();
+
+    if (!order.getSellerId().equals(userId) && !order.getBuyerId().equals(userId)) {
+      throw new ForbiddenException("Error: you are neither the seller, nor the buyer");
+    }
+
+    if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.CONFIRMED) {
+      String message =
+          String.format("Error: order is already %s", order.getStatus().toString().toLowerCase());
+      throw new ForbiddenException(message);
+    }
+
+    order.setStatus(update.getStatus());
+    return order;
   }
 }

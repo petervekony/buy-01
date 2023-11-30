@@ -75,6 +75,20 @@ services:
     #   retries: 3
     #   start_period: 30s
 
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb+srv://${DB_USER}:${DB_PASS}@buy-01.ozmlpob.mongodb.net/?authSource=admin
+      SPRING_DATA_MONGODB_DB: buy-01-orders
+    ports:
+      - "8083:8080"
+    depends_on:
+      # - mongodb
+      - zookeeper
+      - kafka
+
   frontend:
     build:
       context: ./angular
@@ -84,8 +98,6 @@ services:
       - "443:443"
     volumes:
       - ${CERT_PATH}:/etc/nginx/ssl:ro
-      # - /home/tvntvn/cert:/etc/nginx/ssl:ro
-      # - ./angular/cert:/etc/nginx/ssl:ro
     environment:
       - SSL_CERT_NAME=${SSL_CERT_NAME}
       - SSL_CERT_KEY_NAME=${SSL_CERT_KEY_NAME}
