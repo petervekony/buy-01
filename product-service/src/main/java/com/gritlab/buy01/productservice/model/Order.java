@@ -1,5 +1,6 @@
 package com.gritlab.buy01.productservice.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Document(collection = "orders")
 @Data
-public class Order {
+public class Order implements Serializable {
   @Id private String id;
 
   private String sellerId;

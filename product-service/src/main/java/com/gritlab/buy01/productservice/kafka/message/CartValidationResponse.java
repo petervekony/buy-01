@@ -16,5 +16,5 @@ public class CartValidationResponse {
   private Cart cart;
 
   // this contains all the modifications for the unprocessed orders
-  private OrderModifications[] orderModifications;
+  private OrderModifications orderModifications;
 }

@@ -1,6 +1,5 @@
 package com.gritlab.buy01.orderservice.kafka.message;
 
-
 import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.OrderModifications;
 
@@ -17,5 +16,5 @@ public class CartValidationResponse {
   private Cart cart;
 
   // this contains all the modifications for the unprocessed orders
-  private OrderModifications[] orderModifications;
+  private OrderModifications orderModifications;
 }
