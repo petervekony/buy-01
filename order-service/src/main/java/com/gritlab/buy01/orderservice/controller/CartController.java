@@ -94,6 +94,7 @@ public class CartController {
       }
 
       this.cartService.deleteItemFromCart(id, principal.getId());
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     } catch (ForbiddenException e) {
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
@@ -110,6 +111,4 @@ public class CartController {
   }
 
   // update item quantity in cart
-  @PreAuthorize("isAuthenticated()")
-    
 }
