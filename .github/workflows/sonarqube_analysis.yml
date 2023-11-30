@@ -92,6 +92,18 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
 
+      - name: SonarQube Scan (Media Service)
+        if: matrix.project == 'order-service'
+        run: |
+          TEST_REPORT_PATH=""
+          if [ -f reports/test-report.xml ]; then
+            TEST_REPORT_PATH="-Dsonar.testExecutionReportPaths=reports/test-report.xml"
+          fi
+          ./run_sonar_scanner.sh order-service -Dsonar.projectKey=order-service-github -Dsonar.host.url=http://64.226.78.45:9000 -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.java.binaries=target/classes -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info $TEST_REPORT_PATH
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: http://64.226.78.45:9000
+
       - name: SonarQube Scan (Angular)
         if: matrix.project == 'angular'
         run: |
