@@ -4,8 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { OrderService } from '../service/order.service';
 import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
-import { Product } from '../interfaces/product';
-import { Order } from '../interfaces/order';
+import { CartItem, Order } from '../interfaces/order';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -14,7 +13,7 @@ import { Order } from '../interfaces/order';
 })
 export class ShoppingCartComponent implements OnInit {
   // NOTE: change to Order
-  cards$: Observable<Product[]> | null = null;
+  cards$: Observable<CartItem[]> = of([]);
 
   // NOTE: just for testing this part!
   // cards$: Observable<Product[]> | null = null;
@@ -32,28 +31,32 @@ export class ShoppingCartComponent implements OnInit {
     this.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (user) => {
         this.currentUser = user;
-        this.getOrders(this.currentUser.id);
         console.log('user:', this.currentUser); //NOSONAR
+        this.getOrders();
       },
     );
 
     this.orderService.orderUpdates$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.getOrders(this.currentUser.id));
+      .subscribe(() => {
+        this.getOrders();
+      });
   }
 
-  getOrders(userId: string): void {
-    this.orderService.getCart(userId)?.pipe(
+  getOrders(): void {
+    this.orderService.getShoppingCart().pipe(
       takeUntilDestroyed(this.destroyRef),
-    )
-      .subscribe((data) => {
-        this.orders = data.orders;
+    ).subscribe({
+      next: (products) => {
+        this.cards$ = of(products);
+        this.empty = products.length === 0;
+      },
+    });
+  }
 
-        for (const value of Object.values(data.orders)) {
-          this.cards$ = of(value.products);
-        }
-        // this.empty = data.products.length === 0;
-        // this.cards$ = of(data.products);
-        // console.log('orders:', data.products); //NOSONAR
+  confirmOrder(): void {
+    this.orderService.sendOrder().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((response) => {
+        this.cards$ = of(response);
       });
   }
 }

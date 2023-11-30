@@ -1,24 +1,20 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 import { OrderService } from '../service/order.service';
-import { Product } from '../interfaces/product';
+import { CartItem } from '../interfaces/order';
 
 @Component({
   selector: 'app-order-card',
   templateUrl: './order-card.component.html',
   styleUrls: ['./order-card.component.css'],
 })
-export class OrderCardComponent implements OnInit {
+export class OrderCardComponent {
   @Input()
-    card: Product = {} as Product;
+    card: CartItem = {} as CartItem;
 
   private orderService = inject(OrderService);
 
-  ngOnInit(): void {
-    console.log('shop cart'); //NOSONAR
-  }
-
   removeItem() {
-    console.log('delete item:', this.card.id); //NOSONAR
-    this.orderService.removeItem(this.card.id!);
+    console.log('delete item:', this.card.product.id); //NOSONAR
+    this.orderService.removeItem(this.card.product.id!);
   }
 }

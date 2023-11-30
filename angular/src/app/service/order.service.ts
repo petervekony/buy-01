@@ -1,11 +1,12 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
-import { Order } from '../interfaces/order';
-import { Cart } from '../interfaces/cart';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { CartItem, Order } from '../interfaces/order';
 import { Product } from '../interfaces/product';
 import { StateService } from './state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { User } from '../interfaces/user';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -13,22 +14,24 @@ import { User } from '../interfaces/user';
 export class OrderService {
   private stateService = inject(StateService);
   private destroyRef = inject(DestroyRef);
+  private http = inject(HttpClient);
 
   private readonly LOCAL_STORAGE_KEY = 'buy-02';
 
-  private _storage: Map<string, Cart> = new Map<string, Cart>();
-  private _cart: Cart | undefined = {} as Cart; //NOSONAR
   private user: User = {} as User;
+  private products: CartItem[] = [];
 
   constructor() {
     this.stateService.getStateAsObservable().pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((user) => {
       this.user = user;
-      this._storage = this.loadFromLocalStorage();
-      this._cart = this._storage?.get(this.user.id);
+      this.products = this.loadFromLocalStorage();
     });
   }
+
+  private filterTypeSubject = new BehaviorSubject<string>('ALL');
+  filterType$ = this.filterTypeSubject.asObservable();
 
   private orderUpdateSource = new Subject<Order>();
   orderUpdates$ = this.orderUpdateSource.asObservable();
@@ -37,102 +40,132 @@ export class OrderService {
     this.orderUpdateSource.next(order);
   }
 
-  //NOTE: FUCK THIS
-  getCart(userId: string): Observable<Cart> | null {
-    const cart = this.loadFromLocalStorage()?.get(userId);
-    console.log(this.loadFromLocalStorage()); //NOSONAR
-    console.log(cart); //NOSONAR
-    if (!cart) return null;
-    return of(cart);
+  setFilterType(filter: string): void {
+    this.filterTypeSubject.next(filter);
   }
 
-  private loadFromLocalStorage(): Map<string, Cart> {
+  resetFilterType(): void {
+    setTimeout(() => this.setFilterType('ALL'), 15);
+  }
+
+  sendOrder(): Observable<CartItem[]> {
+    const address = environment.cartUrl;
+    return this.http.post<CartItem[]>(address, this.products, {
+      withCredentials: true,
+    });
+  }
+
+  // getShoppingCart(filter: string = 'ALL'): void {
+  //   const address = environment.cartUrl;
+  //   this.http.get<CartItem[]>(address, { withCredentials: true }).pipe(
+  //     takeUntilDestroyed(this.destroyRef),
+  //   )
+  //     .subscribe((items) => {
+  //       this.products = items;
+  //       this.filterOrders(filter);
+  //     });
+  // }
+
+  private loadFromLocalStorage(): CartItem[] {
     const localStorageData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
     if (localStorageData) {
       try {
-        // const data = JSON.parse(atob(localStorageData));
-        const data = JSON.parse(localStorageData);
-        return new Map(Object.entries(data));
+        const data = JSON.parse(atob(localStorageData)); //NOSONAR
+        return data;
       } catch (e) {
-        this._storage = new Map<string, Cart>();
-        return new Map<string, Cart>();
+        this.products = [];
+        return [];
       }
     }
-    this._storage = new Map<string, Cart>();
-    return new Map<string, Cart>();
+    this.products = [];
+    return [];
   }
 
-  getStorage(): Map<string, Cart> {
-    return this._storage;
+  getShoppingCart(filter: string = 'ALL'): Observable<CartItem[]> {
+    return this.filterOrders(filter);
   }
 
-  addToCart(product: Product, userId: string): void {
-    let cart = this._storage?.get(userId);
-    if (!cart) cart = this.createCart();
-    const updatedCart = this.updateCart(cart, product);
-    this._storage = this._storage.set(userId, updatedCart);
-    // this._storage.set(userId, updatedCart);
-    console.log('addToCart, this._storage', this._storage);
-    this.setStorage();
-    console.log('cart:', this._storage); //NOSONAR
-  }
-
-  private updateCart(existingCart: Cart, newProduct: Product): Cart {
-    const orders: Map<string, Order> = existingCart.orders;
-    console.log('updateCart:', orders);
-    if (orders.has(newProduct.userId!)) {
-      console.log('orders.has!!');
-      const products = orders.get(newProduct.userId!)?.products;
-      if (!products?.includes(newProduct)) {
-        products!.push(newProduct);
-      }
-    } else {
-      console.log('order didnt have');
-      existingCart = this.createOrder(existingCart, newProduct);
-      console.log('existingCaart:', existingCart);
+  private filterOrders(filter: string): Observable<CartItem[]> {
+    switch (filter) {
+    case 'CONFIRMED':
+      return of(
+        this.loadFromLocalStorage().filter((e) => e.status === 'CONFIRMED'),
+      );
+    case 'PENDING':
+      return of(
+        this.loadFromLocalStorage().filter((e) => e.status === 'PENDING'),
+      );
+    case 'CANCELLED':
+      return of(
+        this.loadFromLocalStorage().filter((e) => e.status === 'CANCELLED'),
+      );
+    case 'ALL':
+      return of(
+        this.loadFromLocalStorage(),
+      );
     }
-    return existingCart;
+    return of([]);
   }
 
-  createCart(): Cart {
-    return { orders: new Map<string, Order>() } as Cart;
+  // private filterOrders(filter: string): Observable<CartItem[]> {
+  //   switch (filter) {
+  //   case 'CONFIRMED':
+  //     return of(
+  //       this.products.filter((e) => e.status === 'CONFIRMED'),
+  //     );
+  //   case 'PENDING':
+  //     return of(
+  //       this.products.filter((e) => e.status === 'PENDING'),
+  //     );
+  //   case 'CANCELLED':
+  //     return of(
+  //       this.products.filter((e) => e.status === 'CANCELLED'),
+  //     );
+  //   case 'ALL':
+  //     return of(
+  //       this.products,
+  //     );
+  //   }
+  //   return of([]);
+  // }
+
+  addToCart(product: Product): void {
+    const shoppingCart = this.loadFromLocalStorage();
+    //NOSONAR
+    // console.log('cart', shoppingCart); //NOSONAR
+    // console.log(shoppingCart.some((e) => e.product.id === product.id)); //NOSONAR
+
+    if (!shoppingCart.some((e) => e.product.id === product.id)) {
+      const newOrder = this.createOrder(product);
+      shoppingCart.push(newOrder);
+      //NOSONAR
+      // console.log('shoppingCart:', shoppingCart); //NOSONAR
+      // this.setStorage(shoppingCart.reverse()); //NOSONAR
+    }
   }
 
-  private createOrder(existingCart: Cart, product: Product): Cart {
+  private createOrder(product: Product): CartItem {
     const newOrder = {
       status: 'PENDING',
       buyerId: this.user.id,
       sellerId: product.userId,
-      products: [product],
-      totalPrice: product.price,
-    } as Order;
-    existingCart.orders.set(product.userId!, newOrder);
-    return existingCart;
+      product: product,
+      quantity: 1,
+    } as CartItem;
+    return newOrder;
   }
 
   removeItem(productId: string): void {
+    this.products = this.loadFromLocalStorage();
+    this.products = this.products.filter((e) => e.product.id !== productId);
+    this.setStorage(this.products);
     console.log(productId); //NOSONAR
+    this.updateOrders({} as Order);
   }
 
-  // private createStorage(
-  //   userId: string,
-  //   orders: Map<string, Order> = new Map<string, Order>(),
-  // ): Map<string, Cart> {
-  //   const newCart: Cart = {
-  //     orders: orders,
-  //   };
-
-  //   const storage = new Map<string, Cart>();
-  //   storage.set(userId, newCart);
-
-  //   return storage;
-  // }
-
-  setStorage(): void {
-    // this._storage.set(userId, cart);
-    const encodedData = JSON.stringify(Object.fromEntries(this._storage));
-    // const encodedData = btoa(JSON.stringify(Object.fromEntries(this._storage)));
+  setStorage(products: CartItem[]): void {
+    const encodedData = btoa(JSON.stringify(products));
     localStorage.setItem(this.LOCAL_STORAGE_KEY, encodedData);
-    // this.updateOrders({} as Order);
+    this.updateOrders({} as Order);
   }
 }

@@ -2,16 +2,20 @@ import { Product } from './product';
 
 export interface Order {
   id?: string;
-  name: string;
   status: 'PENDING' | 'CANCELLED' | 'CONFIRMED';
   buyerId: string;
   sellerId: string;
-  products: Product[];
-  totalPrice: number;
-  timestamp?: Date;
+  product: Product;
+  orderPlacedAt?: Date;
+  quantity: number;
 }
 
-// export interface OrderGroup {
-//   seller: string;
-//   products: Product[];
-// }
+export interface CartItem {
+  id?: string;
+  status: 'PENDING' | 'CANCELLED' | 'CONFIRMED';
+  buyerId: string;
+  sellerId: string;
+  product: Product;
+  addedToCartAt?: Date;
+  quantity: number;
+}

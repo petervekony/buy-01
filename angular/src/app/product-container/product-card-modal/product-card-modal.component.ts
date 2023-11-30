@@ -193,7 +193,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   }
 
   addToCart() {
-    this.orderService.addToCart(this.product, this.user!.id);
+    this.orderService.addToCart(this.product);
   }
 
   initFormValues() {
