@@ -1,12 +1,11 @@
-package com.gritlab.buy01.orderservice.model;
+package com.gritlab.buy01.productservice.model;
 
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.gritlab.buy01.orderservice.dto.ProductDTO;
-import com.gritlab.buy01.orderservice.model.enums.OrderStatus;
+import com.gritlab.buy01.productservice.model.enums.OrderStatus;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

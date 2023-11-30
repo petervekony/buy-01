@@ -79,8 +79,8 @@ public class OrderService {
     }
 
     return new CartResponse(
-        cartValidationResponse.getProcessedOrders(),
-        cartValidationResponse.getUnprocessedOrders(),
+        cartValidationResponse.getCart(),
+        cartValidationResponse.getProcessed(),
         cartValidationResponse.getOrderModifications());
   }
 

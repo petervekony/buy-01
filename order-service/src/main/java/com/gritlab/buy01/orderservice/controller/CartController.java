@@ -50,9 +50,12 @@ public class CartController {
       return new ResponseEntity<>(cart, HttpStatus.OK);
 
     } catch (UnexpectedPrincipalTypeException | ForbiddenException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+
     } catch (Exception e) {
+
       ErrorMessage error =
           new ErrorMessage(
               "Error: something went wrong with fetching the cart",
@@ -72,10 +75,14 @@ public class CartController {
 
       CartItem addedToCart = this.cartService.addToCart(item);
       return new ResponseEntity<>(addedToCart, HttpStatus.OK);
+
     } catch (ForbiddenException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+
     } catch (Exception e) {
+
       ErrorMessage error =
           new ErrorMessage(
               "Error: something went wrong with adding product to cart",
@@ -95,13 +102,19 @@ public class CartController {
 
       this.cartService.deleteItemFromCart(id, principal.getId());
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
     } catch (ForbiddenException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+
     } catch (NotFoundException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.NOT_FOUND.value());
       return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+
     } catch (Exception e) {
+
       ErrorMessage error =
           new ErrorMessage(
               "Error: something went wrong with removing item from cart",

@@ -1,8 +1,7 @@
-package com.gritlab.buy01.orderservice.kafka.message;
+package com.gritlab.buy01.productservice.kafka.message;
 
-
-import com.gritlab.buy01.orderservice.dto.Cart;
-import com.gritlab.buy01.orderservice.dto.OrderModifications;
+import com.gritlab.buy01.productservice.dto.Cart;
+import com.gritlab.buy01.productservice.dto.OrderModifications;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

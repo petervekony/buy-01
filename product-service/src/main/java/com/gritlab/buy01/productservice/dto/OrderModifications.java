@@ -1,6 +1,6 @@
-package com.gritlab.buy01.orderservice.dto;
+package com.gritlab.buy01.productservice.dto;
 
-import com.gritlab.buy01.orderservice.model.Order;
+import com.gritlab.buy01.productservice.model.Order;
 
 import lombok.Data;
 
