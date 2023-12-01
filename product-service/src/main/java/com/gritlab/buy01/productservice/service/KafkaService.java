@@ -20,13 +20,17 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.productservice.cache.CachedTokenInfo;
+import com.gritlab.buy01.productservice.event.CartValidationEvent;
 import com.gritlab.buy01.productservice.event.ProductOwnershipValidationEvent;
 import com.gritlab.buy01.productservice.event.UserProductsDeletionEvent;
+import com.gritlab.buy01.productservice.kafka.message.CartValidationRequest;
+import com.gritlab.buy01.productservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.productservice.kafka.message.ProductMediaDeleteMessage;
 import com.gritlab.buy01.productservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationResponse;
 import com.gritlab.buy01.productservice.kafka.message.UserProfileDeleteMessage;
+import com.gritlab.buy01.productservice.kafka.utils.ConcurrentHashSet;
 
 @Service
 public class KafkaService {
@@ -35,17 +39,33 @@ public class KafkaService {
   private static final String TOPIC_REQUEST = "token-validation-request";
   private static final String TOPIC_RESPONSE = "token-validation-response";
 
-  @Autowired
   @Qualifier("tokenValidationRequestKafkaTemplate")
-  private KafkaTemplate<String, TokenValidationRequest> tokenValidationRequestKafkaTemplate;
+  private final KafkaTemplate<String, TokenValidationRequest> tokenValidationRequestKafkaTemplate;
 
-  @Autowired
   @Qualifier("productMediaDeleteMessageKafkaTemplate")
-  private KafkaTemplate<String, ProductMediaDeleteMessage> productMediaDeleteMessageKafkaTemplate;
+  private final KafkaTemplate<String, ProductMediaDeleteMessage>
+      productMediaDeleteMessageKafkaTemplate;
+
+  @Qualifier("cartValidationResponseKafkaTemplate")
+  private final KafkaTemplate<String, CartValidationResponse> cartValidationResponseKafkaTemplate;
+
+  private ApplicationEventPublisher eventPublisher;
 
   // token validation responses are cached to limit the number of kafka messages
   private ConcurrentMap<String, CachedTokenInfo> tokenCache = new ConcurrentHashMap<>();
   private static final long TOKEN_CACHE_DURATION = TimeUnit.MINUTES.toMillis(5);
+
+  @Autowired
+  public KafkaService(
+      KafkaTemplate<String, TokenValidationRequest> tokenValidationRequestKafkaTemplate,
+      KafkaTemplate<String, ProductMediaDeleteMessage> productMediaDeleteMessageKafkaTemplate,
+      KafkaTemplate<String, CartValidationResponse> cartValidationResponseKafkaTemplate,
+      ApplicationEventPublisher eventPublisher) {
+    this.tokenValidationRequestKafkaTemplate = tokenValidationRequestKafkaTemplate;
+    this.productMediaDeleteMessageKafkaTemplate = productMediaDeleteMessageKafkaTemplate;
+    this.cartValidationResponseKafkaTemplate = cartValidationResponseKafkaTemplate;
+    this.eventPublisher = eventPublisher;
+  }
 
   public ConcurrentMap<String, CachedTokenInfo> getTokenCache() {
     return tokenCache;
@@ -54,7 +74,7 @@ public class KafkaService {
   // to track processed messages and ensure idempotency
   private Set<String> processedCorrelationIds = new HashSet<>();
 
-  @Autowired private ApplicationEventPublisher eventPublisher;
+  private ConcurrentHashSet<String> processedOrderCorrelationIds = new ConcurrentHashSet<>();
 
   private ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> responseQueues =
       new ConcurrentHashMap<>();
@@ -80,7 +100,6 @@ public class KafkaService {
     if (request.getCorrelationId() != null) {
       responseQueues.put(request.getCorrelationId(), queue);
     } else {
-      System.out.println("Error: Correlation ID is null");
       return null;
     }
     tokenValidationRequestKafkaTemplate.send(TOPIC_REQUEST, request);
@@ -143,5 +162,29 @@ public class KafkaService {
     eventPublisher.publishEvent(
         new ProductOwnershipValidationEvent(
             this, request.getProductId(), request.getUserId(), request.getCorrelationId()));
+  }
+
+  @KafkaListener(
+      topics = "cart-validation-request",
+      groupId = "cart-validation-request-group",
+      containerFactory = "kafkaCartValidationRequestListenerContainerFactory")
+  public void validateCart(CartValidationRequest request) {
+    String correlationId = request.getCorrelationId();
+
+    if (!processedOrderCorrelationIds.contains(correlationId)) {
+      System.out.println(request);
+      System.out.println("CART VALIDATION REQUEST RECEIVED!!!!!");
+      System.out.println(
+          "THIS IS THE CART IN THE KAFKA LISTENER!!!" + request.getCart().toString());
+      eventPublisher.publishEvent(
+          new CartValidationEvent(this, request.getCorrelationId(), request.getCart()));
+
+      processedOrderCorrelationIds.add(correlationId);
+    }
+  }
+
+  public void sendCartValidationResponse(CartValidationResponse response) {
+    System.out.println("CARTVALIDATIONRESPONSE SENT BACK!!!" + response);
+    cartValidationResponseKafkaTemplate.send("cart-validation-response", response);
   }
 }

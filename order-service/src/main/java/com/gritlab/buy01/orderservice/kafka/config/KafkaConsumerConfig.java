@@ -65,6 +65,16 @@ public class KafkaConsumerConfig {
     return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
   }
 
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, CartValidationResponse>
+      cartValidationResponseContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, CartValidationResponse> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(cartValidationResponseConsumerFactory());
+    factory.setConcurrency(3);
+    return factory;
+  }
+
   // @Bean
   // public ConsumerFactory<String, UserAvatarDeleteMessage> userAvatarDeletionConsumerFactory() {
   //   Map<String, Object> configs = consumerConfigs();

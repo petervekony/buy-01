@@ -118,7 +118,10 @@ public class KafkaService {
     }
   }
 
-  @KafkaListener(topics = CART_VALIDATION_RESPONSE, groupId = "cart-validation-group")
+  @KafkaListener(
+      topics = CART_VALIDATION_RESPONSE,
+      groupId = "cart-validation-group",
+      containerFactory = "cartValidationResponseContainerFactory")
   public void consumeCartValidationResponse(CartValidationResponse response) {
     BlockingQueue<CartValidationResponse> queue =
         cartValidationResponseQueues.get(response.getCorrelationId());

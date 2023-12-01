@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartItemDTO;
 import com.gritlab.buy01.orderservice.exception.ForbiddenException;
 import com.gritlab.buy01.orderservice.exception.NotFoundException;
 import com.gritlab.buy01.orderservice.model.CartItem;
+import com.gritlab.buy01.orderservice.model.Order;
 import com.gritlab.buy01.orderservice.repository.CartRepository;
 
 @Service
@@ -19,14 +21,29 @@ public class CartService {
     this.cartRepository = cartRepository;
   }
 
-  public ArrayList<CartItem> getCart(String userId) {
+  public Cart getCart(String userId) {
     Optional<ArrayList<CartItem>> cartQuery = cartRepository.findAllByBuyerId(userId);
 
     if (cartQuery.isEmpty()) {
-      return new ArrayList<>();
+      return null;
     }
 
-    return cartQuery.get();
+    Cart cart = new Cart();
+    ArrayList<Order> orders = new ArrayList<>();
+    ArrayList<CartItem> cartItems = cartQuery.get();
+    for (CartItem item : cartItems) {
+      Order order = new Order();
+      order.setId(item.getId());
+      order.setSellerId(item.getSellerId());
+      order.setBuyerId(item.getBuyerId());
+      order.setProduct(item.getProduct());
+      order.setQuantity(item.getQuantity());
+
+      orders.add(order);
+    }
+    cart.setOrders(orders.toArray(new Order[0]));
+
+    return cart;
   }
 
   public CartItem addToCart(CartItemDTO cartItemDTO) {

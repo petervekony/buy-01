@@ -1,4 +1,4 @@
-package com.gritlab.buy01.orderservice.model;
+package com.gritlab.buy01.productservice.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -6,8 +6,7 @@ import java.util.Date;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.gritlab.buy01.orderservice.dto.ProductDTO;
-import com.gritlab.buy01.orderservice.model.enums.OrderStatus;
+import com.gritlab.buy01.productservice.model.enums.OrderStatus;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -35,5 +34,7 @@ public class Order implements Serializable {
     this.buyerId = buyerId;
     this.product = product;
     this.quantity = quantity;
+
+    this.status = OrderStatus.PENDING;
   }
 }

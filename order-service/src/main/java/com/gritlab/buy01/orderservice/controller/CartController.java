@@ -1,6 +1,5 @@
 package com.gritlab.buy01.orderservice.controller;
 
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartItemDTO;
 import com.gritlab.buy01.orderservice.exception.ForbiddenException;
 import com.gritlab.buy01.orderservice.exception.NotFoundException;
@@ -42,17 +42,20 @@ public class CartController {
   public ResponseEntity<?> getCart() {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
-      ArrayList<CartItem> cart = cartService.getCart(principal.getId());
-      if (cart.isEmpty()) {
+      Cart cart = cartService.getCart(principal.getId());
+      if (cart == null) {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       }
 
       return new ResponseEntity<>(cart, HttpStatus.OK);
 
     } catch (UnexpectedPrincipalTypeException | ForbiddenException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+
     } catch (Exception e) {
+
       ErrorMessage error =
           new ErrorMessage(
               "Error: something went wrong with fetching the cart",
@@ -70,12 +73,20 @@ public class CartController {
         throw new ForbiddenException("Error: only clients can add items to cart");
       }
 
+      if (!principal.getId().equals(item.getBuyerId())) {
+        throw new ForbiddenException("Error: you can only add items to your own cart");
+      }
+
       CartItem addedToCart = this.cartService.addToCart(item);
       return new ResponseEntity<>(addedToCart, HttpStatus.OK);
+
     } catch (ForbiddenException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+
     } catch (Exception e) {
+
       ErrorMessage error =
           new ErrorMessage(
               "Error: something went wrong with adding product to cart",
@@ -95,13 +106,19 @@ public class CartController {
 
       this.cartService.deleteItemFromCart(id, principal.getId());
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
     } catch (ForbiddenException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+
     } catch (NotFoundException e) {
+
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.NOT_FOUND.value());
       return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+
     } catch (Exception e) {
+
       ErrorMessage error =
           new ErrorMessage(
               "Error: something went wrong with removing item from cart",

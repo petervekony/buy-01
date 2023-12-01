@@ -105,6 +105,7 @@ services:
       - user-service
       - product-service
       - media-service
+      - order-service
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
