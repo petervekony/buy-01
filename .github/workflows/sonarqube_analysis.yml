@@ -3,7 +3,7 @@ name: SonarQube Analysis
 on:
   push:
     branches:
-      - "**"
+      - "staging"
 
 jobs:
   sonarqube_scan:
@@ -92,7 +92,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://64.226.78.45:9000
 
-      - name: SonarQube Scan (Media Service)
+      - name: SonarQube Scan (Order Service)
         if: matrix.project == 'order-service'
         run: |
           TEST_REPORT_PATH=""
