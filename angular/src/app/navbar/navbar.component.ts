@@ -32,7 +32,7 @@ export class NavbarComponent implements OnInit {
   route: string = '';
   seller: boolean = false;
   dash = false;
-  home = true;
+  home = false;
   profile = false;
   currentUser: User = {} as User;
   user$ = new Subject<User>();

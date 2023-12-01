@@ -1,6 +1,7 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { Order } from '../interfaces/order';
 import { OrderService } from '../service/order.service';
+import { CartItem } from '../interfaces/order';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-card',
@@ -9,16 +10,27 @@ import { OrderService } from '../service/order.service';
 })
 export class OrderCardComponent implements OnInit {
   @Input()
-    card: Order = {} as Order;
+    card: CartItem = {} as CartItem;
+  @Input()
+    filter: string = 'ALL';
+
+  shopcart = false;
+  max: number = 0;
 
   private orderService = inject(OrderService);
+  private router = inject(Router);
 
   ngOnInit(): void {
-    console.log('shop cart'); //NOSONAR
+    this.shopcart = this.router.url === '/shopcart';
+    this.max = this.card.product.quantity;
+  }
+
+  updateQuantity() {
+    this.orderService.modifyOrder(this.card);
   }
 
   removeItem() {
-    console.log('delete item:', this.card.productId); //NOSONAR
-    this.orderService.removeItem(this.card.productId);
+    console.log('delete item:', this.card.product.id); //NOSONAR
+    this.orderService.removeItem(this.card.product.id!);
   }
 }

@@ -1,11 +1,12 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
-import { Observable, of, Subject } from 'rxjs';
-import { Order } from '../interfaces/order';
-import { Cart } from '../interfaces/cart';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
+import { CartItem, Order } from '../interfaces/order';
 import { Product } from '../interfaces/product';
 import { StateService } from './state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { User } from '../interfaces/user';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -13,21 +14,24 @@ import { User } from '../interfaces/user';
 export class OrderService {
   private stateService = inject(StateService);
   private destroyRef = inject(DestroyRef);
+  private http = inject(HttpClient);
 
   private readonly LOCAL_STORAGE_KEY = 'buy-02';
 
-  private _storage: Map<string, Cart> = new Map<string, Cart>();
-  // private _cart: Cart | undefined = {} as Cart; //NOSONAR
   private user: User = {} as User;
+  private products: CartItem[] = [];
 
   constructor() {
     this.stateService.getStateAsObservable().pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((user) => {
       this.user = user;
-      this._storage = this.loadFromLocalStorage();
+      this.products = this.loadFromLocalStorage();
     });
   }
+
+  private filterTypeSubject = new BehaviorSubject<string>('ALL');
+  filterType$ = this.filterTypeSubject.asObservable();
 
   private orderUpdateSource = new Subject<Order>();
   orderUpdates$ = this.orderUpdateSource.asObservable();
@@ -36,109 +40,139 @@ export class OrderService {
     this.orderUpdateSource.next(order);
   }
 
-  removeItem(productId: string): void {
-    const cart = this.loadFromLocalStorage()?.get(this.user.id);
-    console.log('cart2', cart); //NOSONAR
-    if (!cart) return;
-    const orders = cart.orders.filter((order) => order.productId !== productId);
-    const map = new Map<string, Cart>();
-    map.set(this.user.id, {
-      userId: this.user.id,
-      expiration: cart?.expiration ?? new Date(),
-      orders: orders ?? [],
+  setFilterType(filter: string): void {
+    this.filterTypeSubject.next(filter);
+  }
+
+  resetFilterType(): void {
+    setTimeout(() => this.setFilterType('ALL'), 15);
+  }
+
+  sendOrder(): Observable<CartItem[]> {
+    const address = environment.cartUrl;
+    return this.http.post<CartItem[]>(address, this.products, {
+      withCredentials: true,
     });
-    this.setCart(map);
   }
 
-  getOrders(userId: string): Observable<Order[]> | null {
-    const orders = this.loadFromLocalStorage()?.get(userId)?.orders;
-    console.log(this.loadFromLocalStorage()); //NOSONAR
-    console.log(orders); //NOSONAR
-    if (orders) return of(orders);
-    return of([]);
-  }
+  // getShoppingCart(filter: string = 'ALL'): void {
+  //   const address = environment.cartUrl;
+  //   this.http.get<CartItem[]>(address, { withCredentials: true }).pipe(
+  //     takeUntilDestroyed(this.destroyRef),
+  //   )
+  //     .subscribe((items) => {
+  //       this.products = items;
+  //       return this.filterOrders(filter, items);
+  //     });
+  // }
 
-  private loadFromLocalStorage(): Map<string, Cart> {
+  private loadFromLocalStorage(): CartItem[] {
     const localStorageData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
     if (localStorageData) {
       try {
-        const data = JSON.parse(atob(localStorageData));
-        return new Map(Object.entries(data));
+        const data = JSON.parse(atob(localStorageData)); //NOSONAR
+        return data;
       } catch (e) {
-        this._storage = new Map<string, Cart>();
-        return new Map<string, Cart>();
+        this.products = [];
+        return [];
       }
     }
-    this._storage = new Map<string, Cart>();
-    return new Map<string, Cart>();
+    this.products = [];
+    return [];
   }
 
-  getCart(): Map<string, Cart> {
-    return this._storage;
+  getShoppingCart(filter: string = 'ALL'): Observable<CartItem[]> {
+    return this.filterOrders(filter, this.loadFromLocalStorage());
   }
 
-  addToCart(product: Product, userId: string): void {
-    const newOrder: Order = {
-      name: product.name,
+  private filterOrders(
+    filter: string,
+    products: CartItem[],
+  ): Observable<CartItem[]> {
+    switch (filter) {
+    case 'CONFIRMED':
+      return of(
+        products.filter((e) => e.status === 'CONFIRMED'),
+      );
+    case 'PENDING':
+      return of(
+        products.filter((e) => e.status === 'PENDING'),
+      );
+    case 'CANCELLED':
+      return of(
+        products.filter((e) => e.status === 'CANCELLED'),
+      );
+    case 'ALL':
+      return of(products);
+    }
+    return of([]);
+  }
+
+  // private filterOrders(filter: string): Observable<CartItem[]> {
+  //   switch (filter) {
+  //   case 'CONFIRMED':
+  //     return of(
+  //       this.products.filter((e) => e.status === 'CONFIRMED'),
+  //     );
+  //   case 'PENDING':
+  //     return of(
+  //       this.products.filter((e) => e.status === 'PENDING'),
+  //     );
+  //   case 'CANCELLED':
+  //     return of(
+  //       this.products.filter((e) => e.status === 'CANCELLED'),
+  //     );
+  //   case 'ALL':
+  //     return of(
+  //       this.products,
+  //     );
+  //   }
+  //   return of([]);
+  // }
+
+  addToCart(product: Product): void {
+    const shoppingCart = this.loadFromLocalStorage();
+    //NOSONAR
+
+    if (!shoppingCart.some((e) => e.product.id === product.id)) {
+      const newOrder = this.createOrder(product);
+      shoppingCart.push(newOrder);
+      //NOSONAR
+      this.setStorage(shoppingCart.reverse()); //NOSONAR
+    }
+  }
+
+  private createOrder(product: Product): CartItem {
+    const newOrder = {
       status: 'PENDING',
-      customerId: userId,
-      sellerId: product.userId!,
-      productId: product.id!,
+      buyerId: this.user.id,
+      sellerId: product.userId,
+      product: product,
       quantity: 1,
-    };
-
-    if (this._storage.has(userId)) {
-      const existingCart = this._storage?.get(userId);
-      const updatedCart = this.updateCart(existingCart!, newOrder);
-      this.setCart(updatedCart);
-    } else {
-      const newCart = this.createCart(userId, [newOrder]);
-      this.setCart(newCart);
-    }
+    } as CartItem;
+    return newOrder;
   }
 
-  private updateCart(existingCart: Cart, newOrder: Order): Map<string, Cart> {
-    const { userId, orders } = existingCart;
-    const expiration = this.calculateExpiration();
-
-    if (orders?.some((order) => order.productId === newOrder.productId)) {
-      return this.createCart(userId, orders, expiration);
-    } else {
-      return this.createCart(userId, [newOrder, ...orders], expiration);
-    }
+  modifyOrder(cartItem: CartItem): void {
+    const shoppingCart = this.loadFromLocalStorage();
+    const index = shoppingCart.findIndex((e) =>
+      e.product.id === cartItem.product.id
+    );
+    if (index === -1) return;
+    shoppingCart[index] = cartItem;
+    this.setStorage(shoppingCart);
   }
 
-  private createCart(
-    userId: string,
-    orders: Order[] = [],
-    expiration: Date = this.calculateExpiration(),
-  ): Map<string, Cart> {
-    const newCart: Cart = {
-      userId: userId,
-      expiration: expiration,
-      orders: orders,
-    };
-
-    const newCartMap = new Map<string, Cart>();
-    newCartMap.set(userId, newCart);
-
-    return newCartMap;
-  }
-
-  private calculateExpiration(): Date {
-    const expiration = new Date();
-    expiration.setDate(expiration.getDate() + 2);
-    return expiration;
-  }
-
-  setCart(data: Map<string, Cart>): void {
-    this._storage = data;
-    const encodedData = btoa(JSON.stringify(Object.fromEntries(data)));
-    localStorage.setItem(this.LOCAL_STORAGE_KEY, encodedData);
+  removeItem(productId: string): void {
+    this.products = this.loadFromLocalStorage();
+    this.products = this.products.filter((e) => e.product.id !== productId);
+    this.setStorage(this.products);
     this.updateOrders({} as Order);
   }
 
-  resetCart(): void {
-    this.setCart(new Map<string, Cart>());
+  setStorage(products: CartItem[]): void {
+    const encodedData = btoa(JSON.stringify(products));
+    localStorage.setItem(this.LOCAL_STORAGE_KEY, encodedData);
+    this.updateOrders({} as Order);
   }
 }

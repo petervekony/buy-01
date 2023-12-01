@@ -1,10 +1,10 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { Order } from '../interfaces/order';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { OrderService } from '../service/order.service';
 import { StateService } from '../service/state.service';
 import { User } from '../interfaces/user';
+import { CartItem, Order } from '../interfaces/order';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -13,13 +13,14 @@ import { User } from '../interfaces/user';
 })
 export class ShoppingCartComponent implements OnInit {
   // NOTE: change to Order
-  cards$: Observable<Order[]> | null = null;
+  cards$: Observable<CartItem[]> = of([]);
 
   // NOTE: just for testing this part!
   // cards$: Observable<Product[]> | null = null;
   currentUser: User = {} as User;
   user$: Observable<User> | null = null;
   empty = true;
+  orders: Map<string, Order> | null = null;
 
   private destroyRef = inject(DestroyRef);
   private orderService = inject(OrderService);
@@ -30,23 +31,31 @@ export class ShoppingCartComponent implements OnInit {
     this.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (user) => {
         this.currentUser = user;
-        this.getOrders(this.currentUser.id);
-        console.log('user:', this.currentUser); //NOSONAR
+        this.getOrders();
       },
     );
 
     this.orderService.orderUpdates$.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.getOrders(this.currentUser.id));
+      .subscribe(() => {
+        this.getOrders();
+      });
   }
 
-  getOrders(userId: string): void {
-    this.orderService.getOrders(userId)?.pipe(
+  getOrders(): void {
+    this.orderService.getShoppingCart().pipe(
       takeUntilDestroyed(this.destroyRef),
-    )
-      .subscribe((orders) => {
-        this.empty = orders.length === 0;
-        this.cards$ = of(orders);
-        console.log('orders:', orders); //NOSONAR
+    ).subscribe({
+      next: (products) => {
+        this.cards$ = of(products);
+        this.empty = products.length === 0;
+      },
+    });
+  }
+
+  confirmOrder(): void {
+    this.orderService.sendOrder().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((response) => {
+        this.cards$ = of(response);
       });
   }
 }

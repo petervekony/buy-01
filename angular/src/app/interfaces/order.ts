@@ -1,8 +1,21 @@
+import { Product } from './product';
+
 export interface Order {
-  name: string;
+  id?: string;
   status: 'PENDING' | 'CANCELLED' | 'CONFIRMED';
-  customerId: string;
+  buyerId: string;
   sellerId: string;
-  productId: string;
+  product: Product;
+  orderPlacedAt?: Date;
+  quantity: number;
+}
+
+export interface CartItem {
+  id?: string;
+  status: 'PENDING' | 'CANCELLED' | 'CONFIRMED';
+  buyerId: string;
+  sellerId: string;
+  product: Product;
+  addedToCartAt?: Date;
   quantity: number;
 }

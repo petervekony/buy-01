@@ -1,0 +1,36 @@
+.dashboard-container {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100vw;
+}
+
+.empty {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #c3b5fd;
+}
+
+.total-amount-div {
+  width: 100vw;
+  display: block;
+  text-align: right;
+}
+
+.total-amount-div > p {
+  width: 5rem;
+  font-size: 0.8rem;
+  padding-right: 1.5rem;
+  float: right;
+  color: #c3b5fd;
+  font-weight: bold;
+}
+
+.total-amount-div > h3 {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #6ddafc;
+  padding-right: 2rem;
+  margin-bottom: 0;
+}
