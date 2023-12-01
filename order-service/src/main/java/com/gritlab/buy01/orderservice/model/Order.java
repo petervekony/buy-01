@@ -35,7 +35,5 @@ public class Order implements Serializable {
     this.buyerId = buyerId;
     this.product = product;
     this.quantity = quantity;
-
-    this.status = OrderStatus.PENDING;
   }
 }

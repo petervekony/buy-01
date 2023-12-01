@@ -1,6 +1,5 @@
 package com.gritlab.buy01.orderservice.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,5 +12,5 @@ public class CartResponse {
 
   private Boolean processed;
 
-  private OrderModifications[] orderModifications;
+  private OrderModifications orderModifications;
 }

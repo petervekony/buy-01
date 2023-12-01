@@ -1,5 +1,7 @@
 package com.gritlab.buy01.orderservice.controller;
 
+import java.util.concurrent.TimeoutException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gritlab.buy01.orderservice.dto.Cart;
+import com.gritlab.buy01.orderservice.dto.CartResponse;
 import com.gritlab.buy01.orderservice.dto.OrderStatusUpdate;
 import com.gritlab.buy01.orderservice.dto.PersonalOrders;
 import com.gritlab.buy01.orderservice.exception.ForbiddenException;
@@ -59,20 +61,37 @@ public class OrderController {
     }
   }
 
-  // TODO: finish this on the product-service side
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/orders")
-  public ResponseEntity<?> placeOrder(@RequestBody Cart cart) {
-    // send cart over to product service for validation
-    UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
+  public ResponseEntity<?> placeOrder() {
+    try {
+      UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
 
-    if (!principal.hasRole(CLIENT)) {
-      ErrorMessage error =
-          new ErrorMessage("Error: only clients can place orders", HttpStatus.FORBIDDEN.value());
+      if (!principal.hasRole(CLIENT)) {
+        throw new ForbiddenException("Error: only clients can place orders");
+      }
+
+      CartResponse response = orderService.placeOrder(principal.getId());
+
+      return new ResponseEntity<>(response, HttpStatus.OK);
+
+    } catch (ForbiddenException e) {
+      ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    } catch (TimeoutException e) {
+      ErrorMessage error =
+          new ErrorMessage(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (NotFoundException e) {
+      ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.NOT_FOUND.value());
+      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      ErrorMessage error =
+          new ErrorMessage(
+              "Error: something went wrong during placing the order",
+              HttpStatus.INTERNAL_SERVER_ERROR.value());
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
   }
 
   @PreAuthorize("isAuthenticated()")

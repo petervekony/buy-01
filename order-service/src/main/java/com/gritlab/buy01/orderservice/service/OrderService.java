@@ -3,6 +3,7 @@ package com.gritlab.buy01.orderservice.service;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,14 @@ import com.gritlab.buy01.orderservice.security.UserDetailsImpl;
 public class OrderService {
   private final OrderRepository orderRepository;
   private final KafkaService kafkaService;
+  private final CartService cartService;
 
   @Autowired
-  public OrderService(OrderRepository orderRepository, KafkaService kafkaService) {
+  public OrderService(
+      OrderRepository orderRepository, KafkaService kafkaService, CartService cartService) {
     this.orderRepository = orderRepository;
     this.kafkaService = kafkaService;
+    this.cartService = cartService;
   }
 
   public PersonalOrders getOrders(UserDetailsImpl principal) {
@@ -66,16 +70,27 @@ public class OrderService {
         cancelled.toArray(new Order[0]));
   }
 
-  public CartResponse placeOrder(Cart cart) {
+  public CartResponse placeOrder(String userId) throws TimeoutException, NotFoundException {
     CartValidationRequest cartValidationRequest = new CartValidationRequest();
     cartValidationRequest.setCorrelationId(UUID.randomUUID().toString());
+
+    Cart cart = cartService.getCart(userId);
+    if (cart == null) {
+      throw new NotFoundException("Error: could not find cart");
+    }
+    System.out.println("CART IN PLACEORDER!!!! " + cart);
     cartValidationRequest.setCart(cart);
 
     CartValidationResponse cartValidationResponse =
         kafkaService.sendCartValidationRequestAndWaitForResponse(cartValidationRequest);
 
     if (cartValidationResponse == null) {
-      return null;
+      throw new TimeoutException("Error: Did not receive response from product-service");
+    }
+
+    for (Order order : cartValidationResponse.getCart().getOrders()) {
+      orderRepository.save(order);
+      cartService.deleteItemFromCart(order.getId(), userId);
     }
 
     return new CartResponse(

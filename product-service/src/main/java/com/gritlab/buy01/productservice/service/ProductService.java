@@ -1,6 +1,8 @@
 package com.gritlab.buy01.productservice.service;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
@@ -16,6 +18,7 @@ import com.gritlab.buy01.productservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.productservice.model.Order;
 import com.gritlab.buy01.productservice.model.ProductDTO;
 import com.gritlab.buy01.productservice.model.ProductModel;
+import com.gritlab.buy01.productservice.model.enums.OrderStatus;
 import com.gritlab.buy01.productservice.repository.ProductRepository;
 
 @Service
@@ -43,12 +46,17 @@ public class ProductService {
     while (shouldProcessEvents) {
       try {
         CartValidationEvent event = eventQueue.take();
-        // Implement your logic to process the event here
+
+        System.out.println("THIS IS THE EVENT!!!" + event.toString());
         CartValidationResponse response = new CartValidationResponse();
         response.setCorrelationId(event.getCorrelationId());
 
         Cart cart = event.getCart();
+        response.setCart(cart);
+
+        System.out.println("THIS IS THE CART!!!" + cart.toString());
         OrderModifications processedCart = processCart(cart);
+        System.out.println("THIS IS ORDERMODIFICATIONS, ALL GOOD IF NULL" + processedCart);
 
         if (processedCart == null) {
           response.setProcessed(true);
@@ -56,8 +64,7 @@ public class ProductService {
           response.setProcessed(false);
           response.setOrderModifications(processedCart);
         }
-        // kafkaService.sendCartValidationResponse(response);
-
+        kafkaService.sendCartValidationResponse(response);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
         shouldProcessEvents = false;
@@ -71,13 +78,15 @@ public class ProductService {
 
   public OrderModifications processCart(Cart cart) {
     OrderModifications modifications = new OrderModifications();
-    ArrayList<ProductDTO> modList = new ArrayList<>();
+    modifications.setNotes(new HashSet<>());
+    ArrayList<Order> modList = new ArrayList<>();
 
     for (Order order : cart.getOrders()) {
       ProductDTO orderedProduct = order.getProduct();
       Optional<ProductModel> productQuery = productRepository.findById(order.getProduct().getId());
-      ProductDTO possibleMod = new ProductDTO();
-      possibleMod.setId(order.getProduct().getId());
+      Order possibleMod = new Order();
+      possibleMod.setProduct(new ProductDTO());
+      possibleMod.getProduct().setId(order.getProduct().getId());
 
       if (productQuery.isEmpty()) {
         modList.add(possibleMod);
@@ -91,10 +100,15 @@ public class ProductService {
           || !product.getPrice().equals(orderedProduct.getPrice())
           || !product.getUserId().equals(order.getSellerId())
           || product.getQuantity() < orderedProduct.getQuantity()) {
-        possibleMod.setName(product.getName());
-        possibleMod.setDescription(product.getDescription());
-        possibleMod.setPrice(product.getPrice());
-        possibleMod.setQuantity(product.getQuantity());
+        possibleMod.setSellerId(order.getSellerId());
+        possibleMod.setBuyerId(order.getBuyerId());
+        possibleMod.setQuantity(order.getQuantity());
+
+        possibleMod.getProduct().setName(product.getName());
+        possibleMod.getProduct().setDescription(product.getDescription());
+        possibleMod.getProduct().setPrice(product.getPrice());
+        possibleMod.getProduct().setQuantity(product.getQuantity());
+        possibleMod.getProduct().setUserId(product.getUserId());
 
         modList.add(possibleMod);
 
@@ -106,7 +120,11 @@ public class ProductService {
     }
 
     if (modList.isEmpty()) {
-      // TODO: actually buy the product
+      for (Order order : cart.getOrders()) {
+        reduceProductQuantity(order.getProduct().getId(), order.getQuantity());
+        order.setOrderPlacedAt(new Date());
+        order.setStatus(OrderStatus.PENDING);
+      }
       return null;
     }
 
@@ -122,6 +140,15 @@ public class ProductService {
       productRepository.findByName(name).forEach(products::add);
     }
     return products;
+  }
+
+  public void reduceProductQuantity(String productId, Integer quantity) {
+    Optional<ProductModel> productQuery = getProductById(productId);
+    if (productQuery.isPresent()) {
+      ProductModel product = productQuery.get();
+      product.setQuantity(product.getQuantity() - quantity);
+      productRepository.save(product);
+    }
   }
 
   public Optional<ProductModel> getProductById(String id) {

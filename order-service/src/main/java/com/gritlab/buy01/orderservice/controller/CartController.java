@@ -1,6 +1,5 @@
 package com.gritlab.buy01.orderservice.controller;
 
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartItemDTO;
 import com.gritlab.buy01.orderservice.exception.ForbiddenException;
 import com.gritlab.buy01.orderservice.exception.NotFoundException;
@@ -42,8 +42,8 @@ public class CartController {
   public ResponseEntity<?> getCart() {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
-      ArrayList<CartItem> cart = cartService.getCart(principal.getId());
-      if (cart.isEmpty()) {
+      Cart cart = cartService.getCart(principal.getId());
+      if (cart == null) {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
       }
 
@@ -71,6 +71,10 @@ public class CartController {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
       if (!principal.hasRole(CLIENT)) {
         throw new ForbiddenException("Error: only clients can add items to cart");
+      }
+
+      if (!principal.getId().equals(item.getBuyerId())) {
+        throw new ForbiddenException("Error: you can only add items to your own cart");
       }
 
       CartItem addedToCart = this.cartService.addToCart(item);
