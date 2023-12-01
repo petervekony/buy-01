@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: ["user-service", "product-service", "media-service", "angular"]
+        project: ["user-service", "product-service", "media-service", "order-service", "angular"]
 
     steps:
       - name: Checkout Repository
