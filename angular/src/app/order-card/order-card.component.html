@@ -3,7 +3,13 @@
     {{ card.product.name }}
   </div>
   <div class="body">
-    quantity: {{ card.quantity }}
+    <ng-container *ngIf="shopcart">
+      quantity:
+      <input type="number" [(ngModel)]="card.quantity" (change)="updateQuantity()" min="1" [max]="max" />
+    </ng-container>
+    <ng-container *ngIf="!shopcart">
+      quantity: {{ card.quantity }}
+    </ng-container>
   </div>
   <div class="footer">
     <div class="buttons">

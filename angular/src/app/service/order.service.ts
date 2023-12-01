@@ -62,7 +62,7 @@ export class OrderService {
   //   )
   //     .subscribe((items) => {
   //       this.products = items;
-  //       this.filterOrders(filter);
+  //       return this.filterOrders(filter, items);
   //     });
   // }
 
@@ -82,27 +82,28 @@ export class OrderService {
   }
 
   getShoppingCart(filter: string = 'ALL'): Observable<CartItem[]> {
-    return this.filterOrders(filter);
+    return this.filterOrders(filter, this.loadFromLocalStorage());
   }
 
-  private filterOrders(filter: string): Observable<CartItem[]> {
+  private filterOrders(
+    filter: string,
+    products: CartItem[],
+  ): Observable<CartItem[]> {
     switch (filter) {
     case 'CONFIRMED':
       return of(
-        this.loadFromLocalStorage().filter((e) => e.status === 'CONFIRMED'),
+        products.filter((e) => e.status === 'CONFIRMED'),
       );
     case 'PENDING':
       return of(
-        this.loadFromLocalStorage().filter((e) => e.status === 'PENDING'),
+        products.filter((e) => e.status === 'PENDING'),
       );
     case 'CANCELLED':
       return of(
-        this.loadFromLocalStorage().filter((e) => e.status === 'CANCELLED'),
+        products.filter((e) => e.status === 'CANCELLED'),
       );
     case 'ALL':
-      return of(
-        this.loadFromLocalStorage(),
-      );
+      return of(products);
     }
     return of([]);
   }
@@ -132,15 +133,12 @@ export class OrderService {
   addToCart(product: Product): void {
     const shoppingCart = this.loadFromLocalStorage();
     //NOSONAR
-    // console.log('cart', shoppingCart); //NOSONAR
-    // console.log(shoppingCart.some((e) => e.product.id === product.id)); //NOSONAR
 
     if (!shoppingCart.some((e) => e.product.id === product.id)) {
       const newOrder = this.createOrder(product);
       shoppingCart.push(newOrder);
       //NOSONAR
-      // console.log('shoppingCart:', shoppingCart); //NOSONAR
-      // this.setStorage(shoppingCart.reverse()); //NOSONAR
+      this.setStorage(shoppingCart.reverse()); //NOSONAR
     }
   }
 
@@ -155,11 +153,20 @@ export class OrderService {
     return newOrder;
   }
 
+  modifyOrder(cartItem: CartItem): void {
+    const shoppingCart = this.loadFromLocalStorage();
+    const index = shoppingCart.findIndex((e) =>
+      e.product.id === cartItem.product.id
+    );
+    if (index === -1) return;
+    shoppingCart[index] = cartItem;
+    this.setStorage(shoppingCart);
+  }
+
   removeItem(productId: string): void {
     this.products = this.loadFromLocalStorage();
     this.products = this.products.filter((e) => e.product.id !== productId);
     this.setStorage(this.products);
-    console.log(productId); //NOSONAR
     this.updateOrders({} as Order);
   }
 

@@ -21,8 +21,9 @@ export class DashboardComponent implements OnInit {
   private stateService = inject(StateService);
   private orderService = inject(OrderService);
   private destroyRef = inject(DestroyRef);
+
   //NOTE: hardcoded for now
-  totalAmount: number = 8900009;
+  totalAmount: number = Math.round(Math.random() * 50000);
 
   ngOnInit(): void {
     this.user$ = this.stateService.getStateAsObservable();

@@ -31,7 +31,6 @@ export class ShoppingCartComponent implements OnInit {
     this.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (user) => {
         this.currentUser = user;
-        console.log('user:', this.currentUser); //NOSONAR
         this.getOrders();
       },
     );

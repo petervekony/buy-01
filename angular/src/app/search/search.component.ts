@@ -31,7 +31,7 @@ export class SearchComponent implements OnInit {
 
     this.productService.getProducts().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((products) => {
-        this.products$ = of(products);
+        this.products$ = of(products.reverse()); //NOSONAR
         this.products = products;
       });
   }
