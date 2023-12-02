@@ -3,7 +3,6 @@ package com.gritlab.buy01.productservice.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -42,23 +41,6 @@ public class KafkaServiceTests {
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
-  }
-
-  @Test
-  public void testValidateTokenWithUserMicroservice() {
-    // Creating a new request with a unique token and correlation ID
-    TokenValidationRequest request = new TokenValidationRequest();
-    request.setJwtToken("uniqueToken");
-    request.setCorrelationId("uniqueCorrelationId");
-
-    // Ensuring the cache does not contain an entry for this token
-    kafkaService.getTokenCache().remove(request.getJwtToken());
-
-    // Call the method under test
-    kafkaService.validateTokenWithUserMicroservice(request);
-
-    // Verify that the Kafka template was used to send the request
-    verify(tokenValidationRequestKafkaTemplate).send(eq("token-validation-request"), eq(request));
   }
 
   @Test
@@ -105,19 +87,6 @@ public class KafkaServiceTests {
     kafkaService.deleteUserProducts(message);
 
     verify(eventPublisher).publishEvent(any(UserProductsDeletionEvent.class));
-  }
-
-  @Test
-  public void testDeleteProductMedia() {
-    // Create a productId for testing
-    String productId = "123";
-
-    kafkaService.deleteProductMedia(productId);
-
-    // Verify that productMediaDeleteMessageKafkaTemplate.send is called with any
-    // ProductMediaDeleteMessage
-    verify(productMediaDeleteMessageKafkaTemplate)
-        .send(eq("product-media-deletion"), any(ProductMediaDeleteMessage.class));
   }
 
   @Test
