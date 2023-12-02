@@ -1,3 +1,4 @@
+import { Cart } from './cart';
 import { Product } from './product';
 
 export interface Order {
@@ -18,4 +19,15 @@ export interface CartItem {
   product: Product;
   addedToCartAt?: Date;
   quantity: number;
+}
+
+export interface CartResponse {
+  cart: Cart;
+  processed: boolean;
+  orderModifications: OrderModifications;
+}
+
+export interface OrderModifications {
+  notes: Set<string>;
+  modifications: Order[];
 }

@@ -4,8 +4,8 @@
   </div>
   <div class="body">
     <ng-container *ngIf="shopcart">
-      quantity:
-      <input type="number" [(ngModel)]="card.quantity" (change)="updateQuantity()" min="1" [max]="max" />
+      quantity: {{ card.quantity }}
+      <!-- <input type="number" [(ngModel)]="card.quantity" (change)="updateQuantity()" min="1" [max]="max" /> -->
     </ng-container>
     <ng-container *ngIf="!shopcart">
       quantity: {{ card.quantity }}

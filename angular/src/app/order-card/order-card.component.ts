@@ -31,6 +31,6 @@ export class OrderCardComponent implements OnInit {
 
   removeItem() {
     console.log('delete item:', this.card.product.id); //NOSONAR
-    this.orderService.removeItem(this.card.product.id!);
+    this.orderService.removeItem(this.card.id!);
   }
 }
