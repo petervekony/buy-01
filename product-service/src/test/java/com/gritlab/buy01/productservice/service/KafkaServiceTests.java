@@ -78,7 +78,7 @@ public class KafkaServiceTests {
   }
 
   @Test
-  public void testValidateTokenWithUserMicroservice_CacheHit() {
+  public void testValidateTokenWithUserMicroserviceCacheHit() {
     TokenValidationRequest request = new TokenValidationRequest();
     request.setCorrelationId("123");
     request.setJwtToken("cachedToken");
@@ -109,8 +109,13 @@ public class KafkaServiceTests {
 
   @Test
   public void testDeleteProductMedia() {
-    kafkaService.deleteProductMedia("123");
+    // Create a productId for testing
+    String productId = "123";
 
+    kafkaService.deleteProductMedia(productId);
+
+    // Verify that productMediaDeleteMessageKafkaTemplate.send is called with any
+    // ProductMediaDeleteMessage
     verify(productMediaDeleteMessageKafkaTemplate)
         .send(eq("product-media-deletion"), any(ProductMediaDeleteMessage.class));
   }

@@ -76,6 +76,10 @@ public class KafkaService {
   // to track processed messages and ensure idempotency
   private Set<String> processedCorrelationIds = new HashSet<>();
 
+  public Set<String> getProcessedCorrelationIds() {
+    return processedCorrelationIds;
+  }
+
   private ConcurrentHashSet<String> processedOrderCorrelationIds = new ConcurrentHashSet<>();
 
   private ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> responseQueues =
