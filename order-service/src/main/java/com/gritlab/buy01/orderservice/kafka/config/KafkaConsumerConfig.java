@@ -16,6 +16,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.orderservice.kafka.message.UserProfileDeleteMessage;
 
 @Configuration
 @EnableKafka
@@ -75,88 +76,25 @@ public class KafkaConsumerConfig {
     return factory;
   }
 
-  // @Bean
-  // public ConsumerFactory<String, UserAvatarDeleteMessage> userAvatarDeletionConsumerFactory() {
-  //   Map<String, Object> configs = consumerConfigs();
-  //   configs.put(ConsumerConfig.GROUP_ID_CONFIG, "user-avatar-deletion-group");
-  //   JsonDeserializer<UserAvatarDeleteMessage> deserializer =
-  //       new JsonDeserializer<>(UserAvatarDeleteMessage.class);
-  //   deserializer.setUseTypeHeaders(false);
+  @Bean
+  public ConsumerFactory<String, UserProfileDeleteMessage>
+      userProfileDeleteMessageConsumerFactory() {
+    Map<String, Object> configs = consumerConfigs();
+    configs.put(ConsumerConfig.GROUP_ID_CONFIG, "order-user-profile-deletion-group");
+    JsonDeserializer<UserProfileDeleteMessage> deserializer =
+        new JsonDeserializer<>(UserProfileDeleteMessage.class);
+    deserializer.setUseTypeHeaders(false);
 
-  //   return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
-  // }
+    return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
+  }
 
-  // @Bean
-  // public ConcurrentKafkaListenerContainerFactory<String, UserAvatarDeleteMessage>
-  //     kafkaAvatarDeletionContainerFactory() {
-  //   ConcurrentKafkaListenerContainerFactory<String, UserAvatarDeleteMessage> factory =
-  //       new ConcurrentKafkaListenerContainerFactory<>();
-  //   factory.setConsumerFactory(userAvatarDeletionConsumerFactory());
-  //   factory.setConcurrency(3);
-  //   return factory;
-  // }
-
-  // @Bean
-  // public ConsumerFactory<String, ProductMediaDeleteMessage> productMediaDeletionConsumerFactory()
-  // {
-  //   Map<String, Object> configs = consumerConfigs();
-  //   configs.put(ConsumerConfig.GROUP_ID_CONFIG, "profile-media-deletion-group");
-  //   JsonDeserializer<ProductMediaDeleteMessage> deserializer =
-  //       new JsonDeserializer<>(ProductMediaDeleteMessage.class);
-  //   deserializer.setUseTypeHeaders(false);
-
-  //   return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
-  // }
-
-  // @Bean
-  // public ConcurrentKafkaListenerContainerFactory<String, ProductMediaDeleteMessage>
-  //     kafkaProductMediaDeletionContainerFactory() {
-  //   ConcurrentKafkaListenerContainerFactory<String, ProductMediaDeleteMessage> factory =
-  //       new ConcurrentKafkaListenerContainerFactory<>();
-  //   factory.setConsumerFactory(productMediaDeletionConsumerFactory());
-  //   factory.setConcurrency(3);
-  //   return factory;
-  // }
-
-  // @Bean
-  // public ConsumerFactory<String, ProductOwnershipResponse>
-  //     productOwnershipResponseConsumerFactory() {
-  //   JsonDeserializer<ProductOwnershipResponse> deserializer =
-  //       new JsonDeserializer<>(ProductOwnershipResponse.class);
-  //   deserializer.setUseTypeHeaders(false); // adjust as per your requirements
-
-  //   return new DefaultKafkaConsumerFactory<>(
-  //       consumerConfigs(), new StringDeserializer(), deserializer);
-  // }
-
-  // @Bean
-  // public ConcurrentKafkaListenerContainerFactory<String, ProductOwnershipResponse>
-  //     kafkaProductOwnershipResponseListenerContainerFactory() {
-  //   ConcurrentKafkaListenerContainerFactory<String, ProductOwnershipResponse> factory =
-  //       new ConcurrentKafkaListenerContainerFactory<>();
-  //   factory.setConsumerFactory(productOwnershipResponseConsumerFactory());
-  //   factory.setConcurrency(3); // adjust as per your requirements
-  //   return factory;
-  // }
-
-  // @Bean
-  // public ConsumerFactory<String, UserAvatarUpdateResponse>
-  //     userAvatarUpdateResponseConsumerFactory() {
-  //   JsonDeserializer<UserAvatarUpdateResponse> deserializer =
-  //       new JsonDeserializer<>(UserAvatarUpdateResponse.class);
-  //   deserializer.setUseTypeHeaders(false);
-
-  //   return new DefaultKafkaConsumerFactory<>(
-  //       consumerConfigs(), new StringDeserializer(), deserializer);
-  // }
-
-  // @Bean
-  // public ConcurrentKafkaListenerContainerFactory<String, UserAvatarUpdateResponse>
-  //     kafkaUserAvatarUpdateResponseListenerContainerFactory() {
-  //   ConcurrentKafkaListenerContainerFactory<String, UserAvatarUpdateResponse> factory =
-  //       new ConcurrentKafkaListenerContainerFactory<>();
-  //   factory.setConsumerFactory(userAvatarUpdateResponseConsumerFactory());
-  //   factory.setConcurrency(3);
-  //   return factory;
-  // }
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, UserProfileDeleteMessage>
+      userProfileDeleteMessageContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, UserProfileDeleteMessage> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(userProfileDeleteMessageConsumerFactory());
+    factory.setConcurrency(3);
+    return factory;
+  }
 }

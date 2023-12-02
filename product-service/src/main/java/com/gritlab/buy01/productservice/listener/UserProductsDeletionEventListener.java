@@ -10,7 +10,12 @@ import com.gritlab.buy01.productservice.service.ProductService;
 @Component
 public class UserProductsDeletionEventListener {
 
-  @Autowired private ProductService productService;
+  private final ProductService productService;
+
+  @Autowired
+  public UserProductsDeletionEventListener(ProductService productService) {
+    this.productService = productService;
+  }
 
   @EventListener
   public void handleUserProductsDeletionEvent(UserProductsDeletionEvent event) {

@@ -11,16 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.orderservice.cache.CachedTokenInfo;
+import com.gritlab.buy01.orderservice.event.UserProfileDeletionEvent;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.orderservice.kafka.message.ProductOrderCancellationMessage;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationResponse;
+import com.gritlab.buy01.orderservice.kafka.message.UserProfileDeleteMessage;
 
 @Service
 public class KafkaService {
@@ -44,6 +47,8 @@ public class KafkaService {
 
   // token validation responses are cached to limit the number of kafka messages
   private ConcurrentMap<String, CachedTokenInfo> tokenCache = new ConcurrentHashMap<>();
+
+  private ApplicationEventPublisher eventPublisher;
 
   @Autowired
   public KafkaService(
@@ -151,5 +156,14 @@ public class KafkaService {
 
   public void sendProductOrderCancellation(ProductOrderCancellationMessage message) {
     productOrderCancellationKafkaTemplate.send(PRODUCT_ORDER_CANCELLATION_MESSAGE, message);
+  }
+
+  @KafkaListener(
+      topics = "user-products-deletion",
+      groupId = "order-user-profile-deletion-group",
+      containerFactory = "userProfileDeleteMessageContainerFactory")
+  public void consumerUserProfileDeleteMessage(UserProfileDeleteMessage message) {
+    eventPublisher.publishEvent(
+        new UserProfileDeletionEvent(this, message.getCorrelationId(), message.getUserId()));
   }
 }

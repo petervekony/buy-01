@@ -14,9 +14,9 @@ public interface CartRepository extends MongoRepository<CartItem, String> {
 
   Optional<ArrayList<CartItem>> findAllByBuyerId(String buyerId);
 
-  void deleteById();
+  void deleteById(String id);
 
-  void deleteAllBySellerId();
+  void deleteAllBySellerId(String sellerId);
 
-  void deleteAllByBuyerId();
+  void deleteAllByBuyerId(String buyerId);
 }

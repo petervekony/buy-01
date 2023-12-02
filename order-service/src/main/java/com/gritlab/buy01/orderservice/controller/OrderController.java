@@ -42,7 +42,7 @@ public class OrderController {
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/orders")
-  public ResponseEntity<?> getOrders() {
+  public ResponseEntity<Object> getOrders() {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
 
@@ -63,7 +63,7 @@ public class OrderController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/orders")
-  public ResponseEntity<?> placeOrder() {
+  public ResponseEntity<Object> placeOrder() {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
 
@@ -96,7 +96,7 @@ public class OrderController {
 
   @PreAuthorize("isAuthenticated()")
   @PutMapping("/orders")
-  public ResponseEntity<?> changeOrderStatus(@RequestBody OrderStatusUpdate update) {
+  public ResponseEntity<Object> changeOrderStatus(@RequestBody OrderStatusUpdate update) {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
       String role;

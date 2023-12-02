@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartItemDTO;
+import com.gritlab.buy01.orderservice.dto.ProductDTO;
 import com.gritlab.buy01.orderservice.exception.ForbiddenException;
 import com.gritlab.buy01.orderservice.exception.NotFoundException;
 import com.gritlab.buy01.orderservice.model.CartItem;
@@ -51,6 +52,19 @@ public class CartService {
     return this.cartRepository.save(item);
   }
 
+  public void updateCartContents(Order[] contents) {
+    for (Order content : contents) {
+      Optional<CartItem> cartItemQuery = cartRepository.findById(content.getId());
+      if (cartItemQuery.isPresent()) {
+        CartItem cartItem = cartItemQuery.get();
+        ProductDTO contentProduct = content.getProduct();
+        cartItem.setSellerId(contentProduct.getUserId());
+        cartItem.setProduct(contentProduct);
+        cartRepository.save(cartItem);
+      }
+    }
+  }
+
   public void deleteItemFromCart(String cartItemId, String userId)
       throws ForbiddenException, NotFoundException {
     Optional<CartItem> itemQuery = cartRepository.findById(cartItemId);
@@ -64,5 +78,9 @@ public class CartService {
     }
 
     cartRepository.deleteById(cartItemId);
+  }
+
+  public void deleteUserCart(String userId) {
+    cartRepository.deleteAllByBuyerId(userId);
   }
 }

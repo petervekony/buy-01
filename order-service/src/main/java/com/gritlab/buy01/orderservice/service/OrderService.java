@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartResponse;
+import com.gritlab.buy01.orderservice.dto.OrderModifications;
 import com.gritlab.buy01.orderservice.dto.OrderStatusUpdate;
 import com.gritlab.buy01.orderservice.dto.PersonalOrders;
 import com.gritlab.buy01.orderservice.exception.ForbiddenException;
@@ -86,6 +87,11 @@ public class OrderService {
 
     if (cartValidationResponse == null) {
       throw new TimeoutException("Error: Did not receive response from product-service");
+    }
+
+    OrderModifications modifications = cartValidationResponse.getOrderModifications();
+    if (modifications != null) {
+      cartService.updateCartContents(modifications.getModifications());
     }
 
     for (Order order : cartValidationResponse.getCart().getOrders()) {

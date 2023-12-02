@@ -1,4 +1,4 @@
-package com.gritlab.buy01.userservice.kafka.message;
+package com.gritlab.buy01.orderservice.kafka.message;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
