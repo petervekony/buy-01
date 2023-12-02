@@ -13,7 +13,7 @@ import { CartItem, Order } from '../interfaces/order';
 })
 export class ShoppingCartComponent implements OnInit {
   // NOTE: change to Order
-  cards$: Observable<CartItem[]> = of([]);
+  cartItems$: Observable<CartItem[]> = of([]);
 
   // NOTE: just for testing this part!
   // cards$: Observable<Product[]> | null = null;
@@ -46,16 +46,18 @@ export class ShoppingCartComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: (products) => {
-        this.cards$ = of(products);
+        console.log(products); //NOSONAR
+        this.cartItems$ = of(products);
         this.empty = products.length === 0;
       },
     });
   }
 
   confirmOrder(): void {
-    this.orderService.sendOrder().pipe(takeUntilDestroyed(this.destroyRef))
+    this.orderService.placeOrder().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((response) => {
-        this.cards$ = of(response);
+        console.log(response); //NOSONAR;
+        this.cartItems$ = of(response.cart.orders);
       });
   }
 }

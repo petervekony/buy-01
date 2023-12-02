@@ -1,5 +1,5 @@
-import { Order } from './order';
+import { CartItem } from './order';
 
 export interface Cart {
-  orders: Map<string, Order>; //key:sellerId
+  orders: CartItem[]; //key:sellerId
 }

@@ -2,7 +2,7 @@
   <button (click)="confirmOrder()">CONFIRM ORDER</button>
 </div>
 <div class="order-container">
-  <ng-container *ngFor="let card of cards$ | async">
+  <ng-container *ngFor="let card of cartItems$ | async">
     <app-order-card [card]="card"></app-order-card>
   </ng-container>
   <h2 *ngIf="empty">Your cart is empty</h2>

@@ -1,12 +1,13 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { CartItem, Order } from '../interfaces/order';
+import { BehaviorSubject, Observable, of, Subject, switchMap } from 'rxjs';
+import { CartItem, CartResponse, Order } from '../interfaces/order';
 import { Product } from '../interfaces/product';
 import { StateService } from './state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { User } from '../interfaces/user';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Cart } from '../interfaces/cart';
 
 @Injectable({
   providedIn: 'root',
@@ -19,15 +20,25 @@ export class OrderService {
   private readonly LOCAL_STORAGE_KEY = 'buy-02';
 
   private user: User = {} as User;
-  private products: CartItem[] = [];
+  private cartItems: CartItem[] = [];
 
   constructor() {
     this.stateService.getStateAsObservable().pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((user) => {
       this.user = user;
-      this.products = this.loadFromLocalStorage();
+      this.getCartFromDB().pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((cart) => {
+          console.log(cart.orders); //NOSONAR;
+          this.cartItems$ = of(cart.orders);
+          this.cartItems = cart.orders;
+        });
     });
+  }
+
+  getCartFromDB(): Observable<Cart> {
+    const address = environment.cartUrl;
+    return this.http.get<Cart>(address, { withCredentials: true });
   }
 
   private filterTypeSubject = new BehaviorSubject<string>('ALL');
@@ -35,6 +46,9 @@ export class OrderService {
 
   private orderUpdateSource = new Subject<Order>();
   orderUpdates$ = this.orderUpdateSource.asObservable();
+
+  private cartItemsSource = new Subject<CartItem[]>();
+  cartItems$ = this.cartItemsSource.asObservable();
 
   updateOrders(order: Order): void {
     this.orderUpdateSource.next(order);
@@ -48,12 +62,12 @@ export class OrderService {
     setTimeout(() => this.setFilterType('ALL'), 15);
   }
 
-  sendOrder(): Observable<CartItem[]> {
-    const address = environment.cartUrl;
-    return this.http.post<CartItem[]>(address, this.products, {
-      withCredentials: true,
-    });
-  }
+  // sendOrder(): Observable<CartItem[]> {
+  //   const address = environment.cartUrl;
+  //   return this.http.post<CartItem[]>(address, this.cartItems, {
+  //     withCredentials: true,
+  //   });
+  // }
 
   // getShoppingCart(filter: string = 'ALL'): void {
   //   const address = environment.cartUrl;
@@ -73,37 +87,51 @@ export class OrderService {
         const data = JSON.parse(atob(localStorageData)); //NOSONAR
         return data;
       } catch (e) {
-        this.products = [];
+        this.cartItems = [];
         return [];
       }
     }
-    this.products = [];
+    this.cartItems = [];
     return [];
   }
 
+  // NOSONAR
+  // public class CartResponse {
+  //   private Cart cart;
+  //   private Boolean processed;
+  //   private OrderModifications orderModifications;
+  // }
+
+  placeOrder(): Observable<CartResponse> {
+    const address = environment.placeOrder;
+    return this.http.post<CartResponse>(address, { withCredentials: true });
+  }
+
   getShoppingCart(filter: string = 'ALL'): Observable<CartItem[]> {
-    return this.filterOrders(filter, this.loadFromLocalStorage());
+    return this.getCartFromDB().pipe(
+      switchMap((cart) => this.filterOrders(filter, cart.orders)),
+    );
   }
 
   private filterOrders(
     filter: string,
-    products: CartItem[],
+    cartItems: CartItem[],
   ): Observable<CartItem[]> {
     switch (filter) {
     case 'CONFIRMED':
       return of(
-        products.filter((e) => e.status === 'CONFIRMED'),
+        cartItems.filter((e) => e.status === 'CONFIRMED'),
       );
     case 'PENDING':
       return of(
-        products.filter((e) => e.status === 'PENDING'),
+        cartItems.filter((e) => e.status === 'PENDING'),
       );
     case 'CANCELLED':
       return of(
-        products.filter((e) => e.status === 'CANCELLED'),
+        cartItems.filter((e) => e.status === 'CANCELLED'),
       );
     case 'ALL':
-      return of(products);
+      return of(cartItems);
     }
     return of([]);
   }
@@ -130,25 +158,31 @@ export class OrderService {
   //   return of([]);
   // }
 
-  addToCart(product: Product): void {
-    const shoppingCart = this.loadFromLocalStorage();
+  addToCart(product: Product, quantity: number): void {
+    const newOrder = this.createOrder(product, quantity);
+    const address = environment.addToCartUrl;
+    this.http.post<CartItem>(address, newOrder, { withCredentials: true }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((response) => console.log(response)); //NOSONAR
+    // NOSONAR
+    // const shoppingCart = this.loadFromLocalStorage();
     //NOSONAR
 
-    if (!shoppingCart.some((e) => e.product.id === product.id)) {
-      const newOrder = this.createOrder(product);
-      shoppingCart.push(newOrder);
-      //NOSONAR
-      this.setStorage(shoppingCart.reverse()); //NOSONAR
-    }
+    // NOSONAR
+    // if (!shoppingCart.some((e) => e.product.id === product.id)) {
+    // shoppingCart.push(newOrder);
+    //NOSONAR
+    // this.setToStorage(shoppingCart.reverse()); //NOSONAR
+    // }
   }
 
-  private createOrder(product: Product): CartItem {
+  private createOrder(product: Product, quantity: number): CartItem {
     const newOrder = {
       status: 'PENDING',
       buyerId: this.user.id,
       sellerId: product.userId,
       product: product,
-      quantity: 1,
+      quantity: quantity,
     } as CartItem;
     return newOrder;
   }
@@ -160,17 +194,24 @@ export class OrderService {
     );
     if (index === -1) return;
     shoppingCart[index] = cartItem;
-    this.setStorage(shoppingCart);
+    this.setToStorage(shoppingCart);
   }
 
-  removeItem(productId: string): void {
-    this.products = this.loadFromLocalStorage();
-    this.products = this.products.filter((e) => e.product.id !== productId);
-    this.setStorage(this.products);
-    this.updateOrders({} as Order);
+  removeItem(id: string): void {
+    const address = environment.cartUrl + '/' + id;
+    this.http.delete<CartItem>(address, { withCredentials: true }).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((response) => {
+      console.log('delete item response:', response); //NOSONAR
+      this.updateOrders({} as Order);
+    });
+    // this.cartItems = this.loadFromLocalStorage();
+    // this.cartItems = this.cartItems.filter((e) => e.product.id !== productId);
+    // this.setToStorage(this.cartItems);
+    // this.updateOrders({} as Order);
   }
 
-  setStorage(products: CartItem[]): void {
+  setToStorage(products: CartItem[]): void {
     const encodedData = btoa(JSON.stringify(products));
     localStorage.setItem(this.LOCAL_STORAGE_KEY, encodedData);
     this.updateOrders({} as Order);

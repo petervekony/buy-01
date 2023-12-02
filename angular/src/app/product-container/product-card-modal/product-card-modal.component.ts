@@ -49,6 +49,8 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   quantity = 0;
   currentImageIndex = 0;
   currentDeleteIndex = 0;
+  maxQuantity: number = 1;
+  orderQuantity = 1;
   formOpen = false;
   formValid = true;
   success = false;
@@ -92,6 +94,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   });
 
   ngOnInit(): void {
+    this.maxQuantity = this.product.quantity;
     this.initFormValues();
 
     this.dataService.deleteImage$.pipe(takeUntilDestroyed(this.destroyRef))
@@ -193,7 +196,7 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   }
 
   addToCart() {
-    this.orderService.addToCart(this.product);
+    this.orderService.addToCart(this.product, this.orderQuantity);
   }
 
   initFormValues() {

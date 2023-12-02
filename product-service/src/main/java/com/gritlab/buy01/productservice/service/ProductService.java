@@ -185,6 +185,7 @@ public class ProductService {
       ProductModel product = productData.get();
       product.setName(productModel.getName());
       product.setDescription(productModel.getDescription());
+      product.setQuantity(productModel.getQuantity());
       product.setPrice(productModel.getPrice());
       return Optional.of(productRepository.save(product));
     } else {
