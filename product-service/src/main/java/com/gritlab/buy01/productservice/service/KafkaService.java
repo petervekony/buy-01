@@ -21,11 +21,13 @@ import org.springframework.stereotype.Service;
 
 import com.gritlab.buy01.productservice.cache.CachedTokenInfo;
 import com.gritlab.buy01.productservice.event.CartValidationEvent;
+import com.gritlab.buy01.productservice.event.ProductOrderCancellationEvent;
 import com.gritlab.buy01.productservice.event.ProductOwnershipValidationEvent;
 import com.gritlab.buy01.productservice.event.UserProductsDeletionEvent;
 import com.gritlab.buy01.productservice.kafka.message.CartValidationRequest;
 import com.gritlab.buy01.productservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.productservice.kafka.message.ProductMediaDeleteMessage;
+import com.gritlab.buy01.productservice.kafka.message.ProductOrderCancellationMessage;
 import com.gritlab.buy01.productservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationResponse;
@@ -127,7 +129,12 @@ public class KafkaService {
   public void consumeTokenValidationResponse(TokenValidationResponse response) {
     BlockingQueue<TokenValidationResponse> queue = responseQueues.get(response.getCorrelationId());
     if (queue != null) {
-      queue.offer(response);
+      boolean queued = queue.offer(response);
+      if (!queued) {
+        logger.error(
+            "Error: token validation response with correlationId {} could not be placed in queue",
+            response.getCorrelationId());
+      }
     }
   }
 
@@ -172,10 +179,6 @@ public class KafkaService {
     String correlationId = request.getCorrelationId();
 
     if (!processedOrderCorrelationIds.contains(correlationId)) {
-      System.out.println(request);
-      System.out.println("CART VALIDATION REQUEST RECEIVED!!!!!");
-      System.out.println(
-          "THIS IS THE CART IN THE KAFKA LISTENER!!!" + request.getCart().toString());
       eventPublisher.publishEvent(
           new CartValidationEvent(this, request.getCorrelationId(), request.getCart()));
 
@@ -184,7 +187,22 @@ public class KafkaService {
   }
 
   public void sendCartValidationResponse(CartValidationResponse response) {
-    System.out.println("CARTVALIDATIONRESPONSE SENT BACK!!!" + response);
     cartValidationResponseKafkaTemplate.send("cart-validation-response", response);
+  }
+
+  @KafkaListener(
+      topics = "product-order-cancellation",
+      groupId = "product-order-cancellation-group",
+      containerFactory = "kafkaProductOrderCancellationMessageListenerContainerFactory")
+  public void cancelProductOrder(ProductOrderCancellationMessage message) {
+    String correlationId = message.getCorrelationId();
+
+    if (!processedCorrelationIds.contains(correlationId)) {
+      eventPublisher.publishEvent(
+          new ProductOrderCancellationEvent(
+              this, message.getCorrelationId(), message.getProductId(), message.getQuantity()));
+
+      processedCorrelationIds.add(correlationId);
+    }
   }
 }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.gritlab.buy01.orderservice.cache.CachedTokenInfo;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationResponse;
+import com.gritlab.buy01.orderservice.kafka.message.ProductOrderCancellationMessage;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationResponse;
 
@@ -28,6 +29,7 @@ public class KafkaService {
   private static final String TOPIC_RESPONSE = "token-validation-response";
   private static final String CART_VALIDATION_REQUEST = "cart-validation-request";
   private static final String CART_VALIDATION_RESPONSE = "cart-validation-response";
+  private static final String PRODUCT_ORDER_CANCELLATION_MESSAGE = "product-order-cancellation";
   private static final long TOKEN_CACHE_DURATION = TimeUnit.MINUTES.toMillis(5);
 
   @Qualifier("kafkaTemplate")
@@ -36,15 +38,22 @@ public class KafkaService {
   @Qualifier("cartValidationKafkaTemplate")
   private final KafkaTemplate<String, CartValidationRequest> cartValidationKafkaTemplate;
 
+  @Qualifier("productOrderCancellationKafkaTemplate")
+  private final KafkaTemplate<String, ProductOrderCancellationMessage>
+      productOrderCancellationKafkaTemplate;
+
   // token validation responses are cached to limit the number of kafka messages
   private ConcurrentMap<String, CachedTokenInfo> tokenCache = new ConcurrentHashMap<>();
 
   @Autowired
   public KafkaService(
       KafkaTemplate<String, TokenValidationRequest> kafkaTemplate,
-      KafkaTemplate<String, CartValidationRequest> cartValidationKafkaTemplate) {
+      KafkaTemplate<String, CartValidationRequest> cartValidationKafkaTemplate,
+      KafkaTemplate<String, ProductOrderCancellationMessage>
+          productOrderCancellationKafkaTemplate) {
     this.kafkaTemplate = kafkaTemplate;
     this.cartValidationKafkaTemplate = cartValidationKafkaTemplate;
+    this.productOrderCancellationKafkaTemplate = productOrderCancellationKafkaTemplate;
   }
 
   private ConcurrentMap<String, BlockingQueue<TokenValidationResponse>> responseQueues =
@@ -94,7 +103,12 @@ public class KafkaService {
   public void consumeTokenValidationResponse(TokenValidationResponse response) {
     BlockingQueue<TokenValidationResponse> queue = responseQueues.get(response.getCorrelationId());
     if (queue != null) {
-      queue.offer(response);
+      boolean queued = queue.offer(response);
+      if (!queued) {
+        logger.error(
+            "Error: token validation response by correlationId {} could not be placed in queue",
+            response.getCorrelationId());
+      }
     }
   }
 
@@ -126,7 +140,16 @@ public class KafkaService {
     BlockingQueue<CartValidationResponse> queue =
         cartValidationResponseQueues.get(response.getCorrelationId());
     if (queue != null) {
-      queue.offer(response);
+      boolean queued = queue.offer(response);
+      if (!queued) {
+        logger.error(
+            "Error: cart validation response by correlationId {} could not be placed in queue",
+            response.getCorrelationId());
+      }
     }
+  }
+
+  public void sendProductOrderCancellation(ProductOrderCancellationMessage message) {
+    productOrderCancellationKafkaTemplate.send(PRODUCT_ORDER_CANCELLATION_MESSAGE, message);
   }
 }

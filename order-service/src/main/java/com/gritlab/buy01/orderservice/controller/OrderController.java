@@ -41,7 +41,7 @@ public class OrderController {
   }
 
   @PreAuthorize("isAuthenticated()")
-  @GetMapping("/orders/")
+  @GetMapping("/orders")
   public ResponseEntity<?> getOrders() {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
@@ -116,7 +116,11 @@ public class OrderController {
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.NOT_FOUND.value());
       return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      ErrorMessage error =
+          new ErrorMessage(
+              "Error: something went wrong during updating the order status",
+              HttpStatus.INTERNAL_SERVER_ERROR.value());
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

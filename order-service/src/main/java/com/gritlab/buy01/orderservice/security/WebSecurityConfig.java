@@ -42,7 +42,7 @@ public class WebSecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(HttpMethod.GET, "/api/mediaHealth")
+                auth.requestMatchers(HttpMethod.GET, "/api/orderHealth")
                     .permitAll()
                     .requestMatchers("/error")
                     .permitAll()

@@ -47,16 +47,13 @@ public class ProductService {
       try {
         CartValidationEvent event = eventQueue.take();
 
-        System.out.println("THIS IS THE EVENT!!!" + event.toString());
         CartValidationResponse response = new CartValidationResponse();
         response.setCorrelationId(event.getCorrelationId());
 
         Cart cart = event.getCart();
         response.setCart(cart);
 
-        System.out.println("THIS IS THE CART!!!" + cart.toString());
         OrderModifications processedCart = processCart(cart);
-        System.out.println("THIS IS ORDERMODIFICATIONS, ALL GOOD IF NULL" + processedCart);
 
         if (processedCart == null) {
           response.setProcessed(true);
@@ -209,6 +206,15 @@ public class ProductService {
             kafkaService.deleteProductMedia(product.getId());
             productRepository.deleteById(id);
           });
+    }
+  }
+
+  public void handleProductOrderCancellation(String productId, Integer quantity) {
+    Optional<ProductModel> productQuery = productRepository.findById(productId);
+    if (productQuery.isPresent()) {
+      ProductModel product = productQuery.get();
+      product.setQuantity(product.getQuantity() + quantity);
+      productRepository.save(product);
     }
   }
 }

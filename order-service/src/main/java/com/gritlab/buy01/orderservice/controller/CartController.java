@@ -1,6 +1,5 @@
 package com.gritlab.buy01.orderservice.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +67,10 @@ public class CartController {
   @PostMapping("/carts/add")
   public ResponseEntity<?> addItemToCart(@RequestBody CartItemDTO item) {
     try {
+      if (item.getQuantity() <= 0) {
+        throw new ForbiddenException("Error: quantity has to be more than zero");
+      }
+
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
       if (!principal.hasRole(CLIENT)) {
         throw new ForbiddenException("Error: only clients can add items to cart");

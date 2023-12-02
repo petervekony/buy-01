@@ -14,6 +14,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationRequest;
+import com.gritlab.buy01.orderservice.kafka.message.ProductOrderCancellationMessage;
 import com.gritlab.buy01.orderservice.kafka.message.TokenValidationRequest;
 
 @Configuration
@@ -51,27 +52,15 @@ public class KafkaProducerConfig {
     return new KafkaTemplate<>(cartValidationProducerFactory());
   }
 
-  // // ProductRequest before media upload
-  // @Bean
-  // public ProducerFactory<String, ProductOwnershipRequest>
-  //     producerFactoryForProductOwnershipRequest() {
-  //   return new DefaultKafkaProducerFactory<>(producerConfigs());
-  // }
+  @Bean
+  public ProducerFactory<String, ProductOrderCancellationMessage>
+      productOrderCancellationProducerFactory() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
 
-  // @Bean
-  // public KafkaTemplate<String, ProductOwnershipRequest> productOwnershipRequestKafkaTemplate() {
-  //   return new KafkaTemplate<>(producerFactoryForProductOwnershipRequest());
-  // }
-
-  // // user avatar update message
-  // @Bean
-  // public ProducerFactory<String, UserAvatarUpdateRequest>
-  //     producerFactoryForUserAvatarUpdateRequest() {
-  //   return new DefaultKafkaProducerFactory<>(producerConfigs());
-  // }
-
-  // @Bean
-  // public KafkaTemplate<String, UserAvatarUpdateRequest> userAvatarUpdateRequestKafkaTemplate() {
-  //   return new KafkaTemplate<>(producerFactoryForUserAvatarUpdateRequest());
-  // }
+  @Bean
+  public KafkaTemplate<String, ProductOrderCancellationMessage>
+      productOrderCancellationKafkaTemplate() {
+    return new KafkaTemplate<>(productOrderCancellationProducerFactory());
+  }
 }

@@ -16,6 +16,7 @@ import com.gritlab.buy01.orderservice.exception.ForbiddenException;
 import com.gritlab.buy01.orderservice.exception.NotFoundException;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationRequest;
 import com.gritlab.buy01.orderservice.kafka.message.CartValidationResponse;
+import com.gritlab.buy01.orderservice.kafka.message.ProductOrderCancellationMessage;
 import com.gritlab.buy01.orderservice.model.Order;
 import com.gritlab.buy01.orderservice.model.enums.OrderStatus;
 import com.gritlab.buy01.orderservice.repository.OrderRepository;
@@ -78,7 +79,6 @@ public class OrderService {
     if (cart == null) {
       throw new NotFoundException("Error: could not find cart");
     }
-    System.out.println("CART IN PLACEORDER!!!! " + cart);
     cartValidationRequest.setCart(cart);
 
     CartValidationResponse cartValidationResponse =
@@ -124,6 +124,16 @@ public class OrderService {
     }
 
     order.setStatus(update.getStatus());
-    return order;
+
+    if (order.getStatus() == OrderStatus.CANCELLED) {
+      ProductOrderCancellationMessage message = new ProductOrderCancellationMessage();
+      message.setCorrelationId(UUID.randomUUID().toString());
+      message.setProductId(order.getProduct().getId());
+      message.setQuantity(order.getQuantity());
+
+      kafkaService.sendProductOrderCancellation(message);
+    }
+
+    return orderRepository.save(order);
   }
 }
