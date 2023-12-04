@@ -94,9 +94,11 @@ public class OrderService {
       cartService.updateCartContents(modifications.getModifications());
     }
 
-    for (Order order : cartValidationResponse.getCart().getOrders()) {
-      orderRepository.save(order);
-      cartService.deleteItemFromCart(order.getId(), userId);
+    if (cartValidationResponse.getProcessed()) {
+      for (Order order : cartValidationResponse.getCart().getOrders()) {
+        orderRepository.save(order);
+        cartService.deleteItemFromCart(order.getId(), userId);
+      }
     }
 
     return new CartResponse(

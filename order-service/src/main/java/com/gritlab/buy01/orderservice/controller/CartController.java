@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gritlab.buy01.orderservice.dto.Cart;
@@ -38,7 +39,7 @@ public class CartController {
 
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/carts")
-  public ResponseEntity<?> getCart() {
+  public ResponseEntity<Object> getCart() {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
       Cart cart = cartService.getCart(principal.getId());
@@ -65,7 +66,7 @@ public class CartController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/carts/add")
-  public ResponseEntity<?> addItemToCart(@RequestBody CartItemDTO item) {
+  public ResponseEntity<Object> addItemToCart(@RequestBody CartItemDTO item) {
     try {
       if (item.getQuantity() <= 0) {
         throw new ForbiddenException("Error: quantity has to be more than zero");
@@ -83,7 +84,7 @@ public class CartController {
       CartItem addedToCart = this.cartService.addToCart(item);
       return new ResponseEntity<>(addedToCart, HttpStatus.OK);
 
-    } catch (ForbiddenException e) {
+    } catch (ForbiddenException | UnexpectedPrincipalTypeException e) {
 
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
@@ -100,7 +101,7 @@ public class CartController {
 
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/carts/{id}")
-  public ResponseEntity<?> deleteItemFromCart(@PathVariable("id") String id) {
+  public ResponseEntity<Object> deleteItemFromCart(@PathVariable("id") String id) {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
       if (!principal.hasRole(CLIENT)) {
@@ -110,7 +111,7 @@ public class CartController {
       this.cartService.deleteItemFromCart(id, principal.getId());
       return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
-    } catch (ForbiddenException e) {
+    } catch (ForbiddenException | UnexpectedPrincipalTypeException e) {
 
       ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
       return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
@@ -130,5 +131,32 @@ public class CartController {
     }
   }
 
-  // update item quantity in cart
+  @PreAuthorize("isAuthenticated()")
+  @PostMapping("/carts")
+  public ResponseEntity<Object> updateCartItemQuantity(
+      @RequestParam(required = true) String id, @RequestParam(required = true) Integer quantity) {
+    try {
+
+      CartItemDTO updatedCart = cartService.updateCartItemQuantity(id, quantity);
+      return new ResponseEntity<>(updatedCart, HttpStatus.OK);
+
+    } catch (ForbiddenException | UnexpectedPrincipalTypeException e) {
+
+      ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.FORBIDDEN.value());
+      return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+
+    } catch (NotFoundException e) {
+
+      ErrorMessage error = new ErrorMessage(e.getMessage(), HttpStatus.NOT_FOUND.value());
+      return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+
+    } catch (Exception e) {
+
+      ErrorMessage error =
+          new ErrorMessage(
+              "Error: something went wrong with item quantity update",
+              HttpStatus.INTERNAL_SERVER_ERROR.value());
+      return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

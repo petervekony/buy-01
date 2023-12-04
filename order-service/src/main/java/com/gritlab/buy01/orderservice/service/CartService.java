@@ -13,6 +13,7 @@ import com.gritlab.buy01.orderservice.exception.NotFoundException;
 import com.gritlab.buy01.orderservice.model.CartItem;
 import com.gritlab.buy01.orderservice.model.Order;
 import com.gritlab.buy01.orderservice.repository.CartRepository;
+import com.gritlab.buy01.orderservice.security.UserDetailsImpl;
 
 @Service
 public class CartService {
@@ -82,5 +83,33 @@ public class CartService {
 
   public void deleteUserCart(String userId) {
     cartRepository.deleteAllByBuyerId(userId);
+  }
+
+  public CartItemDTO updateCartItemQuantity(String id, Integer quantity)
+      throws ForbiddenException, NotFoundException {
+    Optional<CartItem> cartItemQuery = cartRepository.findById(id);
+    if (cartItemQuery.isEmpty()) {
+      throw new NotFoundException(
+          String.format("Error: cart item could not be found by id %s", id));
+    }
+
+    CartItem item = cartItemQuery.get();
+    UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
+
+    if (!item.getBuyerId().equals(principal.getId())) {
+      throw new ForbiddenException("Error: cart item does not belong to you");
+    }
+
+    item.setQuantity(quantity);
+
+    cartRepository.save(item);
+
+    return new CartItemDTO(
+        item.getId(),
+        item.getSellerId(),
+        item.getBuyerId(),
+        item.getProduct(),
+        item.getQuantity(),
+        item.getAddedToCartAt());
   }
 }
