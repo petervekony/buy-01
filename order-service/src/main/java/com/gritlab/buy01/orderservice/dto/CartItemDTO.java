@@ -30,4 +30,11 @@ public class CartItemDTO {
     this.product = product;
     this.quantity = quantity;
   }
+
+  public CartItemDTO(String sellerId, String buyerId, ProductDTO product, Integer quantity) {
+    this.sellerId = sellerId;
+    this.buyerId = buyerId;
+    this.product = product;
+    this.quantity = quantity;
+  }
 }
