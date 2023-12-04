@@ -49,6 +49,13 @@ public class CartService {
   }
 
   public CartItem addToCart(CartItemDTO cartItemDTO) {
+    Optional<CartItem> cartItemQuery =
+        cartRepository.findByBuyerIdAndProductId(
+            cartItemDTO.getBuyerId(), cartItemDTO.getProduct().getId());
+    if (cartItemQuery.isPresent()) {
+      return null;
+    }
+
     CartItem item = new CartItem(cartItemDTO);
     return this.cartRepository.save(item);
   }

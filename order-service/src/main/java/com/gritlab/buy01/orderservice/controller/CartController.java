@@ -82,6 +82,8 @@ public class CartController {
       }
 
       CartItem addedToCart = this.cartService.addToCart(item);
+
+      // return will be the new added CartItem, or null if the product is already in the user's cart
       return new ResponseEntity<>(addedToCart, HttpStatus.OK);
 
     } catch (ForbiddenException | UnexpectedPrincipalTypeException e) {

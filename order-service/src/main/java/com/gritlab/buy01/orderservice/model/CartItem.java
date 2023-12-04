@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.gritlab.buy01.orderservice.dto.CartItemDTO;
 import com.gritlab.buy01.orderservice.dto.ProductDTO;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,15 +21,17 @@ import lombok.NoArgsConstructor;
 public class CartItem {
   @Id private String id;
 
-  private String sellerId;
+  @NotNull private String sellerId;
 
-  private String buyerId;
+  @NotNull private String buyerId;
 
-  private ProductDTO product;
+  @NotNull private ProductDTO product;
 
+  @NotNull
+  @Min(0)
   private Integer quantity;
 
-  private Date addedToCartAt;
+  @NotNull private Date addedToCartAt;
 
   public CartItem(String sellerId, String buyerId, ProductDTO product, Integer quantity) {
     this.sellerId = sellerId;

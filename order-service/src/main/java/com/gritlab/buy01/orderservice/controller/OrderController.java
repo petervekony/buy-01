@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gritlab.buy01.orderservice.dto.CartResponse;
@@ -63,7 +64,7 @@ public class OrderController {
 
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/orders")
-  public ResponseEntity<Object> placeOrder() {
+  public ResponseEntity<Object> placeOrder(@RequestParam(required = false) String reorder) {
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
 
@@ -71,7 +72,12 @@ public class OrderController {
         throw new ForbiddenException("Error: only clients can place orders");
       }
 
-      CartResponse response = orderService.placeOrder(principal.getId());
+      CartResponse response;
+      if (reorder != null) {
+        response = orderService.placeOrder(principal.getId());
+      } else {
+        response = orderService.reOrder(reorder);
+      }
 
       return new ResponseEntity<>(response, HttpStatus.OK);
 

@@ -72,14 +72,10 @@ public class OrderService {
         cancelled.toArray(new Order[0]));
   }
 
-  public CartResponse placeOrder(String userId) throws TimeoutException, NotFoundException {
+  private CartResponse handleCartOrder(String userId, Cart cart, boolean reorder)
+      throws TimeoutException {
     CartValidationRequest cartValidationRequest = new CartValidationRequest();
     cartValidationRequest.setCorrelationId(UUID.randomUUID().toString());
-
-    Cart cart = cartService.getCart(userId);
-    if (cart == null) {
-      throw new NotFoundException("Error: could not find cart");
-    }
     cartValidationRequest.setCart(cart);
 
     CartValidationResponse cartValidationResponse =
@@ -94,17 +90,45 @@ public class OrderService {
       cartService.updateCartContents(modifications.getModifications());
     }
 
-    if (cartValidationResponse.getProcessed()) {
+    if (cartValidationResponse.isProcessed()) {
       for (Order order : cartValidationResponse.getCart().getOrders()) {
         orderRepository.save(order);
-        cartService.deleteItemFromCart(order.getId(), userId);
+        if (!reorder) cartService.deleteItemFromCart(order.getId(), userId);
       }
     }
 
     return new CartResponse(
         cartValidationResponse.getCart(),
-        cartValidationResponse.getProcessed(),
+        cartValidationResponse.isProcessed(),
         cartValidationResponse.getOrderModifications());
+  }
+
+  public CartResponse placeOrder(String userId) throws TimeoutException, NotFoundException {
+    Cart cart = cartService.getCart(userId);
+    if (cart == null) {
+      throw new NotFoundException("Error: could not find cart");
+    }
+
+    return handleCartOrder(userId, cart, false);
+  }
+
+  public CartResponse reOrder(String orderId)
+      throws NotFoundException, ForbiddenException, TimeoutException {
+    Optional<Order> orderQuery = orderRepository.findById(orderId);
+    if (orderQuery.isEmpty()) {
+      throw new NotFoundException("Error: order not found");
+    }
+    Order order = orderQuery.get();
+
+    UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
+    if (!principal.getId().equals(order.getBuyerId())) {
+      throw new ForbiddenException("Error: not your order");
+    }
+
+    order.setId(null);
+    Cart cart = new Cart();
+    cart.setOrders(new Order[] {order});
+    return handleCartOrder(principal.getId(), cart, true);
   }
 
   public Order changeOrderStatus(OrderStatusUpdate update, String userId, String role)

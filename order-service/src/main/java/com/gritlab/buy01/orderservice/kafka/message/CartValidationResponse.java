@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class CartValidationResponse implements Serializable {
   private String correlationId;
 
-  private Boolean processed;
+  private boolean processed;
 
   private Cart cart;
 
