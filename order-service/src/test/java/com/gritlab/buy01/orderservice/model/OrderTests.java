@@ -19,16 +19,13 @@ public class OrderTests {
 
   @BeforeEach
   public void setUp() {
-    // Initialize Mockito annotations
     MockitoAnnotations.openMocks(this);
 
-    // Create a sample ProductDTO for testing
     ProductDTO productDTO = new ProductDTO();
     productDTO.setId("product-123");
     productDTO.setName("Sample Product");
     productDTO.setPrice(10.0);
 
-    // Create a new Order instance for testing
     order = new Order("seller-1", "buyer-1", productDTO, 2);
   }
 
@@ -46,7 +43,6 @@ public class OrderTests {
 
   @Test
   public void testSettersAndGetters() {
-    // Test setter and getter methods
     order.setId("order-456");
     assertEquals("order-456", order.getId());
 
