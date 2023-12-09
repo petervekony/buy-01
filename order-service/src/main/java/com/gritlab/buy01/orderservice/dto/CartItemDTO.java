@@ -2,6 +2,8 @@ package com.gritlab.buy01.orderservice.dto;
 
 import java.util.Date;
 
+import com.gritlab.buy01.orderservice.model.CartItem;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,5 +38,15 @@ public class CartItemDTO {
     this.buyerId = buyerId;
     this.product = product;
     this.quantity = quantity;
+  }
+
+  public CartItem convertToModel() {
+    return new CartItem(
+        this.getId(),
+        this.getSellerId(),
+        this.getBuyerId(),
+        this.getProduct(),
+        this.getQuantity(),
+        this.getAddedToCartAt());
   }
 }

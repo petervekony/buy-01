@@ -48,4 +48,14 @@ public class CartItem {
     this.quantity = cartItemDTO.getQuantity();
     this.addedToCartAt = new Date();
   }
+
+  public CartItemDTO convertToDTO() {
+    return new CartItemDTO(
+        this.getId(),
+        this.getSellerId(),
+        this.getBuyerId(),
+        this.getProduct(),
+        this.getQuantity(),
+        this.getAddedToCartAt());
+  }
 }

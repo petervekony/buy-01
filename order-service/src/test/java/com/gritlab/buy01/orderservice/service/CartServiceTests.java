@@ -1,30 +1,44 @@
 package com.gritlab.buy01.orderservice.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartItemDTO;
 import com.gritlab.buy01.orderservice.dto.ProductDTO;
+import com.gritlab.buy01.orderservice.exception.ForbiddenException;
+import com.gritlab.buy01.orderservice.exception.NotFoundException;
 import com.gritlab.buy01.orderservice.model.CartItem;
 import com.gritlab.buy01.orderservice.model.Order;
 import com.gritlab.buy01.orderservice.repository.CartRepository;
+import com.gritlab.buy01.orderservice.security.UserDetailsImpl;
 
 class CartServiceTests {
   private static final String USER_ID = "userId";
@@ -43,6 +57,11 @@ class CartServiceTests {
   void setUp() {
     MockitoAnnotations.openMocks(this);
     initializeTestData();
+  }
+
+  @AfterEach
+  void tearDown() {
+    SecurityContextHolder.clearContext();
   }
 
   private void initializeTestData() {
@@ -115,7 +134,7 @@ class CartServiceTests {
   }
 
   @Test
-  void testUpdateCartContents() {
+  void testUpdateCartContentsSuccess() {
     String updatedSellerId = "updatedSellerId";
     ProductDTO updatedProduct =
         new ProductDTO(
@@ -140,5 +159,85 @@ class CartServiceTests {
     assertEquals(updatedSellerId, updatedCartItem.getSellerId());
     assertEquals(updatedProduct, updatedCartItem.getProduct());
     assertEquals(1, updatedCartItem.getQuantity());
+  }
+
+  @Test
+  void testDeleteFromCartNotFound() {
+    when(cartRepository.findById(any(String.class))).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class, () -> cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID));
+  }
+
+  @Test
+  void testDeleteFromCartForbidden() {
+    String otherItemId = "itemId";
+    CartItem other = new CartItem(otherItemId, SELLER_ID, "otherBuyer", mockProduct, 1, new Date());
+
+    when(cartRepository.findById(otherItemId)).thenReturn(Optional.of(other));
+
+    assertThrows(
+        ForbiddenException.class, () -> cartService.deleteItemFromCart(otherItemId, USER_ID));
+  }
+
+  @Test
+  void testDeleteFromCartSuccess() {
+    when(cartRepository.findById(CART_ITEM_ID)).thenReturn(Optional.of(cartItem));
+
+    assertDoesNotThrow(() -> cartService.deleteItemFromCart(CART_ITEM_ID, USER_ID));
+  }
+
+  @Test
+  void testUpdateCartItemQuantityNotFound() {
+    when(cartRepository.findById(any(String.class))).thenReturn(Optional.empty());
+
+    assertThrows(
+        NotFoundException.class, () -> cartService.updateCartItemQuantity(CART_ITEM_ID, 1));
+  }
+
+  @Test
+  void testUpdateCartItemQuantityForbidden() {
+    when(cartRepository.findById(CART_ITEM_ID)).thenReturn(Optional.of(cartItem));
+
+    List<GrantedAuthority> mockAuthorities =
+        Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENT"));
+    UserDetailsImpl mockUserDetails = new UserDetailsImpl("someId", "John Doe", mockAuthorities);
+
+    Authentication authentication = Mockito.mock(Authentication.class);
+    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+    SecurityContextHolder.setContext(securityContext);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(mockUserDetails);
+
+    assertThrows(
+        ForbiddenException.class, () -> cartService.updateCartItemQuantity(CART_ITEM_ID, 1));
+  }
+
+  @Test
+  void testUpdateCartItemQuantitySuccess() {
+    when(cartRepository.findById(any(String.class))).thenReturn(Optional.of(cartItem));
+
+    List<GrantedAuthority> mockAuthorities =
+        Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENT"));
+    UserDetailsImpl mockUserDetails = new UserDetailsImpl(USER_ID, "John Doe", mockAuthorities);
+
+    Authentication authentication = Mockito.mock(Authentication.class);
+    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+    SecurityContextHolder.setContext(securityContext);
+
+    when(securityContext.getAuthentication()).thenReturn(authentication);
+    when(authentication.getPrincipal()).thenReturn(mockUserDetails);
+
+    when(cartRepository.save(any(CartItem.class))).thenReturn(cartItem);
+
+    Integer updatedQuantity = 123;
+
+    cartService.updateCartItemQuantity(USER_ID, updatedQuantity);
+
+    verify(cartRepository).save(cartItemCaptor.capture());
+    CartItem savedCartItem = cartItemCaptor.getValue();
+
+    assertEquals(updatedQuantity, savedCartItem.getQuantity());
   }
 }

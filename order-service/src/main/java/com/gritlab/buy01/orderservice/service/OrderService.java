@@ -72,7 +72,7 @@ public class OrderService {
         cancelled.toArray(new Order[0]));
   }
 
-  private CartResponse handleCartOrder(String userId, Cart cart, boolean reorder)
+  public CartResponse handleCartOrder(String userId, Cart cart, boolean reorder)
       throws TimeoutException {
     CartValidationRequest cartValidationRequest = new CartValidationRequest();
     cartValidationRequest.setCorrelationId(UUID.randomUUID().toString());
