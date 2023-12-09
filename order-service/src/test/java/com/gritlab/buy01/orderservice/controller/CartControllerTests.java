@@ -116,7 +116,6 @@ class CartControllerTest {
     when(cartService.addToCart(any(CartItemDTO.class))).thenReturn(mockCartItem);
 
     ResponseEntity<Object> response = cartController.addItemToCart(mockItemDTO);
-    System.out.println(response);
     assertEquals(HttpStatus.OK, response.getStatusCode());
     assertEquals(mockCartItem, response.getBody());
   }
