@@ -35,6 +35,8 @@ import com.gritlab.buy01.orderservice.service.CartService;
 
 @ExtendWith(MockitoExtension.class)
 class CartControllerTest {
+  private static final String USER_ID = "userId";
+  private static final String SELLER_ID = "sellerId";
 
   @Mock private CartService cartService;
 
@@ -46,7 +48,7 @@ class CartControllerTest {
   void setUp() {
     mockUserDetails =
         new UserDetailsImpl(
-            "userId",
+            USER_ID,
             "userName",
             Collections.singletonList(new SimpleGrantedAuthority("ROLE_CLIENT")));
 
@@ -90,9 +92,9 @@ class CartControllerTest {
   void testAddItemToCartWithForbiddenException() {
     CartItemDTO mockItemDTO = new CartItemDTO();
     ProductDTO mockProduct =
-        new ProductDTO("productId", "productName", "productDescription", 10.0, 5, "sellerId");
-    mockItemDTO.setBuyerId("userId");
-    mockItemDTO.setSellerId("sellerId");
+        new ProductDTO("productId", "productName", "productDescription", 10.0, 5, SELLER_ID);
+    mockItemDTO.setBuyerId(USER_ID);
+    mockItemDTO.setSellerId(SELLER_ID);
     mockItemDTO.setProduct(mockProduct);
     mockItemDTO.setQuantity(1);
     when(cartService.addToCart(any(CartItemDTO.class)))
@@ -106,9 +108,9 @@ class CartControllerTest {
   void testAddItemToCartSuccess() {
     CartItemDTO mockItemDTO = new CartItemDTO();
     ProductDTO mockProduct =
-        new ProductDTO("productId", "productName", "productDescription", 10.0, 5, "sellerId");
-    mockItemDTO.setBuyerId("userId");
-    mockItemDTO.setSellerId("sellerId");
+        new ProductDTO("productId", "productName", "productDescription", 10.0, 5, SELLER_ID);
+    mockItemDTO.setBuyerId(USER_ID);
+    mockItemDTO.setSellerId(SELLER_ID);
     mockItemDTO.setProduct(mockProduct);
     mockItemDTO.setQuantity(1);
 
