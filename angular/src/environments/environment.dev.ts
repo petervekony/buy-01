@@ -12,8 +12,8 @@ export const environment = {
   mediaURL: `${baseURL}/media`,
   userMediaURL: `${baseURL}/media/user/`,
   productMediaURL: `${baseURL}/media/product/`,
-  cartUrl: `${baseURL}/carts`,
-  addToCartUrl: `${baseURL}/carts/add`,
-  placeOrder: `${baseURL}/orders`,
+  cartURL: `${baseURL}/carts`,
+  addToCartURL: `${baseURL}/carts/add`,
+  ordersURL: `${baseURL}/orders`,
   logoutURL: `${baseURL}/auth/signout`,
 };

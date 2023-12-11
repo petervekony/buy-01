@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
       (user) => {
         this.currentUser = user;
         this.getOrders();
+        this.getAllOrders();
       },
     );
 
@@ -45,6 +46,17 @@ export class DashboardComponent implements OnInit {
     this.orderService.orderUpdates$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.getOrders();
+      });
+  }
+
+  getAllOrders(): void {
+    this.orderService.getAllOrders().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((cart) => {
+        console.log(cart); //NOSONAR
+        this.cards$ = this.orderService.filterOrders(
+          this.filterType,
+          cart.orders,
+        );
       });
   }
 

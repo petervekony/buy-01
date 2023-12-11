@@ -37,7 +37,7 @@ export class OrderService {
   }
 
   getCartFromDB(): Observable<Cart> {
-    const address = environment.cartUrl;
+    const address = environment.cartURL;
     return this.http.get<Cart>(address, { withCredentials: true });
   }
 
@@ -103,7 +103,7 @@ export class OrderService {
   // }
 
   placeOrder(): Observable<CartResponse> {
-    const address = environment.placeOrder;
+    const address = environment.ordersURL;
     return this.http.post<CartResponse>(address, { withCredentials: true });
   }
 
@@ -113,7 +113,7 @@ export class OrderService {
     );
   }
 
-  private filterOrders(
+  filterOrders(
     filter: string,
     cartItems: CartItem[],
   ): Observable<CartItem[]> {
@@ -160,7 +160,7 @@ export class OrderService {
 
   addToCart(product: Product, quantity: number): void {
     const newOrder = this.createOrder(product, quantity);
-    const address = environment.addToCartUrl;
+    const address = environment.addToCartURL;
     this.http.post<CartItem>(address, newOrder, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((response) => console.log(response)); //NOSONAR
@@ -174,6 +174,13 @@ export class OrderService {
     //NOSONAR
     // this.setToStorage(shoppingCart.reverse()); //NOSONAR
     // }
+  }
+
+  //eslint-disable-next-line
+  getAllOrders(): Observable<any> {
+    const address = environment.ordersURL;
+    //eslint-disable-next-line
+    return this.http.get<any>(address, { withCredentials: true });
   }
 
   private createOrder(product: Product, quantity: number): CartItem {
@@ -198,7 +205,7 @@ export class OrderService {
   }
 
   removeItem(id: string): void {
-    const address = environment.cartUrl + '/' + id;
+    const address = environment.cartURL + '/' + id;
     this.http.delete<CartItem>(address, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((response) => {
