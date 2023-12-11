@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, of } from 'rxjs';
-import { CartItem } from '../interfaces/order';
+import { CartItem, Order } from '../interfaces/order';
 import { User } from '../interfaces/user';
 import { OrderService } from '../service/order.service';
 import { StateService } from '../service/state.service';
@@ -12,10 +12,14 @@ import { StateService } from '../service/state.service';
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
+  pendingOrders$: Observable<Order[]> = of([]);
+  confirmedOrders$: Observable<Order[]> = of([]);
+  cancelledOrders$: Observable<Order[]> = of([]);
+
   cards$: Observable<CartItem[]> = of([]);
   user$: Observable<User> | null = null;
   currentUser: User = {} as User;
-  empty: boolean = false;
+  empty: boolean = true;
   filterType: string = 'ALL';
 
   private stateService = inject(StateService);
@@ -30,7 +34,6 @@ export class DashboardComponent implements OnInit {
     this.user$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(
       (user) => {
         this.currentUser = user;
-        this.getOrders();
         this.getAllOrders();
       },
     );
@@ -51,12 +54,11 @@ export class DashboardComponent implements OnInit {
 
   getAllOrders(): void {
     this.orderService.getAllOrders().pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((cart) => {
-        console.log(cart); //NOSONAR
-        this.cards$ = this.orderService.filterOrders(
-          this.filterType,
-          cart.orders,
-        );
+      .subscribe((personalOrder) => {
+        this.confirmedOrders$ = of(personalOrder.confirmed);
+        this.pendingOrders$ = of(personalOrder.pending);
+        this.cancelledOrders$ = of(personalOrder.cancelled);
+        console.log(personalOrder); //NOSONAR
       });
   }
 

@@ -11,6 +11,12 @@ export interface Order {
   quantity: number;
 }
 
+export interface PersonalOrder {
+  pending: Order[];
+  confirmed: Order[];
+  cancelled: Order[];
+}
+
 export interface CartItem {
   id?: string;
   status: 'PENDING' | 'CANCELLED' | 'CONFIRMED';

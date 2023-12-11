@@ -73,7 +73,7 @@ public class OrderController {
       }
 
       CartResponse response;
-      if (reorder != null) {
+      if (reorder == null) {
         response = orderService.placeOrder(principal.getId());
       } else {
         response = orderService.reOrder(reorder);

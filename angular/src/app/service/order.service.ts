@@ -1,6 +1,11 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subject, switchMap } from 'rxjs';
-import { CartItem, CartResponse, Order } from '../interfaces/order';
+import {
+  CartItem,
+  CartResponse,
+  Order,
+  PersonalOrder,
+} from '../interfaces/order';
 import { Product } from '../interfaces/product';
 import { StateService } from './state.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,25 +27,6 @@ export class OrderService {
   private user: User = {} as User;
   private cartItems: CartItem[] = [];
 
-  constructor() {
-    this.stateService.getStateAsObservable().pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe((user) => {
-      this.user = user;
-      this.getCartFromDB().pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe((cart) => {
-          console.log(cart.orders); //NOSONAR;
-          this.cartItems$ = of(cart.orders);
-          this.cartItems = cart.orders;
-        });
-    });
-  }
-
-  getCartFromDB(): Observable<Cart> {
-    const address = environment.cartURL;
-    return this.http.get<Cart>(address, { withCredentials: true });
-  }
-
   private filterTypeSubject = new BehaviorSubject<string>('ALL');
   filterType$ = this.filterTypeSubject.asObservable();
 
@@ -49,6 +35,25 @@ export class OrderService {
 
   private cartItemsSource = new Subject<CartItem[]>();
   cartItems$ = this.cartItemsSource.asObservable();
+
+  constructor() {
+    this.stateService.getStateAsObservable().pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe((user) => {
+      this.user = user;
+      this.getCartFromDB().pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe((cart) => {
+          this.cartItems$ = of(cart.orders);
+          this.cartItems = cart.orders;
+          console.log('cartItems:', this.cartItems); //NOSONAR;
+        });
+    });
+  }
+
+  getCartFromDB(): Observable<Cart> {
+    const address = environment.cartURL;
+    return this.http.get<Cart>(address, { withCredentials: true });
+  }
 
   updateOrders(order: Order): void {
     this.orderUpdateSource.next(order);
@@ -177,10 +182,10 @@ export class OrderService {
   }
 
   //eslint-disable-next-line
-  getAllOrders(): Observable<any> {
+  getAllOrders(): Observable<PersonalOrder> {
     const address = environment.ordersURL;
     //eslint-disable-next-line
-    return this.http.get<any>(address, { withCredentials: true });
+    return this.http.get<PersonalOrder>(address, { withCredentials: true });
   }
 
   private createOrder(product: Product, quantity: number): CartItem {
