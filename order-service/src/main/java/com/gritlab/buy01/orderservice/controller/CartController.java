@@ -95,7 +95,7 @@ public class CartController {
 
       ErrorMessage error =
           new ErrorMessage(
-              "Error: something went wrong with adding product to cart",
+              "Error: something went wrong with adding product to cart: " + e.getMessage(),
               HttpStatus.INTERNAL_SERVER_ERROR.value());
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

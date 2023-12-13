@@ -95,7 +95,7 @@ public class OrderController {
     } catch (Exception e) {
       ErrorMessage error =
           new ErrorMessage(
-              "Error: something went wrong during placing the order",
+              "Error: something went wrong during placing the order: " + e.getMessage(),
               HttpStatus.INTERNAL_SERVER_ERROR.value());
       return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
