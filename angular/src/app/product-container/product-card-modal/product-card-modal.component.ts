@@ -196,6 +196,9 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
   }
 
   addToCart() {
+    if (this.product.quantity < this.orderQuantity) {
+      this.orderQuantity = this.product.quantity;
+    }
     this.orderService.addToCart(this.product, this.orderQuantity);
   }
 

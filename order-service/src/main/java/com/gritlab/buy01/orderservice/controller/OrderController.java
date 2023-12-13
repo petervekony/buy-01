@@ -65,6 +65,7 @@ public class OrderController {
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/orders")
   public ResponseEntity<Object> placeOrder(@RequestParam(required = false) String reorder) {
+    System.out.println("reorder:" + reorder);
     try {
       UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
 
@@ -73,7 +74,7 @@ public class OrderController {
       }
 
       CartResponse response;
-      if (reorder != null) {
+      if (reorder == null) {
         response = orderService.placeOrder(principal.getId());
       } else {
         response = orderService.reOrder(reorder);

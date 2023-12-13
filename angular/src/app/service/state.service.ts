@@ -49,6 +49,10 @@ export class StateService implements OnInit {
     return this._state;
   }
 
+  getCurrentUser(): User {
+    return this._state.getValue();
+  }
+
   getStateAsObservable(): Observable<User> {
     return this._state.asObservable();
   }

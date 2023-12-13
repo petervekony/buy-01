@@ -1,55 +1,43 @@
 <div class="total-amount-div">
-  <h3>$ {{ totalAmount }}</h3>
+  <h3>{{ isSeller ? '+$' +totalAmount : '-$' + totalAmount }}</h3>
   <p>TOTAL</p>
 </div>
 <div class="dashboard-container">
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" #tabGroup
     (selectedTabChange)="changeFilter($event.tab.textLabel.toUpperCase())">
-    <mat-tab label="All">
-      <ng-template matTabContent>
-        <ng-container *ngIf="empty">
-          <div class="empty">
-            <h2>No orders</h2>
-          </div>
-        </ng-container>
-        <ng-container *ngFor="let card of cards$ | async">
-          <app-order-card [card]="card" [filter]="filterType"></app-order-card>
-        </ng-container>
-      </ng-template>
-    </mat-tab>
     <mat-tab label="Pending">
       <ng-template matTabContent>
-        <ng-container *ngIf="empty">
+        <ng-container *ngIf="pendingEmpty">
           <div class="empty">
             <h2>No pending orders</h2>
           </div>
         </ng-container>
-        <ng-container *ngFor="let card of cards$ | async">
-          <app-order-card [card]="card" [filter]="filterType"></app-order-card>
+        <ng-container *ngFor="let card of pendingOrders$ | async">
+          <app-order-card [card]="card" [filter]="filterType" [user]="currentUser"></app-order-card>
         </ng-container>
       </ng-template>
     </mat-tab>
     <mat-tab label="Confirmed">
       <ng-template matTabContent>
-        <ng-container *ngIf="empty">
+        <ng-container *ngIf="confirmedEmpty">
           <div class="empty">
             <h2>No confirmed orders</h2>
           </div>
         </ng-container>
-        <ng-container *ngFor="let card of cards$ | async">
-          <app-order-card [card]="card" [filter]="filterType"></app-order-card>
+        <ng-container *ngFor="let card of confirmedOrders$ | async">
+          <app-order-card [card]="card" [filter]="filterType" [user]="currentUser"></app-order-card>
         </ng-container>
       </ng-template>
     </mat-tab>
     <mat-tab label="Cancelled">
       <ng-template matTabContent>
-        <ng-container *ngIf="empty">
+        <ng-container *ngIf="cancelledEmpty">
           <div class="empty">
             <h2>No cancelled orders</h2>
           </div>
         </ng-container>
-        <ng-container *ngFor="let card of cards$ | async">
-          <app-order-card [card]="card" [filter]="filterType"></app-order-card>
+        <ng-container *ngFor="let card of cancelledOrders$ | async">
+          <app-order-card [card]="card" [filter]="filterType" [user]="currentUser"></app-order-card>
         </ng-container>
       </ng-template>
     </mat-tab>

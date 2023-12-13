@@ -12,15 +12,10 @@ import { CartItem, Order } from '../interfaces/order';
   styleUrls: ['./shopping-cart.component.css'],
 })
 export class ShoppingCartComponent implements OnInit {
-  // NOTE: change to Order
   cartItems$: Observable<CartItem[]> = of([]);
-
-  // NOTE: just for testing this part!
-  // cards$: Observable<Product[]> | null = null;
   currentUser: User = {} as User;
   user$: Observable<User> | null = null;
   empty = true;
-  orders: Map<string, Order> | null = null;
 
   private destroyRef = inject(DestroyRef);
   private orderService = inject(OrderService);
@@ -57,6 +52,7 @@ export class ShoppingCartComponent implements OnInit {
     this.orderService.placeOrder().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((response) => {
         console.log(response); //NOSONAR;
+        this.orderService.updateOrders({} as Order);
         this.cartItems$ = of(response.cart.orders);
       });
   }

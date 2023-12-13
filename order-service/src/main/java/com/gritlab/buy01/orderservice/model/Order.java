@@ -9,9 +9,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.gritlab.buy01.orderservice.dto.ProductDTO;
 import com.gritlab.buy01.orderservice.model.enums.OrderStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "orders")
 @Data
