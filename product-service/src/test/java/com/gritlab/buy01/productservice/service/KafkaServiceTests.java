@@ -39,12 +39,12 @@ public class KafkaServiceTests {
   @InjectMocks private KafkaService kafkaService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     MockitoAnnotations.openMocks(this);
   }
 
   @Test
-  public void testConsumeTokenValidationResponse() {
+  void testConsumeTokenValidationResponse() {
     TokenValidationResponse response = new TokenValidationResponse();
     response.setUserId("123");
     response.setName("testUser");
@@ -60,7 +60,7 @@ public class KafkaServiceTests {
   }
 
   @Test
-  public void testValidateTokenWithUserMicroserviceCacheHit() {
+  void testValidateTokenWithUserMicroserviceCacheHit() {
     TokenValidationRequest request = new TokenValidationRequest();
     request.setCorrelationId("123");
     request.setJwtToken("cachedToken");
@@ -80,7 +80,7 @@ public class KafkaServiceTests {
   }
 
   @Test
-  public void testDeleteUserProducts() {
+  void testDeleteUserProducts() {
     UserProfileDeleteMessage message = new UserProfileDeleteMessage();
     message.setUserId("123");
 
@@ -90,7 +90,7 @@ public class KafkaServiceTests {
   }
 
   @Test
-  public void testValidateOwnership() {
+  void testValidateOwnership() {
     ProductOwnershipRequest request = new ProductOwnershipRequest();
     request.setProductId("123");
     request.setUserId("456");
