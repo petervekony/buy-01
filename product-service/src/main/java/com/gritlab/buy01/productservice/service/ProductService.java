@@ -80,7 +80,7 @@ public class ProductService {
 
     for (Order order : cart.getOrders()) {
       ProductDTO orderedProduct = order.getProduct();
-      Optional<ProductModel> productQuery = productRepository.findById(order.getProduct().getId());
+      Optional<ProductModel> productQuery = productRepository.findById(orderedProduct.getId());
       Order possibleMod = new Order();
       possibleMod.setProduct(new ProductDTO());
       possibleMod.getProduct().setId(order.getProduct().getId());
@@ -96,7 +96,7 @@ public class ProductService {
           || !product.getDescription().equals(orderedProduct.getDescription())
           || !product.getPrice().equals(orderedProduct.getPrice())
           || !product.getUserId().equals(order.getSellerId())
-          || product.getQuantity() < orderedProduct.getQuantity()) {
+          || product.getQuantity() < order.getQuantity()) {
         possibleMod.setSellerId(order.getSellerId());
         possibleMod.setBuyerId(order.getBuyerId());
         possibleMod.setQuantity(order.getQuantity());
@@ -110,7 +110,7 @@ public class ProductService {
         modList.add(possibleMod);
 
         modifications.getNotes().add("Some order details have changed");
-        if (product.getQuantity() < orderedProduct.getQuantity()) {
+        if (product.getQuantity() < order.getQuantity()) {
           modifications.getNotes().add("Some products were not available in the ordered quantity");
         }
       }
