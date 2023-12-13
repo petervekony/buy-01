@@ -32,3 +32,8 @@
   gap: 5px;
   word-wrap: break-word;
 }
+
+.order-container h4 {
+  color: #ff3c69;
+  text-shadow: 0 0 3px #ff3c69;
+}

@@ -1,5 +1,5 @@
 <div class="total-amount-div">
-  <h3>{{ isSeller ? '+$' +totalAmount : '-$' + totalAmount }}</h3>
+  <h3>{{ '$' + totalAmount }}</h3>
   <p>TOTAL</p>
 </div>
 <div class="dashboard-container">
@@ -38,6 +38,18 @@
         </ng-container>
         <ng-container *ngFor="let card of cancelledOrders$ | async">
           <app-order-card [card]="card" [filter]="filterType" [user]="currentUser"></app-order-card>
+        </ng-container>
+      </ng-template>
+    </mat-tab>
+    <mat-tab label="Best Products">
+      <ng-template matTabContent>
+        <ng-container *ngIf="cancelledEmpty">
+          <div class="empty">
+            <h2>No bought products</h2>
+          </div>
+        </ng-container>
+        <ng-container *ngFor="let card of aggregatedProducts$ | async">
+          <app-order-card [filter]="filterType" [user]="currentUser" [aggregatedProduct]="card"></app-order-card>
         </ng-container>
       </ng-template>
     </mat-tab>

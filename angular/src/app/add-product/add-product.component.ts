@@ -68,13 +68,13 @@ export class AddProductComponent implements OnInit {
     price: new FormControl(0, [
       Validators.required,
       Validators.min(0),
-      Validators.max(99999999999),
+      Validators.max(9999999999),
       this.validatorService.numberValidator(),
     ]),
     quantity: new FormControl(0, [
       Validators.required,
       Validators.min(0),
-      Validators.max(99999999999),
+      Validators.max(99999),
       this.validatorService.numberValidator(),
     ]),
   });

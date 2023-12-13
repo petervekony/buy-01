@@ -12,6 +12,27 @@
   box-shadow: 0 0 10px #c185fb;
 }
 
+:host(.problematic-order) .order-container {
+  border: 1px solid #ff0079;
+  box-shadow: 0 0 10px #ff007980;
+}
+
+:host(.problematic-order) .order-container:hover,
+:host(.problematic-order) .order-container:active {
+  border: 1px solid #ff0079;
+  box-shadow: 0 0 10px #ff007980;
+}
+
+/* .problematic-order { */
+/*   border: 1px solid #ff0079; */
+/*   box-shadow: 0 0 10px #ff007980; */
+/* } */
+
+/* .problematic-order:hover, .problematic-order:active { */
+/*   border: 1px solid #ff0079; */
+/*   box-shadow: 0 0 10px #ff007980; */
+/* } */
+
 .header {
   display: flex;
   flex-direction: column;
@@ -41,6 +62,11 @@
   padding-left: 3px;
   text-align: center;
   margin-left: 3px;
+}
+
+.total-amounts {
+  display: flex;
+  flex-direction: column;
 }
 
 .buttons {
@@ -79,19 +105,22 @@
 
 @media screen and (width >= 700px) {
   .order-container {
-    width: 45vw;
+    width: 70vw;
+    max-width: 500px;
   }
 }
 
 
 @media screen and (width >= 1100px) {
   .order-container {
-    width: 30vw;
+    width: 40vw;
+    max-width: 500px;
   }
 }
 
-@media screen and (width <= 500px) {
+@media screen and (width < 700px) {
   .order-container {
     width: calc(100vw - 40px);
+    max-width: 500px;
   }
 }

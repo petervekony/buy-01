@@ -1,10 +1,18 @@
-import { Component, DestroyRef, inject, Input, OnInit } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  HostBinding,
+  inject,
+  Input,
+  OnInit,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { CartItem } from '../interfaces/order';
 import { User } from '../interfaces/user';
 import { OrderService } from '../service/order.service';
 import { UserService } from '../service/user.service';
+import { AggregatedProduct } from '../interfaces/product';
 
 @Component({
   selector: 'app-order-card',
@@ -18,10 +26,16 @@ export class OrderCardComponent implements OnInit {
     filter: string = 'PENDING';
   @Input()
     user: User = {} as User;
+  @Input()
+    aggregatedProduct?: AggregatedProduct;
+
+  @HostBinding('class.problematic.order')
+    isProblematicOrder: boolean = false;
 
   isOnShopcart = false;
   isOnDashboard = false;
   isSeller: boolean | undefined = undefined;
+  isAggregatedProduct: boolean = this.aggregatedProduct !== undefined;
 
   max: number = 0;
   seller: User = {} as User;
@@ -33,6 +47,8 @@ export class OrderCardComponent implements OnInit {
   private userService = inject(UserService);
 
   ngOnInit(): void {
+    this.isAggregatedProduct = this.aggregatedProduct !== undefined;
+    if (!this.card.product) return;
     this.userService.getOwnerInfo(this.card.sellerId).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((user) => {
@@ -49,14 +65,7 @@ export class OrderCardComponent implements OnInit {
     this.isOnDashboard = this.router.url === '/dashboard';
     this.isSeller = this.user.role === 'ROLE_SELLER' ||
       this.user.role === 'SELLER';
-    //NOSONAR
-    // this.isSeller$.next(this.user.role === 'SELLER');
     this.max = this.card.product.quantity;
-
-    //NOSONAR
-    // this.isNotSeller$ = this.isSeller$.pipe(map((value) => !value));
-    console.log(this.user);
-    console.log(this.user.role === 'SELLER');
   }
 
   // updateQuantity() {

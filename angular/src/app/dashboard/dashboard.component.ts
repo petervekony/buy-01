@@ -5,6 +5,7 @@ import { CartItem, Order } from '../interfaces/order';
 import { User } from '../interfaces/user';
 import { OrderService } from '../service/order.service';
 import { StateService } from '../service/state.service';
+import { AggregatedProduct } from '../interfaces/product';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +16,7 @@ export class DashboardComponent implements OnInit {
   pendingOrders$: Observable<Order[]> = of([]);
   confirmedOrders$: Observable<Order[]> = of([]);
   cancelledOrders$: Observable<Order[]> = of([]);
+  aggregatedProducts$: Observable<AggregatedProduct[]> = of([]);
 
   cards$: Observable<CartItem[]> = of([]);
   user$: Observable<User> | null = null;
@@ -24,10 +26,10 @@ export class DashboardComponent implements OnInit {
   pendingEmpty = false;
   cancelledEmpty = false;
   isSeller: boolean | undefined = undefined;
-  confirmedTotalPrice: number = 0;
-  cancelledTotalPrice: number = 0;
-  pendingTotalPrice: number = 0;
-  totalAmount: number = 0;
+  confirmedTotalPrice: string = '0';
+  cancelledTotalPrice: string = '0';
+  pendingTotalPrice: string = '0';
+  totalAmount: string = '0';
   filterType: string = 'PENDING';
 
   private stateService = inject(StateService);
@@ -49,8 +51,19 @@ export class DashboardComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef),
     )
       .subscribe((filterType) => {
-        this.filterType = filterType;
-        this.getOrders();
+        console.log(filterType);
+        if (filterType === 'BEST PRODUCTS') {
+          this.orderService.getAggregatedProducts().pipe(
+            takeUntilDestroyed(this.destroyRef),
+          ).subscribe((products) => {
+            this.aggregatedProducts$ = of(this.sortProducts(products));
+            console.log(products);
+          });
+          this.filterType = filterType;
+        } else {
+          this.filterType = filterType;
+          this.getOrders();
+        }
       });
 
     this.orderService.orderUpdates$.pipe(takeUntilDestroyed(this.destroyRef))
@@ -95,19 +108,11 @@ export class DashboardComponent implements OnInit {
     return orders.reduce(
       (acc, order) => acc + order.product.price * order.quantity,
       0,
-    );
+    ).toFixed(2);
   }
 
-  private sortOrders(orders: Order[], filter: string) {
-    if (filter === 'PRICE') {
-      return orders.sort((a, b) => {
-        const priceA = a.product.price * a.quantity;
-        const priceB = b.product.price * b.quantity;
-        return priceA - priceB;
-      });
-    } else {
-      return orders.sort((a, b) => a.quantity + b.quantity);
-    }
+  private sortProducts(products: AggregatedProduct[]) {
+    return products.sort((a, b) => b.totalPrice - a.totalPrice);
   }
 
   changeFilter(filter: string) {
@@ -125,6 +130,11 @@ export class DashboardComponent implements OnInit {
     case 'CANCELLED': {
       this.totalAmount = this.cancelledTotalPrice;
       this.orderService.setFilterType('CANCELLED');
+      break;
+    }
+    case 'BEST PRODUCTS': {
+      this.totalAmount = this.confirmedTotalPrice;
+      this.orderService.setFilterType('BEST PRODUCTS');
       break;
     }
     }

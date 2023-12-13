@@ -1,27 +1,32 @@
 <div class="order-container">
   <div class="header">
-    <h2>{{ card.product.name }}</h2>
-    <p>{{ isSeller ? buyer.name : seller.name }}</p>
-    <p>{{ isSeller ? buyer.email : seller.email }}</p>
+    <h2>{{ !isAggregatedProduct ? card.product.name : aggregatedProduct?.product?.name }}</h2>
+    <p>{{ isSeller && !isAggregatedProduct ? buyer.name : seller.name }}</p>
+    <p>{{ isSeller && !isAggregatedProduct ? buyer.email : seller.email }}</p>
   </div>
   <div class="body">
     <ng-container *ngIf="isOnShopcart">
-      <p>quantity: {{ card.quantity }}</p>
+      <p>Quantity: {{ card.quantity }}</p>
       <!-- <input type="number" [(ngModel)]="card.quantity" (change)="updateQuantity()" min="1" [max]="max" /> -->
     </ng-container>
-    <ng-container *ngIf="isOnDashboard">
-      <p>quantity: {{ card.quantity }}</p>
+    <ng-container *ngIf="isOnDashboard && !isAggregatedProduct">
+      <p>Quantity: {{ card.quantity }}</p>
+    </ng-container>
+    <ng-container *ngIf="isAggregatedProduct">
+      <div class="total-amounts">
+        <p>Total quantity: {{ aggregatedProduct!.totalQuantity }}</p>
+        <p>Total price: {{ '$' + aggregatedProduct!.totalPrice }}</p>
+      </div>
     </ng-container>
   </div>
-  <div class="footer">
+  <div class="footer" *ngIf="!isAggregatedProduct">
     <div class="buttons">
       <button class="modify-button" (click)="changeOrderStatus('CONFIRMED')"
         *ngIf="isOnDashboard && isSeller && filter === 'PENDING'" id="confirm-button">
         <mat-icon aria-hidden="false" aria-label="confirm icon" fontIcon="done" matTooltip="Confirm order"></mat-icon>
       </button>
 
-      <button class="modify-button" (click)="removeItem()" id="remove-button"
-        *ngIf="isOnShopcart && filter === 'PENDING'">
+      <button class="modify-button" (click)="removeItem()" id="remove-button" *ngIf="isOnShopcart">
         <mat-icon aria-hidden="false" aria-label="remove icon" fontIcon="clear" matTooltip="Remove order"></mat-icon>
       </button>
 

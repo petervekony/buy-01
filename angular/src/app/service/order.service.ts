@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, Observable, of, Subject, switchMap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, Subject, switchMap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import {
   Cart,
@@ -22,8 +22,6 @@ export class OrderService {
   private stateService = inject(StateService);
   private destroyRef = inject(DestroyRef);
   private http = inject(HttpClient);
-
-  private readonly LOCAL_STORAGE_KEY = 'buy-02';
 
   private user: User = {} as User;
   private cartItems: CartItem[] = [];
@@ -83,25 +81,28 @@ export class OrderService {
     });
   }
 
-  getAggregatedProducts(orders: Order[]): AggregatedProduct[] {
-    const productMap = new Map<string, AggregatedProduct>();
+  getAggregatedProducts(): Observable<AggregatedProduct[]> {
+    return this.getAllOrders().pipe(map((personalOrder) => {
+      const orders = personalOrder.confirmed;
+      const productMap = new Map<string, AggregatedProduct>();
 
-    orders.forEach((order) => {
-      const productId = order.product.id!;
-      const existingProduct = productMap.get(productId);
+      orders.forEach((order) => {
+        const productId = order.product.id!;
+        const existingProduct = productMap.get(productId);
 
-      if (existingProduct) {
-        existingProduct.totalQuantity += order.quantity;
-        existingProduct.totalPrice += order.product.price * order.quantity;
-      } else {
-        productMap.set(productId, {
-          product: order.product,
-          totalQuantity: order.quantity,
-          totalPrice: order.product.price * order.quantity,
-        });
-      }
-    });
-    return Array.from(productMap.values());
+        if (existingProduct) {
+          existingProduct.totalQuantity += order.quantity;
+          existingProduct.totalPrice += order.product.price * order.quantity;
+        } else {
+          productMap.set(productId, {
+            product: order.product,
+            totalQuantity: order.quantity,
+            totalPrice: order.product.price * order.quantity,
+          });
+        }
+      });
+      return Array.from(productMap.values());
+    }));
   }
 
   placeOrder(): Observable<CartResponse> {
