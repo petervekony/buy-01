@@ -1,5 +1,10 @@
 package com.gritlab.buy01.orderservice.service;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
 import com.gritlab.buy01.orderservice.dto.Cart;
 import com.gritlab.buy01.orderservice.dto.CartItemDTO;
 import com.gritlab.buy01.orderservice.dto.ProductDTO;
@@ -9,9 +14,6 @@ import com.gritlab.buy01.orderservice.model.CartItem;
 import com.gritlab.buy01.orderservice.model.Order;
 import com.gritlab.buy01.orderservice.repository.CartRepository;
 import com.gritlab.buy01.orderservice.security.UserDetailsImpl;
-import java.util.ArrayList;
-import java.util.Optional;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CartService {
@@ -66,6 +68,9 @@ public class CartService {
         ProductDTO contentProduct = content.getProduct();
         cartItem.setSellerId(contentProduct.getUserId());
         cartItem.setProduct(contentProduct);
+        if (cartItem.getQuantity() > content.getProduct().getQuantity()) {
+          cartItem.setQuantity(content.getProduct().getQuantity());
+        }
         cartRepository.save(cartItem);
       }
     }

@@ -65,9 +65,9 @@ export class OrderService {
     this.filterTypeSubject.next(filter);
   }
 
-  // resetFilterType(): void {
-  //   setTimeout(() => this.setFilterType('PENDING'), 15);
-  // }
+  resetFilterType(): void {
+    setTimeout(() => this.setFilterType('PENDING'), 15);
+  }
 
   changeOrderStatus(orderId: string, status: string): Observable<Order> {
     const changeStatus = {
