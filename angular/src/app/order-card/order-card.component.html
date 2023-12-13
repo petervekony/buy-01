@@ -7,7 +7,6 @@
   <div class="body">
     <ng-container *ngIf="isOnShopcart">
       <p>Quantity: {{ card.quantity }}</p>
-      <!-- <input type="number" [(ngModel)]="card.quantity" (change)="updateQuantity()" min="1" [max]="max" /> -->
     </ng-container>
     <ng-container *ngIf="isOnDashboard && !isAggregatedProduct">
       <p>Quantity: {{ card.quantity }}</p>
