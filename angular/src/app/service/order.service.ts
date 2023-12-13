@@ -1,18 +1,19 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, Observable, of, Subject, switchMap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import {
+  Cart,
   CartItem,
   CartResponse,
   Order,
+  OrderStatusUpdate,
   PersonalOrder,
 } from '../interfaces/order';
-import { Product } from '../interfaces/product';
-import { StateService } from './state.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AggregatedProduct, Product } from '../interfaces/product';
 import { User } from '../interfaces/user';
-import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
-import { Cart } from '../interfaces/cart';
+import { StateService } from './state.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +28,7 @@ export class OrderService {
   private user: User = {} as User;
   private cartItems: CartItem[] = [];
 
-  private filterTypeSubject = new BehaviorSubject<string>('ALL');
+  private filterTypeSubject = new BehaviorSubject<string>('PENDING');
   filterType$ = this.filterTypeSubject.asObservable();
 
   private orderUpdateSource = new Subject<Order>();
@@ -40,6 +41,7 @@ export class OrderService {
     this.stateService.getStateAsObservable().pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((user) => {
+      if (!user?.name) return;
       this.user = user;
       this.getCartFromDB().pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((cart) => {
@@ -63,49 +65,44 @@ export class OrderService {
     this.filterTypeSubject.next(filter);
   }
 
-  resetFilterType(): void {
-    setTimeout(() => this.setFilterType('ALL'), 15);
+  // resetFilterType(): void {
+  //   setTimeout(() => this.setFilterType('PENDING'), 15);
+  // }
+
+  changeOrderStatus(orderId: string, status: string): Observable<Order> {
+    const changeStatus = {
+      id: orderId,
+      status: status,
+    } as OrderStatusUpdate;
+    const address = environment.ordersURL;
+    console.log(
+      this.http.put<Order>(address, changeStatus, { withCredentials: true }),
+    );
+    return this.http.put<Order>(address, changeStatus, {
+      withCredentials: true,
+    });
   }
 
-  // sendOrder(): Observable<CartItem[]> {
-  //   const address = environment.cartUrl;
-  //   return this.http.post<CartItem[]>(address, this.cartItems, {
-  //     withCredentials: true,
-  //   });
-  // }
+  getAggregatedProducts(orders: Order[]): AggregatedProduct[] {
+    const productMap = new Map<string, AggregatedProduct>();
 
-  // getShoppingCart(filter: string = 'ALL'): void {
-  //   const address = environment.cartUrl;
-  //   this.http.get<CartItem[]>(address, { withCredentials: true }).pipe(
-  //     takeUntilDestroyed(this.destroyRef),
-  //   )
-  //     .subscribe((items) => {
-  //       this.products = items;
-  //       return this.filterOrders(filter, items);
-  //     });
-  // }
+    orders.forEach((order) => {
+      const productId = order.product.id!;
+      const existingProduct = productMap.get(productId);
 
-  private loadFromLocalStorage(): CartItem[] {
-    const localStorageData = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-    if (localStorageData) {
-      try {
-        const data = JSON.parse(atob(localStorageData)); //NOSONAR
-        return data;
-      } catch (e) {
-        this.cartItems = [];
-        return [];
+      if (existingProduct) {
+        existingProduct.totalQuantity += order.quantity;
+        existingProduct.totalPrice += order.product.price * order.quantity;
+      } else {
+        productMap.set(productId, {
+          product: order.product,
+          totalQuantity: order.quantity,
+          totalPrice: order.product.price * order.quantity,
+        });
       }
-    }
-    this.cartItems = [];
-    return [];
+    });
+    return Array.from(productMap.values());
   }
-
-  // NOSONAR
-  // public class CartResponse {
-  //   private Cart cart;
-  //   private Boolean processed;
-  //   private OrderModifications orderModifications;
-  // }
 
   placeOrder(): Observable<CartResponse> {
     const address = environment.ordersURL;
@@ -141,50 +138,16 @@ export class OrderService {
     return of([]);
   }
 
-  // private filterOrders(filter: string): Observable<CartItem[]> {
-  //   switch (filter) {
-  //   case 'CONFIRMED':
-  //     return of(
-  //       this.products.filter((e) => e.status === 'CONFIRMED'),
-  //     );
-  //   case 'PENDING':
-  //     return of(
-  //       this.products.filter((e) => e.status === 'PENDING'),
-  //     );
-  //   case 'CANCELLED':
-  //     return of(
-  //       this.products.filter((e) => e.status === 'CANCELLED'),
-  //     );
-  //   case 'ALL':
-  //     return of(
-  //       this.products,
-  //     );
-  //   }
-  //   return of([]);
-  // }
-
   addToCart(product: Product, quantity: number): void {
     const newOrder = this.createOrder(product, quantity);
     const address = environment.addToCartURL;
     this.http.post<CartItem>(address, newOrder, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((response) => console.log(response)); //NOSONAR
-    // NOSONAR
-    // const shoppingCart = this.loadFromLocalStorage();
-    //NOSONAR
-
-    // NOSONAR
-    // if (!shoppingCart.some((e) => e.product.id === product.id)) {
-    // shoppingCart.push(newOrder);
-    //NOSONAR
-    // this.setToStorage(shoppingCart.reverse()); //NOSONAR
-    // }
   }
 
-  //eslint-disable-next-line
   getAllOrders(): Observable<PersonalOrder> {
     const address = environment.ordersURL;
-    //eslint-disable-next-line
     return this.http.get<PersonalOrder>(address, { withCredentials: true });
   }
 
@@ -199,14 +162,15 @@ export class OrderService {
     return newOrder;
   }
 
-  modifyOrder(cartItem: CartItem): void {
-    const shoppingCart = this.loadFromLocalStorage();
-    const index = shoppingCart.findIndex((e) =>
-      e.product.id === cartItem.product.id
+  reOrder(orderId: string): void {
+    const address = environment.ordersURL;
+    const params = new HttpParams().set('reorder', orderId);
+    this.http.post<CartResponse>(address, null, {
+      params: params,
+      withCredentials: true,
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((response) =>
+      console.log(response)
     );
-    if (index === -1) return;
-    shoppingCart[index] = cartItem;
-    this.setToStorage(shoppingCart);
   }
 
   removeItem(id: string): void {
@@ -217,15 +181,5 @@ export class OrderService {
       console.log('delete item response:', response); //NOSONAR
       this.updateOrders({} as Order);
     });
-    // this.cartItems = this.loadFromLocalStorage();
-    // this.cartItems = this.cartItems.filter((e) => e.product.id !== productId);
-    // this.setToStorage(this.cartItems);
-    // this.updateOrders({} as Order);
-  }
-
-  setToStorage(products: CartItem[]): void {
-    const encodedData = btoa(JSON.stringify(products));
-    localStorage.setItem(this.LOCAL_STORAGE_KEY, encodedData);
-    this.updateOrders({} as Order);
   }
 }

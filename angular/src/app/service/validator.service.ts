@@ -90,7 +90,7 @@ export class ValidatorService {
       if (!price) return null;
 
       return Validators.min(0)(control) ||
-          Validators.max(99999999999)(control)
+          Validators.max(9999999999)(control)
         ? { priceInvalid: true }
         : null;
     };
@@ -102,7 +102,7 @@ export class ValidatorService {
       if (!quantity) return null;
 
       return Validators.min(0)(control) ||
-          Validators.max(99999999999)(control)
+          Validators.max(99999)(control)
         ? { quantityInvalid: true }
         : null;
     };

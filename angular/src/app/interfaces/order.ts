@@ -1,4 +1,3 @@
-import { Cart } from './cart';
 import { Product } from './product';
 
 export interface Order {
@@ -36,4 +35,13 @@ export interface CartResponse {
 export interface OrderModifications {
   notes: Set<string>;
   modifications: Order[];
+}
+
+export interface OrderStatusUpdate {
+  id: string;
+  status: 'CANCELLED' | 'CONFIRMED';
+}
+
+export interface Cart {
+  orders: CartItem[]; //key:sellerId
 }

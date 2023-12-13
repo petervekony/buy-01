@@ -1,20 +1,38 @@
 <div class="order-container">
   <div class="header">
-    {{ card.product.name }}
+    <h2>{{ card.product.name }}</h2>
+    <p>{{ isSeller ? buyer.name : seller.name }}</p>
+    <p>{{ isSeller ? buyer.email : seller.email }}</p>
   </div>
   <div class="body">
-    <ng-container *ngIf="shopcart">
-      quantity: {{ card.quantity }}
+    <ng-container *ngIf="isOnShopcart">
+      <p>quantity: {{ card.quantity }}</p>
       <!-- <input type="number" [(ngModel)]="card.quantity" (change)="updateQuantity()" min="1" [max]="max" /> -->
     </ng-container>
-    <ng-container *ngIf="!shopcart">
-      quantity: {{ card.quantity }}
+    <ng-container *ngIf="isOnDashboard">
+      <p>quantity: {{ card.quantity }}</p>
     </ng-container>
   </div>
   <div class="footer">
     <div class="buttons">
-      <button id="remove-button" (click)="removeItem()">
-        <mat-icon aria-hidden="false" aria-label="remove icon" fontIcon="delete" matTooltip="Remove item"></mat-icon>
+      <button class="modify-button" (click)="changeOrderStatus('CONFIRMED')"
+        *ngIf="isOnDashboard && isSeller && filter === 'PENDING'" id="confirm-button">
+        <mat-icon aria-hidden="false" aria-label="confirm icon" fontIcon="done" matTooltip="Confirm order"></mat-icon>
+      </button>
+
+      <button class="modify-button" (click)="removeItem()" id="remove-button"
+        *ngIf="isOnShopcart && filter === 'PENDING'">
+        <mat-icon aria-hidden="false" aria-label="remove icon" fontIcon="clear" matTooltip="Remove order"></mat-icon>
+      </button>
+
+      <button class="modify-button" (click)="changeOrderStatus('CANCELLED')" id="remove-button"
+        *ngIf="isOnDashboard && filter === 'PENDING'">
+        <mat-icon aria-hidden="false" aria-label="remove icon" fontIcon="clear" matTooltip="Cancel order"></mat-icon>
+      </button>
+
+      <button class="modify-button" (click)="reOrder(card.id!)" id="redo-button"
+        *ngIf="isOnDashboard && !isSeller && (filter === 'CONFIRMED' || filter === 'CANCELLED')">
+        <mat-icon aria-hidden="false" aria-label="remove icon" fontIcon="loop" matTooltip="Order again"></mat-icon>
       </button>
     </div>
   </div>

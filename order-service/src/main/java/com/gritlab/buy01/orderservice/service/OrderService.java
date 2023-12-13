@@ -74,6 +74,7 @@ public class OrderService {
 
   public CartResponse handleCartOrder(String userId, Cart cart, boolean reorder)
       throws TimeoutException {
+    System.out.println("userId: " + userId + " cart:" + cart + " reorder:" + reorder);
     CartValidationRequest cartValidationRequest = new CartValidationRequest();
     cartValidationRequest.setCorrelationId(UUID.randomUUID().toString());
     cartValidationRequest.setCart(cart);
@@ -114,11 +115,13 @@ public class OrderService {
 
   public CartResponse reOrder(String orderId)
       throws NotFoundException, ForbiddenException, TimeoutException {
+    System.out.println("orderId in reOrder: " + orderId);
     Optional<Order> orderQuery = orderRepository.findById(orderId);
     if (orderQuery.isEmpty()) {
       throw new NotFoundException("Error: order not found");
     }
     Order order = orderQuery.get();
+    System.out.println("order in reOrder: " + order);
 
     UserDetailsImpl principal = UserDetailsImpl.getPrincipal();
     if (!principal.getId().equals(order.getBuyerId())) {

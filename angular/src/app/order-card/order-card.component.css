@@ -1,6 +1,5 @@
 .order-container {
   margin: 1rem 1rem 0.5rem;
-  height: 5rem;
   position: relative;
   width: 80vw;
   border: 1px solid #ffffff4d;
@@ -13,18 +12,28 @@
   box-shadow: 0 0 10px #c185fb;
 }
 
-.buttons {
+.header {
   display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  justify-content: flex-end;
+  flex-direction: column;
 }
 
 .body {
   display: flex;
   flex-direction: row;
-  margin-left: 1rem;
-  padding-top: 10px;
+  /* padding-top: 10px; */
+}
+
+.header p {
+  margin: 0;
+}
+
+.header h2 {
+  margin: 0;
+  margin-bottom: 4px;
+}
+
+.body p {
+  padding-top: 1rem;
 }
 
 .body > input {
@@ -34,20 +43,38 @@
   margin-left: 3px;
 }
 
-#remove-button {
-  position: absolute;
-  bottom: 10px;
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.modify-button {
   background-color: transparent;
   outline: none;
   border: none;
   box-shadow: none;
 }
 
-#remove-button:hover, #remove-button:active {
+.modify-button:hover, .modify-button:active {
   transform: scale(1.1);
-  color: #ff0079;
   cursor: pointer;
+}
+
+#remove-button:hover, #remove-button:active {
+  color: #ff0079;
   text-shadow: 0 0 5px #ff007980;
+}
+
+#confirm-button:hover, #confirm-button:active {
+  color: #00ff7c;
+  text-shadow: 0 0 5px #00ff7c80;
+}
+
+#redo-button:hover, #redo-button:active {
+  color: #00a7c5;
+  text-shadow: 0 0 5px #00a7c580;
 }
 
 @media screen and (width >= 700px) {
