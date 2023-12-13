@@ -32,7 +32,7 @@ export class NavbarComponent implements OnInit {
   route: string = '';
   seller: boolean = false;
   dash = false;
-  home = true;
+  home = false;
   profile = false;
   currentUser: User = {} as User;
   user$ = new Subject<User>();
@@ -50,7 +50,10 @@ export class NavbarComponent implements OnInit {
   dashboard$ = this.dataService.dashboard$;
 
   ngOnInit(): void {
-    if (this.router.url === '/profile') {
+    if (
+      this.router.url === '/profile' || this.router.url === '/shopcart' ||
+      this.router.url === '/search'
+    ) {
       this.home = false;
       this.dash = false;
       this.profile = true;
@@ -95,7 +98,6 @@ export class NavbarComponent implements OnInit {
 
     this.dataService.updateDashboard(dash);
     this.dash = dash;
-    // this.home = !dash;
   }
 
   private getAuthAndAvatar() {
@@ -111,7 +113,6 @@ export class NavbarComponent implements OnInit {
             this.mediaService.updateAvatar(this.placeholder);
           }
         },
-        error: (error) => console.error(error),
       });
   }
 
@@ -127,7 +128,6 @@ export class NavbarComponent implements OnInit {
           this.mediaService.updateAvatar(this.placeholder);
         }
       },
-      error: (err) => console.log(err),
     });
   }
 
@@ -139,7 +139,7 @@ export class NavbarComponent implements OnInit {
         ),
       ).pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((event: NavigationEnd) => {
-        if (event && event.urlAfterRedirects) {
+        if (event?.urlAfterRedirects) {
           this.route = event.urlAfterRedirects;
           this.home = this.route === '/home';
           this.profile = this.route === '/profile';
@@ -160,7 +160,6 @@ export class NavbarComponent implements OnInit {
   }
 
   goToProfile() {
-    // this.showDashboard(false);
     this.formStateService.setFormOpen(false);
     this.move('profile');
   }

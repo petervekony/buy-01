@@ -14,6 +14,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
+import com.gritlab.buy01.productservice.kafka.message.CartValidationRequest;
+import com.gritlab.buy01.productservice.kafka.message.ProductOrderCancellationMessage;
 import com.gritlab.buy01.productservice.kafka.message.ProductOwnershipRequest;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationResponse;
 import com.gritlab.buy01.productservice.kafka.message.UserProfileDeleteMessage;
@@ -94,6 +96,48 @@ public class KafkaConsumerConfig {
         new ConcurrentKafkaListenerContainerFactory<>();
     factory.setConsumerFactory(productOwnershipRequestConsumerFactory());
     factory.setConcurrency(3); // adjust as per your requirements
+    return factory;
+  }
+
+  @Bean
+  public ConsumerFactory<String, CartValidationRequest> cartValidationRequestConsumerFactory() {
+    Map<String, Object> configs = consumerConfigs();
+    configs.put(ConsumerConfig.GROUP_ID_CONFIG, "cart-validation-request-group");
+    JsonDeserializer<CartValidationRequest> deserializer =
+        new JsonDeserializer<>(CartValidationRequest.class);
+    deserializer.setUseTypeHeaders(false);
+
+    return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
+  }
+
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, CartValidationRequest>
+      kafkaCartValidationRequestListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, CartValidationRequest> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(cartValidationRequestConsumerFactory());
+    factory.setConcurrency(1);
+    return factory;
+  }
+
+  @Bean
+  public ConsumerFactory<String, ProductOrderCancellationMessage>
+      productOrderCancellationMessageConsumerFactory() {
+    Map<String, Object> configs = consumerConfigs();
+    configs.put(ConsumerConfig.GROUP_ID_CONFIG, "product-order-cancellation-group");
+    JsonDeserializer<ProductOrderCancellationMessage> deserializer =
+        new JsonDeserializer<>(ProductOrderCancellationMessage.class);
+    deserializer.setUseTypeHeaders(false);
+    return new DefaultKafkaConsumerFactory<>(configs, new StringDeserializer(), deserializer);
+  }
+
+  @Bean
+  public ConcurrentKafkaListenerContainerFactory<String, ProductOrderCancellationMessage>
+      kafkaProductOrderCancellationMessageListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String, ProductOrderCancellationMessage> factory =
+        new ConcurrentKafkaListenerContainerFactory<>();
+    factory.setConsumerFactory(productOrderCancellationMessageConsumerFactory());
+    factory.setConcurrency(1);
     return factory;
   }
 }

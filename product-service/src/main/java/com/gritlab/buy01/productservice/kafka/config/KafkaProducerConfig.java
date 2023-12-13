@@ -13,6 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import com.gritlab.buy01.productservice.kafka.message.CartValidationResponse;
 import com.gritlab.buy01.productservice.kafka.message.ProductMediaDeleteMessage;
 import com.gritlab.buy01.productservice.kafka.message.ProductOwnershipResponse;
 import com.gritlab.buy01.productservice.kafka.message.TokenValidationRequest;
@@ -65,5 +66,16 @@ public class KafkaProducerConfig {
   @Bean(name = "productOwnershipResponseKafkaTemplate")
   public KafkaTemplate<String, ProductOwnershipResponse> productOwnershipResponseKafkaTemplate() {
     return new KafkaTemplate<>(producerFactoryForProductOwnershipResponse());
+  }
+
+  @Bean
+  public ProducerFactory<String, CartValidationResponse>
+      producerFactoryForCartValidationResponse() {
+    return new DefaultKafkaProducerFactory<>(producerConfigs());
+  }
+
+  @Bean(name = "cartValidationResponseKafkaTemplate")
+  public KafkaTemplate<String, CartValidationResponse> cartValidationResponseKafkaTemplate() {
+    return new KafkaTemplate<>(producerFactoryForCartValidationResponse());
   }
 }

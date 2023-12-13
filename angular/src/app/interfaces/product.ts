@@ -8,3 +8,9 @@ export interface Product {
   thumbnail?: string;
   image?: string;
 }
+
+export interface AggregatedProduct {
+  product: Product;
+  totalPrice: number;
+  totalQuantity: number;
+}

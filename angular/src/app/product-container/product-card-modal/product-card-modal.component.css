@@ -135,6 +135,20 @@
   color:#8d6ff3;
 }
 
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 1rem;
+}
+
+#quantity-input {
+  height: 1.2rem;
+  width: 3rem;
+  align-self: center;
+  text-align: center;
+  margin-right: 1rem;
+}
+
 #submit-button {
   margin-top: 3rem;
 }

@@ -1,0 +1,39 @@
+.top-bar {
+  position: fixed;
+  right: 1rem;
+
+}
+
+.top-bar > button {
+  margin-top: 0.5rem;
+  max-width: 150px;
+  padding: 5px;
+  border-radius: 7px;
+  border: 1px solid #c3b5fd;
+  color: #c3b5fd;
+  background-color: #0e0e0e;
+}
+
+.top-bar > button:hover {
+  background-color: #c3b5fd;
+  color: #0e0e0e;
+  transform: scale(1.1);
+  font-weight: bold;
+  box-shadow: 0 0 3px #c3b5fd;
+}
+
+.order-container {
+  display: flex;
+  width: 100vw;
+  height: calc(100vh - 100px);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 5px;
+  word-wrap: break-word;
+}
+
+.order-container h4 {
+  color: #ff3c69;
+  text-shadow: 0 0 3px #ff3c69;
+}

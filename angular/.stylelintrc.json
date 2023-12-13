@@ -1,5 +1,5 @@
 {
-  "extends": ["stylelint-config-standard", "stylelint-config-standard-scss"],
+  "extends": ["stylelint-config-standard"],
   "rules": {
     "selector-class-pattern": null,
     "unit-allowed-list": ["em", "rem", "px", "%", "vw", "vh", "s"],

@@ -16,11 +16,18 @@ import com.gritlab.buy01.productservice.service.ProductService;
 @Service
 public class ProductOwnershipValidationListener {
 
-  @Autowired private ProductService productService;
+  private final ProductService productService;
+
+  @Qualifier("productOwnershipResponseKafkaTemplate")
+  private final KafkaTemplate<String, ProductOwnershipResponse> kafkaTemplate;
 
   @Autowired
-  @Qualifier("productOwnershipResponseKafkaTemplate")
-  private KafkaTemplate<String, ProductOwnershipResponse> kafkaTemplate;
+  public ProductOwnershipValidationListener(
+      ProductService productService,
+      KafkaTemplate<String, ProductOwnershipResponse> kafkaTemplate) {
+    this.productService = productService;
+    this.kafkaTemplate = kafkaTemplate;
+  }
 
   @EventListener
   public void handleProductOwnershipValidationEvent(ProductOwnershipValidationEvent event) {

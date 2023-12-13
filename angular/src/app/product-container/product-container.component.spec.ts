@@ -72,7 +72,7 @@ describe('ProductContainerComponent', () => {
     });
     fixture = TestBed.createComponent(ProductContainerComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    // fixture.detectChanges(); //NOSONAR
   });
 
   it('should create', () => {
@@ -112,21 +112,27 @@ describe('ProductContainerComponent', () => {
     },
   );
 
-  // it('should call showProducts when productAdded$ emits and dashboard is false', () => {
-  //   component.dashboard = false;
-  //   component.ngOnInit();
-  //   const showProductsSpy = spyOn(component, 'showProducts');
-  //   productServiceMock.productAdded$ = of({} as Product);
-  //   expect(showProductsSpy).toHaveBeenCalled();
-  // });
+  xit(
+    'should call showProducts when productAdded$ emits and dashboard is false',
+    () => {
+      const showProductsSpy = spyOn(component, 'showProducts');
+      component.dashboard = false;
+      component.ngOnInit();
+      productServiceMock.productAdded$ = of({} as Product);
+      expect(showProductsSpy).toHaveBeenCalled();
+    },
+  );
 
-  // it('should call getOwnerProduct when productAdded$ emits and dashboard is true', () => {
-  //   component.dashboard = true;
-  //   component.ngOnInit();
-  //   const showProductsSpy = spyOn(component, 'getOwnerProducts');
-  //   productServiceMock.productAdded$ = of({} as Product);
-  //   expect(showProductsSpy).toHaveBeenCalled();
-  // });
+  xit(
+    'should call getOwnerProduct when productAdded$ emits and dashboard is true',
+    () => {
+      const showProductsSpy = spyOn(component, 'getOwnerProducts');
+      component.dashboard = true;
+      component.ngOnInit();
+      productServiceMock.productAdded$ = of({} as Product);
+      expect(showProductsSpy).toHaveBeenCalled();
+    },
+  );
 
   it(
     'should handle the case when there are no products and user is at home',

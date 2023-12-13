@@ -1,71 +1,36 @@
-.top-bar {
-  position: sticky;
-  height: 3rem;
-  width: 100%;
-  margin-left: auto;
+.dashboard-container {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  z-index: 10;
-  top: 100px;
-}
-
-.add-product {
-  width: max-content;
-  height: 2rem;
-  padding: 0.5rem;
-  margin-right: 1rem;
-  margin-top: -1rem;
-}
-
-dialog {
-  display: flex;
-  width: 90vw;
-  height: 80vh;
-  min-height: 700px;
-  min-width: 300px;
-  position: absolute;
-  left: 5vw;
-  /* margin-left: 3.5vw; */
-  top: calc(10vw + 100px);
-  z-index: 15;
-  border: none;
-}
-
-.wrapper {
-  padding-top: 10px;
-  display: flex;
-  flex-wrap: column-wrap;
   justify-content: center;
   width: 100vw;
 }
 
-@media screen and (width >= 700px){
-  dialog {
-    width: 60vw;
-    left: 20vw;
-  }
+.empty {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #c3b5fd;
 }
 
-@media screen and (width < 700px){
-  dialog {
-    width: 80vw;
-    height: 100vh;
-    left: 10vw;
-  }
+.total-amount-div {
+  width: 100vw;
+  display: block;
+  text-align: right;
 }
 
-@media screen and (width < 500px){
-  dialog {
-    width: 100vw;
-    height: 100vh;
-    top: 10;
-    left: 0;
-  }
+.total-amount-div > p {
+  width: 5rem;
+  font-size: 0.8rem;
+  padding-right: 1.5rem;
+  float: right;
+  color: #c3b5fd;
+  font-weight: bold;
 }
 
-@media screen and (height < 800px){
-  dialog {
-    top: 10;
-  }
+.total-amount-div > h3 {
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #6ddafc;
+  padding-right: 2rem;
+  margin-bottom: 0;
 }

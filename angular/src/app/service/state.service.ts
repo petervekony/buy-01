@@ -49,12 +49,16 @@ export class StateService implements OnInit {
     return this._state;
   }
 
+  getCurrentUser(): User {
+    return this._state.getValue();
+  }
+
   getStateAsObservable(): Observable<User> {
     return this._state.asObservable();
   }
 
   setUserState(user: User) {
-    this._state.next(user);
+    this._state?.next(user);
   }
 
   get cookie(): string | undefined {

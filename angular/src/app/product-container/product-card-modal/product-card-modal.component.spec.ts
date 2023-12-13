@@ -13,7 +13,7 @@ import { of } from 'rxjs';
 import { DataService } from 'src/app/service/data.service';
 import { UserService } from 'src/app/service/user.service';
 import { MatIconModule } from '@angular/material/icon';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, NgForm } from '@angular/forms';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { FileSelectEvent } from 'primeng/fileupload';
 import { ProductService } from 'src/app/service/product.service';
@@ -100,6 +100,7 @@ describe('ProductCardModalComponent', () => {
         NoopAnimationsModule,
         BrowserAnimationsModule,
         MatIconModule,
+        FormsModule,
       ],
       providers: [
         MediaService,

@@ -20,6 +20,7 @@ import { FileSelectEvent } from 'primeng/fileupload';
 import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Media } from '../interfaces/media';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile-page',
@@ -27,7 +28,6 @@ import { Media } from '../interfaces/media';
   styleUrls: ['./profile-page.component.css'],
 })
 export class ProfilePageComponent implements OnInit {
-  //TODO: check if we can delete these viewChilds!
   @ViewChild('profileForm')
     profileForm: ElementRef | undefined;
   @ViewChild('profile')
@@ -45,11 +45,9 @@ export class ProfilePageComponent implements OnInit {
   deleteFormOpen = false;
   filename: string = '';
   user$ = new Subject<User>();
-  // user$: Observable<User>;
   currentUser: User = {} as User;
   fileSelected: File | null = null;
   placeholder: string = environment.placeholder;
-  // avatar$: BehaviorSubject<string> = new BehaviorSubject(this.placeholder);
 
   private formStateService = inject(FormStateService);
   private cookieService = inject(CookieService);
@@ -59,6 +57,7 @@ export class ProfilePageComponent implements OnInit {
   private validatorService = inject(ValidatorService);
   private destroyRef = inject(DestroyRef);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   avatar$ = this.mediaService.avatar$;
 
@@ -98,17 +97,15 @@ export class ProfilePageComponent implements OnInit {
             ).pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe({
                 next: (media) => {
-                  if (media && media?.image) {
+                  if (media?.image) {
                     this.mediaService.updateAvatar(
                       this.mediaService.formatMedia(media),
                     );
                   }
                 },
-                error: (err) => console.log(err),
               });
           }
         },
-        error: (err) => console.error(err),
       });
     this.formValid = true;
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
@@ -135,8 +132,8 @@ export class ProfilePageComponent implements OnInit {
       mediaData = new FormData();
       mediaData.append(
         'image',
-        this.fileToBlob(this.fileSelected!),
-        this.filename as string,
+        this.fileToBlob(this.fileSelected),
+        this.filename,
       );
     }
     this.mediaService.uploadAvatar(
@@ -151,7 +148,6 @@ export class ProfilePageComponent implements OnInit {
         );
         this.hideModal();
       },
-      error: (err) => console.log(err),
     });
   }
 
@@ -183,10 +179,6 @@ export class ProfilePageComponent implements OnInit {
       break;
     case 'deleteAvatar':
       this.deleteAvatarFormOpen = true;
-      this.setToTrue();
-      break;
-    case 'deleteUser':
-      this.deleteUserFormOpen = true;
       this.setToTrue();
       break;
     default:
@@ -233,7 +225,6 @@ export class ProfilePageComponent implements OnInit {
       next: (data) => {
         this.userService.updateUsernameAdded(data);
       },
-      error: (err) => console.log(err),
     });
     this.hideModal();
 
@@ -261,5 +252,9 @@ export class ProfilePageComponent implements OnInit {
       this.userService.logout();
     });
     this.hideModal();
+  }
+
+  move(location: string): void {
+    this.router.navigate([location]);
   }
 }
