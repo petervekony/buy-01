@@ -34,6 +34,16 @@ pipeline {
         }
       }
     }
+    stage('Run Tests: Order Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('order-service') {
+          sh 'mvn test'
+        }
+      }
+    }
     stage('Run Tests: Angular') {
       agent {
         label 'master'
@@ -112,6 +122,28 @@ pipeline {
         }
       }
     }
+    stage('Order Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('order-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-order-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+          }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
+        }
+      }
+    }
     stage('Angular SonarQube Analysis & Quality Gate') {
       agent {
         label 'master'
@@ -165,7 +197,7 @@ pipeline {
                 sh "cd ~/production/buy-01 && git pull origin main && docker-compose --env-file .env.prod build --no-cache && docker-compose --env-file .env.prod up -d"
 
                 // health check
-                def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1']
+                def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1', 'buy-01_order-service_1']
                 def maxWaitTime = 180 // maximum wait time in seconds
                 boolean allHealthy = false
                 int elapsedTime = 0
