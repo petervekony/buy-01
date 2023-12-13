@@ -97,6 +97,7 @@ public class ProductService {
           || !product.getPrice().equals(orderedProduct.getPrice())
           || !product.getUserId().equals(order.getSellerId())
           || product.getQuantity() < order.getQuantity()) {
+        possibleMod.setId(order.getId());
         possibleMod.setSellerId(order.getSellerId());
         possibleMod.setBuyerId(order.getBuyerId());
         possibleMod.setQuantity(order.getQuantity());
