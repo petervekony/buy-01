@@ -18,7 +18,8 @@
     <button class="dashboard" *ngIf="!dash && seller && home" (click)="showDashboard(true)">
       <mat-icon aria-hidden="false" aria-label="apps icon" fontIcon="apps" matTooltip="Manage your products"></mat-icon>
     </button>
-    <button class="dashboard" *ngIf="!seller" (click)="move('shopcart')">
+    <button class="dashboard" *ngIf="!seller" (click)="move('shopcart')" [matBadge]="badgeItems" matBadgeColor="warn"
+      matBadgeSize="small">
       <mat-icon aria-hidden="false" aria-label="shopping cart" fontIcon="shopping_cart"
         matTooltip="Shopping Cart"></mat-icon>
     </button>
