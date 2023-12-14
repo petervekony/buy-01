@@ -18,6 +18,7 @@ import { MediaService } from '../service/media.service';
 import { environment } from 'src/environments/environment';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DataService } from '../service/data.service';
+import { OrderService } from '../service/order.service';
 
 @Component({
   selector: 'app-navbar',
@@ -34,6 +35,7 @@ export class NavbarComponent implements OnInit {
   dash = false;
   home = false;
   profile = false;
+  badgeItems: number = 0;
   currentUser: User = {} as User;
   user$ = new Subject<User>();
 
@@ -45,6 +47,7 @@ export class NavbarComponent implements OnInit {
   private mediaService = inject(MediaService);
   private destroyRef = inject(DestroyRef);
   private dataService = inject(DataService);
+  private orderService = inject(OrderService);
 
   avatar$ = this.mediaService.avatar$;
   dashboard$ = this.dataService.dashboard$;
@@ -62,6 +65,21 @@ export class NavbarComponent implements OnInit {
       this.dash = false;
       this.profile = false;
     }
+
+    this.orderService.orderUpdates$.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.orderService.getCartFromDB().pipe(
+          takeUntilDestroyed(this.destroyRef),
+        )
+          .subscribe((cart) => {
+            this.badgeItems = cart.orders.length;
+          });
+      });
+
+    this.orderService.getCartFromDB().pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((cart) => {
+        this.badgeItems = cart.orders.length;
+      });
 
     this.formStateService.formOpen$.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isOpen) => {
