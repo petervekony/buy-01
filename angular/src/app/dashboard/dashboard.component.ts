@@ -73,7 +73,7 @@ export class DashboardComponent implements OnInit {
         this.applySearchFilterToAggregatedProducts(products, this.searchTerm)
       ),
     ).subscribe((filteredProducts) => {
-      this.aggregatedProducts$ = of(filteredProducts);
+      this.aggregatedProducts$ = of(this.sortProducts(filteredProducts));
     });
   }
 
@@ -161,7 +161,7 @@ export class DashboardComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
       ).subscribe((products) => {
         this.aggregatedProducts$ = of(
-          this.applySearchFilter(products, searchTerm),
+          this.sortProducts(this.applySearchFilter(products, searchTerm)),
         );
       });
     }
