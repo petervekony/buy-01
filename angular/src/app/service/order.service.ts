@@ -138,7 +138,7 @@ export class OrderService {
     const address = environment.addToCartURL;
     this.http.post<CartItem>(address, newOrder, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe((response) => console.log(response)); //NOSONAR
+    ).subscribe(() => this.updateOrders({} as Order));
   }
 
   getAllOrders(): Observable<PersonalOrder> {

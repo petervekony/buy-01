@@ -33,6 +33,7 @@ import { GalleriaModule } from 'primeng/galleria';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     InputTextareaModule,
     InputNumberModule,
     MatTooltipModule,
+    MatBadgeModule,
   ],
   providers: [CookieService],
   bootstrap: [AppComponent],

@@ -65,7 +65,7 @@
 }
 
 .buttons button {
-  background-color: #121212;
+  background-color: transparent;
   width: 2rem;
   height: 2rem;
   outline: none;
