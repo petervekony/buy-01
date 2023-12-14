@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { User } from '../interfaces/user';
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatBadgeModule } from '@angular/material/badge';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -20,7 +21,12 @@ describe('NavbarComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [NavbarComponent],
-      imports: [MatIconModule, HttpClientModule, HttpClientTestingModule],
+      imports: [
+        MatIconModule,
+        HttpClientModule,
+        HttpClientTestingModule,
+        MatBadgeModule,
+      ],
       providers: [
         {
           provide: Router,
@@ -40,6 +46,13 @@ describe('NavbarComponent', () => {
           provide: StateService,
           useValue: {
             resetState: jasmine.createSpy('resetState'),
+            getStateAsObservable: () =>
+              of({
+                name: 'taneli',
+                email: 'taneli@taneli.com',
+                id: '123123123123123',
+                role: 'SELLER',
+              } as User),
           },
         },
         {
