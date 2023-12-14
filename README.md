@@ -1,3 +1,22 @@
+# buy-02
+
+Buy-02 is the continuation of the buy-01 project in the Java track of 01Edu's
+curriculum. It consists of creating one more microservice, which handles orders
+and shopping carts. All the previous requirements about security, Jenkins,
+SonarQube, etc. are still standing.
+
+Users registered as clients can add products to their cart, and when they are
+ready to order, they can confirm it. Both the shopping carts and the previous
+orders are saved into the database for persistence. If a client changes their
+mind, they can cancel orders before they are confirmed. They are also able to
+reorder products if they are still available.
+
+Sellers can confirm or cancel pending orders, and see their previous
+transactions.
+
+Users can see their best products (most sold/bought), also search through
+previous orders.
+
 ## Safe-Zone
 
 Safe-Zone is the fifth project in the java track of 01Edu's curriculum. The goal
