@@ -23,16 +23,6 @@
   box-shadow: 0 0 10px #ff007980;
 }
 
-/* .problematic-order { */
-/*   border: 1px solid #ff0079; */
-/*   box-shadow: 0 0 10px #ff007980; */
-/* } */
-
-/* .problematic-order:hover, .problematic-order:active { */
-/*   border: 1px solid #ff0079; */
-/*   box-shadow: 0 0 10px #ff007980; */
-/* } */
-
 .header {
   display: flex;
   flex-direction: column;
@@ -41,7 +31,6 @@
 .body {
   display: flex;
   flex-direction: row;
-  /* padding-top: 10px; */
 }
 
 .header p {
@@ -62,6 +51,11 @@
   padding-left: 3px;
   text-align: center;
   margin-left: 3px;
+}
+
+.quantity-container {
+  display: flex;
+  flex-direction: column;
 }
 
 .total-amounts {
