@@ -135,15 +135,8 @@ describe('ProductService', () => {
     req.flush(mockProducts);
   });
 
-  //TODO: THIS MIGHT BE WRONG WAY, WE ARE STILL FILTERING THE PRODUCTS ON FE NOT BE!
   it('should get owner products', () => {
     const userId = '123';
-    // const mockUser: User = {
-    //   name: 'test',
-    //   email: 'test@test.com',
-    //   id: '123',
-    //   role: 'SELLER',
-    // };
     const mockProducts: Product[] = [
       {
         name: 'test',
@@ -169,7 +162,6 @@ describe('ProductService', () => {
       expect(products).toEqual(mockProducts);
       service.updateUserProducts(products);
     });
-    // service.getProductsById(userId);
 
     const req = httpTestingController.expectOne(
       `${environment.userProductsURL}` + userId,

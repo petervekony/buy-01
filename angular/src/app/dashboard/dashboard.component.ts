@@ -1,11 +1,11 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Observable, of } from 'rxjs';
+import { combineLatest, map, Observable, of } from 'rxjs';
 import { CartItem, Order } from '../interfaces/order';
 import { User } from '../interfaces/user';
 import { OrderService } from '../service/order.service';
 import { StateService } from '../service/state.service';
-import { AggregatedProduct } from '../interfaces/product';
+import { AggregatedProduct, Product } from '../interfaces/product';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,6 +31,8 @@ export class DashboardComponent implements OnInit {
   pendingTotalPrice: string = '0';
   totalAmount: string = '0';
   filterType: string = 'PENDING';
+  searchTerm: string = '';
+  searchTerm$: Observable<string> = of('');
 
   private stateService = inject(StateService);
   private orderService = inject(OrderService);
@@ -43,7 +45,6 @@ export class DashboardComponent implements OnInit {
         this.currentUser = user;
         this.isSeller = user.role === 'ROLE_SELLER' || user.role === 'SELLER';
         this.getAllOrders();
-        console.log(this.currentUser);
       },
     );
 
@@ -51,18 +52,11 @@ export class DashboardComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef),
     )
       .subscribe((filterType) => {
-        console.log(filterType);
+        this.filterType = filterType;
         if (filterType === 'BEST PRODUCTS') {
-          this.orderService.getAggregatedProducts().pipe(
-            takeUntilDestroyed(this.destroyRef),
-          ).subscribe((products) => {
-            this.aggregatedProducts$ = of(this.sortProducts(products));
-            console.log(products);
-          });
-          this.filterType = filterType;
+          this.fetchAndFilterAggregatedProducts();
         } else {
-          this.filterType = filterType;
-          this.getOrders();
+          this.fetchAndFilterOrders();
         }
       });
 
@@ -70,6 +64,50 @@ export class DashboardComponent implements OnInit {
       .subscribe(() => {
         this.getAllOrders();
       });
+  }
+
+  private fetchAndFilterAggregatedProducts(): void {
+    this.orderService.getAggregatedProducts().pipe(
+      takeUntilDestroyed(this.destroyRef),
+      map((products) =>
+        this.applySearchFilterToAggregatedProducts(products, this.searchTerm)
+      ),
+    ).subscribe((filteredProducts) => {
+      this.aggregatedProducts$ = of(this.sortProducts(filteredProducts));
+    });
+  }
+
+  private fetchAndFilterOrders(): void {
+    combineLatest([
+      this.orderService.getAllOrders().pipe(
+        takeUntilDestroyed(this.destroyRef),
+      ),
+      this.searchTerm$,
+    ]).pipe(
+      map(([personalOrder, searchTerm]) => {
+        this.confirmedOrders$ = of(
+          this.applySearchFilter(personalOrder.confirmed, searchTerm),
+        );
+        this.pendingOrders$ = of(
+          this.applySearchFilter(personalOrder.pending, searchTerm),
+        );
+        this.cancelledOrders$ = of(
+          this.applySearchFilter(personalOrder.cancelled, searchTerm),
+        );
+      }),
+    ).subscribe();
+  }
+
+  private applySearchFilterToAggregatedProducts(
+    products: AggregatedProduct[],
+    searchTerm: string,
+  ): AggregatedProduct[] {
+    if (!searchTerm) return products;
+    return products.filter((product) => {
+      return product.product.name.toLowerCase().includes(
+        searchTerm.toLowerCase(),
+      );
+    });
   }
 
   getAllOrders(): void {
@@ -81,7 +119,6 @@ export class DashboardComponent implements OnInit {
           personalOrder.confirmed,
         );
         this.pendingOrders$ = of(personalOrder.pending);
-        console.log(personalOrder.pending);
         this.pendingEmpty = personalOrder.pending.length === 0;
         this.pendingTotalPrice = this.countTotalValue(personalOrder.pending);
         this.totalAmount = this.pendingTotalPrice;
@@ -101,6 +138,42 @@ export class DashboardComponent implements OnInit {
         this.cards$ = of(products);
         this.empty = products.length === 0;
       },
+    });
+  }
+
+  filterOrders(searchTerm: string): void {
+    if (this.filterType !== 'BEST PRODUCTS') {
+      this.orderService.getAllOrders().pipe(
+        takeUntilDestroyed(this.destroyRef),
+      ).subscribe((personalOrder) => {
+        this.confirmedOrders$ = of(
+          this.applySearchFilter(personalOrder.confirmed, searchTerm),
+        );
+        this.pendingOrders$ = of(
+          this.applySearchFilter(personalOrder.pending, searchTerm),
+        );
+        this.cancelledOrders$ = of(
+          this.applySearchFilter(personalOrder.cancelled, searchTerm),
+        );
+      });
+    } else {
+      this.orderService.getAggregatedProducts().pipe(
+        takeUntilDestroyed(this.destroyRef),
+      ).subscribe((products) => {
+        this.aggregatedProducts$ = of(
+          this.sortProducts(this.applySearchFilter(products, searchTerm)),
+        );
+      });
+    }
+  }
+
+  //eslint-disable-next-line
+  private applySearchFilter(orders: any, searchTerm: string): any {
+    if (!searchTerm) return orders;
+    return orders.filter((order: { product: Product }) => {
+      return order.product.name.toLowerCase().includes(
+        searchTerm.toLowerCase(),
+      );
     });
   }
 
@@ -138,6 +211,12 @@ export class DashboardComponent implements OnInit {
       break;
     }
     }
+  }
+
+  reset() {
+    if (this.searchTerm === '') return;
+    this.searchTerm = '';
+    this.filterOrders(this.searchTerm);
   }
 
   ngOnDestroy(): void {

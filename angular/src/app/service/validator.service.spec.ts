@@ -43,6 +43,4 @@ describe('ValidatorService', () => {
     });
     expect(validator(form)).toEqual({ 'invalidPassword': true });
   });
-
-  // Write similar tests for other validators...
 });

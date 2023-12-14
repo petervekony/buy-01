@@ -14,13 +14,11 @@ import { FormStateService } from 'src/app/service/form-state.service';
 import { DestroyRef, ElementRef } from '@angular/core';
 import { DataService } from 'src/app/service/data.service';
 import { AuthService } from 'src/app/service/auth.service';
-import { environment } from 'src/environments/environment';
 import { Media } from 'src/app/interfaces/media';
 
 describe('ProductCardComponent', () => {
   let component: ProductCardComponent;
   let fixture: ComponentFixture<ProductCardComponent>;
-  const placeholder = environment.placeholder;
 
   const mockProduct = {
     name: 'test product',
@@ -67,12 +65,6 @@ describe('ProductCardComponent', () => {
     imageAdded$: imageAddedSubject.asObservable(),
   };
 
-  // const mediaServiceFailMock = {
-  //   getProductThumbnail: jasmine.createSpy('getProductThumbnail').and
-  //     .returnValue(of(null)),
-  //   formatMedia: jasmine.createSpy('formatMedia').and.returnValue(''),
-  // };
-
   const authServiceMock = {
     getAuth: jasmine.createSpy('getAuth').and.returnValue(of({
       name: 'taneli',
@@ -83,10 +75,6 @@ describe('ProductCardComponent', () => {
       avatar: 'avatar.jpg',
     })),
   };
-
-  // const authServiceFailMock = {
-  //   getAuth: jasmine.createSpy('getAuth').and.returnValue(of(null)),
-  // };
 
   const dataServiceMock = {
     ids$: of(['123123123', '123123123']),
@@ -116,8 +104,6 @@ describe('ProductCardComponent', () => {
           provide: MediaService,
           useValue: mediaServiceMock,
         },
-        // ProductService,
-        // UserService,
         {
           provide: DataService,
           useValue: dataServiceMock,
@@ -133,7 +119,6 @@ describe('ProductCardComponent', () => {
         DestroyRef,
       ],
     });
-    // destroyRef = inject(DestroyRef);
     fixture = TestBed.createComponent(ProductCardComponent);
     component = fixture.componentInstance;
     component.productModal = new ElementRef(document.createElement('dialog'));
@@ -163,33 +148,14 @@ describe('ProductCardComponent', () => {
       expect(component.modalVisible).toBeTrue();
       expect(formStateServiceMock.setFormOpen).toHaveBeenCalledWith(true);
       expect(component.productModal?.nativeElement).toBeDefined();
-      // expect(component.productModal.nativeElement.show).toHaveBeenCalled();
     },
   );
 
   it('hideModal should set modalVisible to false and close the modal', () => {
-    // const hideSpy = spyOn(component.productModal?.nativeElement, 'close');
-
     component.hideModal();
     expect(formStateServiceMock.setFormOpen).toHaveBeenCalledWith(false);
     expect(component.modalVisible).toBeFalse();
-    // expect(hideSpy).toHaveBeenCalled();
   });
-
-  // it(
-  //   'getProductThumbnail should update imageSrc with a valid image URL',
-  //   () => {
-  //     expect(component.imageSrc$.value == placeholder);
-  //     component.ngAfterViewInit();
-  //     expect(mediaServiceMock.getProductThumbnail).toHaveBeenCalledWith(
-  //       component.product.id,
-  //     );
-  //     expect(mediaServiceMock.formatMedia).toHaveBeenCalled();
-  //     expect(component.imageSrc$.value).toEqual(
-  //       'data:' + 'image/jpg' + ';base64,' + '987987987987',
-  //     );
-  //   },
-  // );
 
   it('should get the current user if user is logged in', () => {
     expect(component.currentUser).toEqual({
@@ -247,11 +213,4 @@ describe('ProductCardComponent', () => {
     card.click();
     expect(component.showModal).toHaveBeenCalled();
   });
-
-  // it('getProductThumbnail should set imageSrc to the placeholder when media is missing or an error occurs', () => {
-  //   expect(component.imageSrc = placeholder);
-  //   expect(mediaServiceFailMock.getProductThumbnail).toHaveBeenCalledWith();
-  //   expect(mediaServiceFailMock.formatMedia).not.toHaveBeenCalled();
-  //   expect(component.imageSrc).toEqual(placeholder);
-  // });
 });

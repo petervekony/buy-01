@@ -10,11 +10,10 @@ module.exports = function (config) {
       require('karma-sonarqube-unit-reporter'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
-      // require('karma-junit-reporter'),
       require('@angular-devkit/build-angular/plugins/karma'),
     ],
     client: {
-      clearContext: false, // leave Jasmine Spec Runner output visible in browser
+      clearContext: false,
     },
     coverageReporter: {
       dir: require('path').join(__dirname, './coverage/'),
@@ -29,7 +28,6 @@ module.exports = function (config) {
     },
     port: 9876,
     colors: true,
-    // logLevel: config.LOG_INFO,
     logLevel: LOG_DEBUG,
     autoWatch: true,
     browsers: ['ChromeHeadless'],

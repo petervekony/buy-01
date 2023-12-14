@@ -2,6 +2,15 @@
   <h3>{{ '$' + totalAmount }}</h3>
   <p>TOTAL</p>
 </div>
+<div class="search-container">
+  <div class="search-bar">
+    <button (click)="reset()" class="search-button">
+      <mat-icon aria-hidden="false" aria-label="reset icon" fontIcon="refresh" matTooltip="Reset"></mat-icon>
+    </button>
+    <input type="text" name="oder-search" id="search-field" [(ngModel)]="searchTerm" maxlength="100"
+      (ngModelChange)="filterOrders(searchTerm)" placeholder="Search orders..">
+  </div>
+</div>
 <div class="dashboard-container">
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" #tabGroup
     (selectedTabChange)="changeFilter($event.tab.textLabel.toUpperCase())">

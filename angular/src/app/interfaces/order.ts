@@ -1,4 +1,4 @@
-import { Product } from './product';
+import { AggregatedProduct, Product } from './product';
 
 export interface Order {
   id?: string;
@@ -43,5 +43,7 @@ export interface OrderStatusUpdate {
 }
 
 export interface Cart {
-  orders: CartItem[]; //key:sellerId
+  orders: CartItem[];
 }
+
+export type DashboardItem = Order | AggregatedProduct;
