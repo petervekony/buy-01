@@ -8,16 +8,11 @@ import { NavigationEnd, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { User } from '../interfaces/user';
 import { HttpClientModule } from '@angular/common/http';
-import {
-  HttpClientTestingModule,
-  // HttpTestingController,
-} from '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
   let fixture: ComponentFixture<NavbarComponent>;
-  // let httpMock: HttpTestingController;
-  // let authService: AuthService;
   let userService: UserService;
   let stateService: StateService;
   let router: Router;
@@ -62,9 +57,7 @@ describe('NavbarComponent', () => {
       ],
     });
     fixture = TestBed.createComponent(NavbarComponent);
-    // httpMock = TestBed.inject(HttpTestingController);
     component = fixture.componentInstance;
-    // authService = TestBed.inject(AuthService);
     userService = TestBed.inject(UserService);
     stateService = TestBed.inject(StateService);
     router = TestBed.inject(Router);
@@ -77,16 +70,16 @@ describe('NavbarComponent', () => {
 
   it('should call logout when logging out', () => {
     component.logout();
-    expect(userService.logout).toHaveBeenCalled(); // Verify if the logout method was called
+    expect(userService.logout).toHaveBeenCalled();
   });
 
   it('should call resetState when logging out', () => {
     component.logout();
-    expect(stateService.resetState).toHaveBeenCalled(); // Verify if the resetState method was called
+    expect(stateService.resetState).toHaveBeenCalled();
   });
 
   it('should call navigate when moving', () => {
     component.move('login');
-    expect(router.navigate).toHaveBeenCalledWith(['login']); // Verify if navigate was called with the expected argument
+    expect(router.navigate).toHaveBeenCalledWith(['login']);
   });
 });

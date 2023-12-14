@@ -10,9 +10,7 @@ import { UserService } from '../service/user.service';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { User } from '../interfaces/user';
 import { Media } from '../interfaces/media';
-// import { environment } from 'src/environments/environment';
 import { FileSelectEvent } from 'primeng/fileupload';
-// import { StateService } from '../service/state.service';
 
 describe('ProfilePageComponent', () => {
   let component: ProfilePageComponent;
@@ -24,7 +22,6 @@ describe('ProfilePageComponent', () => {
   //eslint-disable-next-line
   let userService: UserService;
   let cookieService: CookieService;
-  // let stateService: StateService;
 
   const GMockUser: User = {
     id: '123',
@@ -60,12 +57,9 @@ describe('ProfilePageComponent', () => {
     formStateService = TestBed.inject(FormStateService);
     userService = TestBed.inject(UserService);
     cookieService = TestBed.inject(CookieService);
-    // stateService = TestBed.inject(StateService);
 
     component.user$ = new Subject<User>();
     component.avatar$ = new BehaviorSubject(component.placeholder);
-
-    // fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -103,10 +97,8 @@ describe('ProfilePageComponent', () => {
 
     //eslint-disable-next-line
     (component as any).getAuthAndAvatar();
-    // component.avatar$.next(mediaService.formatMedia(mockMedia));
 
     expect(component.currentUser).toEqual(mockUser);
-    // expect(component.avatar$).toBe(of(mediaService.formatMedia(mockMedia)));
   });
 
   it('should get user authentication and placeholder avatar if user has no avatar', () => {
@@ -123,7 +115,6 @@ describe('ProfilePageComponent', () => {
     component.getAuthAndAvatar();
 
     expect(component.currentUser).toEqual(mockUser);
-    // expect(component.avatar$.value).toBe(environment.placeholder);
   });
 
   it(
@@ -142,8 +133,6 @@ describe('ProfilePageComponent', () => {
       mediaService.updateImageAdded(GMockMedia);
 
       fixture.detectChanges();
-
-      // expect(getAuthAndAvatarSpy).toHaveBeenCalled();
 
       getAuthAndAvatarSpy.calls.reset();
 
@@ -184,9 +173,6 @@ describe('ProfilePageComponent', () => {
     const uploadAvatarSpy = spyOn(mediaService, 'uploadAvatar').and.returnValue(
       of(mockMediaData),
     );
-    // const updateImageAddedSpy = spyOn(mediaService, 'updateImageAdded');
-    // const stateServiceSpy = spyOn(stateService, 'setUserState');
-    // const obsUser = of(mockUserData);
 
     component.currentUser = mockUserData;
     component.fileSelected = new File([''], 'test.png', { type: 'image/png' });
@@ -197,24 +183,7 @@ describe('ProfilePageComponent', () => {
     fixture.detectChanges();
     expect(uploadAvatarSpy).toHaveBeenCalledWith('123', mockAvatarData);
     expect(component.currentUser.avatar).toBe('1234');
-    // expect(updateImageAddedSpy).toHaveBeenCalledWith(mockMediaData);
-    // expect(stateServiceSpy).toHaveBeenCalledWith(obsUser);
   });
-
-  // it('should handle avatar upload error', () => {
-  //   const errorResponse = new Error('Avatar upload failed');
-  //   const uploadAvatarSpy = spyOn(mediaService, 'uploadAvatar').and.returnValue(
-  //     throwError(errorResponse),
-  //   );
-  //   const consoleLogSpy = spyOn(console, 'log');
-
-  //   // Set up component properties and trigger the method here
-
-  //   component.submitAvatar();
-
-  //   expect(uploadAvatarSpy).toHaveBeenCalled();
-  //   expect(consoleLogSpy).toHaveBeenCalledWith(errorResponse);
-  // });
 
   it('should convert a File to a Blob', () => {
     const file: File = new File(['test data'], 'test.txt', {
@@ -237,7 +206,6 @@ describe('ProfilePageComponent', () => {
     component.openForm('profile');
     fixture.detectChanges();
     expect(component.profileFormOpen).toBe(true);
-    // expect(component.formOpen).toBe(true);
   });
 
   it('should validate the user update form', () => {
@@ -400,48 +368,10 @@ describe('ProfilePageComponent', () => {
     expect(component.hideModal).toHaveBeenCalled();
   });
 
-  // it('should handle errors when updating the user', () => {
-  //   const component =
-  //     TestBed.createComponent(ProfilePageComponent).componentInstance;
-  //   const userService = TestBed.inject(UserService);
-
-  //   const errorResponse = 'An error occurred';
-  //   spyOn(userService, 'updateUser').and.returnValue(throwError(errorResponse));
-  //   spyOn(component, 'hideModal').and.callThrough();
-  //   spyOn(console, 'log').and.callThrough();
-
-  //   component.currentUser = GMockUser;
-  //   component.userUpdateForm.setValue({
-  //     name: 'John',
-  //     email: 'john@example.com',
-  //     password: 'password',
-  //     confirmPassword: 'password',
-  //   });
-
-  //   component.onSubmit();
-
-  //   formStateService.formOpen$.subscribe((formOpen) => {
-  //     expect(formOpen).toBe(false);
-  //   });
-
-  //   expect(userService.updateUser).toHaveBeenCalledWith(
-  //     {
-  //       name: 'John',
-  //       email: 'john@example.com',
-  //       password: 'password',
-  //     },
-  //     component.currentUser.id,
-  //   );
-
-  //   expect(component.hideModal).toHaveBeenCalled();
-  //   expect(console.log).toHaveBeenCalledWith(errorResponse);
-  // });
-
   it('should delete the avatar', () => {
     const component =
       TestBed.createComponent(ProfilePageComponent).componentInstance;
     const mediaService = TestBed.inject(MediaService);
-    // const avatarSubjectSpy = spyOn(component.avatar$, 'next');
     const mediaServiceSpy = spyOn(mediaService, 'deleteAvatar').and.returnValue(
       of({}),
     );
@@ -450,8 +380,6 @@ describe('ProfilePageComponent', () => {
 
     expect(mediaServiceSpy).toHaveBeenCalledWith(component.currentUser.id);
     expect(mediaServiceSpy).toHaveBeenCalledOnceWith(component.currentUser.id);
-    // expect(avatarSubjectSpy).toHaveBeenCalledWith(component.placeholder);
-    // expect(avatarSubjectSpy).toHaveBeenCalledOnceWith(component.placeholder);
   });
 
   it('should delete the user', () => {

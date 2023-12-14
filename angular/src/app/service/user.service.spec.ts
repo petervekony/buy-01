@@ -5,7 +5,6 @@ import {
 } from '@angular/common/http/testing';
 import { UserService } from './user.service';
 import { environment } from 'src/environments/environment';
-// import { of } from 'rxjs';
 import { LoginRequest } from '../interfaces/login-request';
 import { SignupRequest } from '../interfaces/signup-request';
 import { User } from '../interfaces/user';
@@ -112,7 +111,6 @@ describe('UserService', () => {
     expect(req.request.method).toBe('GET');
     req.flush(expectedResponse);
   });
-  //kakakaka
 
   it(
     'should delete cookie and log out',

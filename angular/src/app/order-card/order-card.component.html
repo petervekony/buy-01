@@ -6,10 +6,16 @@
   </div>
   <div class="body">
     <ng-container *ngIf="isOnShopcart">
-      <p>Quantity: {{ card.quantity }}</p>
+      <div class="quantity-container">
+        <p>Quantity: {{ card.quantity }}</p>
+        <p>TOTAL: ${{ (card.product.price * card.quantity).toFixed(2) }}</p>
+      </div>
     </ng-container>
     <ng-container *ngIf="isOnDashboard && !isAggregatedProduct">
-      <p>Quantity: {{ card.quantity }}</p>
+      <div class="quantity-container">
+        <p>Quantity: {{ card.quantity }}</p>
+        <p>TOTAL: ${{ (card.product.price * card.quantity).toFixed(2) }}</p>
+      </div>
     </ng-container>
     <ng-container *ngIf="isAggregatedProduct">
       <div class="total-amounts">
