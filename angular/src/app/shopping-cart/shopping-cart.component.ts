@@ -43,7 +43,6 @@ export class ShoppingCartComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: (products) => {
-        console.log(products);
         this.cartItems$ = of(products);
         this.empty = products.length === 0;
       },
@@ -53,15 +52,11 @@ export class ShoppingCartComponent implements OnInit {
   confirmOrder(): void {
     this.orderService.placeOrder().pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((response) => {
-        console.log(response);
         if (!response.processed) {
           this.errorMessages = new Set(response?.orderModifications?.notes);
           this.problematicOrderIds = new Set(
             response.orderModifications?.modifications?.map((e) => e.id!),
           );
-          this.cartItems$ = of(response.cart.orders);
-          console.log(this.errorMessages);
-          console.log(this.problematicOrderIds);
         }
         this.cartItems$ = of(response.cart.orders);
         this.orderService.updateOrders({} as Order);

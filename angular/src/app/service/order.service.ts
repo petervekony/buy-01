@@ -24,7 +24,6 @@ export class OrderService {
   private http = inject(HttpClient);
 
   private user: User = {} as User;
-  private cartItems: CartItem[] = [];
 
   private filterTypeSubject = new BehaviorSubject<string>('PENDING');
   filterType$ = this.filterTypeSubject.asObservable();
@@ -44,8 +43,6 @@ export class OrderService {
       this.getCartFromDB().pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe((cart) => {
           this.cartItems$ = of(cart.orders);
-          this.cartItems = cart.orders;
-          console.log('cartItems:', this.cartItems); //NOSONAR;
         });
     });
   }
@@ -73,9 +70,6 @@ export class OrderService {
       status: status,
     } as OrderStatusUpdate;
     const address = environment.ordersURL;
-    console.log(
-      this.http.put<Order>(address, changeStatus, { withCredentials: true }),
-    );
     return this.http.put<Order>(address, changeStatus, {
       withCredentials: true,
     });
@@ -178,8 +172,7 @@ export class OrderService {
     const address = environment.cartURL + '/' + id;
     this.http.delete<CartItem>(address, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe((response) => {
-      console.log('delete item response:', response); //NOSONAR
+    ).subscribe(() => {
       this.updateOrders({} as Order);
     });
   }

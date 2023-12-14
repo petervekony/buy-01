@@ -43,7 +43,6 @@ export class DashboardComponent implements OnInit {
         this.currentUser = user;
         this.isSeller = user.role === 'ROLE_SELLER' || user.role === 'SELLER';
         this.getAllOrders();
-        console.log(this.currentUser);
       },
     );
 
@@ -51,13 +50,11 @@ export class DashboardComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef),
     )
       .subscribe((filterType) => {
-        console.log(filterType);
         if (filterType === 'BEST PRODUCTS') {
           this.orderService.getAggregatedProducts().pipe(
             takeUntilDestroyed(this.destroyRef),
           ).subscribe((products) => {
             this.aggregatedProducts$ = of(this.sortProducts(products));
-            console.log(products);
           });
           this.filterType = filterType;
         } else {
@@ -81,7 +78,6 @@ export class DashboardComponent implements OnInit {
           personalOrder.confirmed,
         );
         this.pendingOrders$ = of(personalOrder.pending);
-        console.log(personalOrder.pending);
         this.pendingEmpty = personalOrder.pending.length === 0;
         this.pendingTotalPrice = this.countTotalValue(personalOrder.pending);
         this.totalAmount = this.pendingTotalPrice;

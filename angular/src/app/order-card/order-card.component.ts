@@ -76,7 +76,6 @@ export class OrderCardComponent implements OnInit {
     this.orderService.changeOrderStatus(this.card.id!, status).pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((order) => {
-      console.log('order:', order); //NOSONAR
       this.orderService.updateOrders(order);
     });
   }
@@ -86,7 +85,6 @@ export class OrderCardComponent implements OnInit {
   }
 
   removeItem() {
-    console.log('delete item:', this.card.product.id); //NOSONAR
     this.orderService.removeItem(this.card.id!);
   }
 }
