@@ -220,7 +220,6 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    // this.orderService.updateOrders({} as Order);
     this.orderService.resetFilterType();
   }
 }

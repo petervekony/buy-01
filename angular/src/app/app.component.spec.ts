@@ -37,7 +37,6 @@ describe('AppComponent', () => {
     app.ngOnInit();
     expect(app.checkUnauthenticatedRoutes('/dashboard')).toBeTrue();
     expect(checkRouteSpy).toHaveBeenCalledWith('/dashboard');
-    // expect(app.loggedIn).toBeFalse();
   });
 
   it('should set loggedIn to false for an unauthenticated route', () => {

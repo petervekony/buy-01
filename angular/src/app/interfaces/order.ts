@@ -43,7 +43,7 @@ export interface OrderStatusUpdate {
 }
 
 export interface Cart {
-  orders: CartItem[]; //key:sellerId
+  orders: CartItem[];
 }
 
 export type DashboardItem = Order | AggregatedProduct;

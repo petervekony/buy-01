@@ -68,10 +68,6 @@ export class OrderCardComponent implements OnInit {
     this.max = this.card.product.quantity;
   }
 
-  // updateQuantity() {
-  //   this.orderService.modifyOrder(this.card);
-  // }
-
   changeOrderStatus(status: string) {
     this.orderService.changeOrderStatus(this.card.id!, status).pipe(
       takeUntilDestroyed(this.destroyRef),

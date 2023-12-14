@@ -20,14 +20,6 @@ describe('authGuard', () => {
     state: RouterStateSnapshot,
   ) => authGuard(route, state);
 
-  // const authServiceSpy = jasmine.createSpyObj('AuthService', ['getAuth']);
-  // authServiceSpy.getAuth.and.returnValue(of({
-  //   name: 'testUser',
-  //   email: 'taneli@gmail.com',
-  //   id: '123123123',
-  //   role: 'SELLER',
-  // } as User));
-
   const cookieServiceSpy = jasmine.createSpyObj('CookieService', ['delete']);
   const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -88,30 +80,4 @@ describe('authGuard', () => {
       });
     }),
   );
-
-  // TODO: Fix the part where getAuth returns invalid user!
-  // xit(
-  //   'should return false and redirect to login if user is not authenticated and path is dashboard',
-  //   fakeAsync(() => {
-  //     TestBed.runInInjectionContext(() => {
-  //       const authService = inject(AuthService);
-  //       const route = {
-  //         routeConfig: { path: 'dashboard' },
-  //       } as ActivatedRouteSnapshot;
-  //       //eslint-disable-next-line
-  //       const authSpy = spyOn(authService, "getAuth").and.callThrough().and
-  //         .returnValue(of({} as User));
-  //       tick();
-  //       //HACK: this sometimes breaks
-  //       //
-  //       // expect(authSpy).toHaveBeenCalled();
-  //       //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //       const canActivate = executeGuard(route, null as any);
-  //       expect(canActivate).toBe(true);
-  //       tick();
-
-  //       expect(routerSpy.navigate).toHaveBeenCalledWith(['login']);
-  //     });
-  //   }),
-  // );
 });

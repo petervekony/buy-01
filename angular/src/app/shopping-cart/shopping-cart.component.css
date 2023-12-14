@@ -1,7 +1,19 @@
 .top-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   position: fixed;
+  width: calc(100% - 2rem);
+  align-items: center;
   right: 1rem;
+}
 
+.top-bar p {
+  color: #c3b5fd;
+}
+
+.top-bar span {
+  font-weight: bold;
 }
 
 .top-bar > button {

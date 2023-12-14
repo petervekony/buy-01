@@ -13,12 +13,11 @@ import { of } from 'rxjs';
 import { DataService } from 'src/app/service/data.service';
 import { UserService } from 'src/app/service/user.service';
 import { MatIconModule } from '@angular/material/icon';
-import { FormControl, FormGroup, FormsModule, NgForm } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule } from '@angular/forms';
 import { FormStateService } from 'src/app/service/form-state.service';
 import { FileSelectEvent } from 'primeng/fileupload';
 import { ProductService } from 'src/app/service/product.service';
 import { ProductRequest } from 'src/app/interfaces/product-request';
-// import { FileUpload } from 'primeng/fileupload';
 
 describe('ProductCardModalComponent', () => {
   let component: ProductCardModalComponent;
@@ -31,7 +30,6 @@ describe('ProductCardModalComponent', () => {
   let dataService: DataService;
   //eslint-disable-next-line
   let userService: UserService;
-  // let formStateService: FormStateService;
   let productService: ProductService;
 
   const mockProducts = [
@@ -82,14 +80,6 @@ describe('ProductCardModalComponent', () => {
     role: 'SELLER',
     avatar: 'testimage',
   };
-
-  // const mockProductMedia = {
-  //   id: '2',
-  //   image: 'testimage',
-  //   productId: '2',
-  //   userId: '',
-  //   mimeType: 'image/png',
-  // };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -181,7 +171,7 @@ describe('ProductCardModalComponent', () => {
     component.ngOnInit();
 
     expect(getOwnerInfoSpy).toHaveBeenCalled();
-    expect(component.currentDeleteIndex).toBe(1); // Modify with the index value
+    expect(component.currentDeleteIndex).toBe(1);
 
     expect(component.images).toEqual(
       mockMediaResponse.media.map((item) =>
@@ -346,7 +336,7 @@ describe('ProductCardModalComponent', () => {
 
     const updateProductSpy = spyOn(productService, 'updateProductAdded');
 
-    component.formValid = true; // Ensure the form is valid
+    component.formValid = true;
     component.fileSelected = new File(['file contents'], 'example.txt', {
       type: 'text/plain',
     });
