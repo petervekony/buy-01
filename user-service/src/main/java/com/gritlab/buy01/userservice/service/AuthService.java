@@ -83,7 +83,6 @@ public class AuthService {
                       role));
       return resp;
     } catch (Exception e) {
-      System.out.println(e.getMessage());
       ErrorMessage error =
           new ErrorMessage("Incorrect username or password", HttpStatus.UNAUTHORIZED.value());
       return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
@@ -132,11 +131,9 @@ public class AuthService {
   public User getUserDetailsFromToken(String token) {
     try {
       String userId = jwtUtils.getUserIdFromJwtToken(token);
-      System.out.println("THIS IS THE USER ID ON AUTH: " + userId);
 
       return userRepository.findById(userId).orElse(null);
     } catch (Exception e) {
-      System.out.println(e.getMessage());
       return null;
     }
   }
