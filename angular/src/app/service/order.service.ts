@@ -138,7 +138,7 @@ export class OrderService {
     const address = environment.addToCartURL;
     this.http.post<CartItem>(address, newOrder, { withCredentials: true }).pipe(
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe((response) => console.log(response)); //NOSONAR
+    ).subscribe(() => this.updateOrders({} as Order));
   }
 
   getAllOrders(): Observable<PersonalOrder> {
@@ -146,7 +146,7 @@ export class OrderService {
     return this.http.get<PersonalOrder>(address, { withCredentials: true });
   }
 
-  private createOrder(product: Product, quantity: number): CartItem {
+  createOrder(product: Product, quantity: number): CartItem {
     const newOrder = {
       status: 'PENDING',
       buyerId: this.user.id,
@@ -164,6 +164,7 @@ export class OrderService {
       params: params,
       withCredentials: true,
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((response) =>
+      //NOTE: remove this!
       console.log(response)
     );
   }

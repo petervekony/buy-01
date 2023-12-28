@@ -38,10 +38,13 @@ describe('MediaService', () => {
       mimeType: 'image/jpeg',
     };
 
+    const spy = spyOn(service, 'updateImageAdded').and.callThrough();
+
     service.updateImageAdded(mockMedia);
     service.imageAdded$.subscribe((media) => {
       expect(media).toEqual(mockMedia);
     });
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should return product thumbnail', () => {

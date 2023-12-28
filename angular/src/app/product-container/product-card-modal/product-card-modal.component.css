@@ -176,7 +176,6 @@
 
 .delete-container,
 .edit-product-container {
-  /* flex: 9; */
   height: calc(80vh - 5rem);
   width: 100%;
   display: flex;
@@ -316,5 +315,4 @@
     border-radius: none;
     border: none;
   }
-
 }

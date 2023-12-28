@@ -130,17 +130,6 @@ export class DashboardComponent implements OnInit {
       });
   }
 
-  getOrders(): void {
-    this.orderService.getShoppingCart(this.filterType).pipe(
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe({
-      next: (products) => {
-        this.cards$ = of(products);
-        this.empty = products.length === 0;
-      },
-    });
-  }
-
   filterOrders(searchTerm: string): void {
     if (this.filterType !== 'BEST PRODUCTS') {
       this.orderService.getAllOrders().pipe(
