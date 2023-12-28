@@ -26,7 +26,6 @@ dialog {
   min-width: 300px;
   position: absolute;
   left: 5vw;
-  /* margin-left: 3.5vw; */
   top: calc(10vw + 100px);
   z-index: 15;
   border: none;
