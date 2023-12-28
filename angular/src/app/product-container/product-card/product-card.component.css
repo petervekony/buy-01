@@ -105,13 +105,21 @@ dialog {
   max-width: 600px;
 }
 
+@media screen and (height < 900px) {
+  dialog {
+    height: calc(100vh - 2rem);
+    top: 2rem;
+    z-index: 1000;
+  }
+}
+
 @media screen and (width >= 700px) {
   .card-container {
-    min-width: 30vw;
+    min-width: 40vw;
   }
 
-.body-container {
-  margin-top: 15%;
+  .body-container {
+    margin-top: 17%;
   }
 }
 
@@ -120,8 +128,8 @@ dialog {
     min-width: 23vw;
   }
 
-.body-container {
-  margin-top: 18%;
+  .body-container {
+    margin-top: 18%;
   }
 }
 
@@ -164,17 +172,17 @@ dialog {
     min-width: calc(50vw - 40px);
   }
 
-.body-container {
-  margin-top: 12%;
+  .body-container {
+    margin-top: 12%;
   }
 }
 
 @media screen and (width <= 500px) {
   .card-container {
-    min-width: calc(100vw - 20px);
+    min-width: calc(100vw - 40px);
   }
 
-.body-container {
-  margin-top: 20%;
+  .body-container {
+    margin-top: 20%;
   }
 }
