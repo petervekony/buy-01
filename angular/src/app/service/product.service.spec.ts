@@ -13,8 +13,6 @@ import { AuthService } from './auth.service';
 describe('ProductService', () => {
   let service: ProductService;
   let httpTestingController: HttpTestingController;
-  //eslint-disable-next-line
-  let authService: AuthService;
 
   beforeEach(() => {
     const authServiceMock = {
@@ -36,7 +34,6 @@ describe('ProductService', () => {
     });
     service = TestBed.inject(ProductService);
     httpTestingController = TestBed.inject(HttpTestingController);
-    authService = TestBed.inject(AuthService);
   });
 
   afterEach(() => {
@@ -75,7 +72,6 @@ describe('ProductService', () => {
 
     const req = httpTestingController.expectOne(`${environment.productsURL}`);
     expect(req.request.method).toEqual('GET');
-
     req.flush(mockProducts);
   });
 
@@ -96,7 +92,6 @@ describe('ProductService', () => {
       `${environment.productsURL}?userId=${userId}`,
     );
     expect(req.request.method).toEqual('GET');
-
     req.flush(mockUser);
   });
 
@@ -131,7 +126,6 @@ describe('ProductService', () => {
       `${environment.userProductsURL}` + userId,
     );
     expect(req.request.method).toEqual('GET');
-
     req.flush(mockProducts);
   });
 
@@ -184,7 +178,6 @@ describe('ProductService', () => {
       `${environment.productsURL}/${productId}`,
     );
     expect(req.request.method).toEqual('DELETE');
-
     req.flush({});
   });
 
@@ -217,7 +210,6 @@ describe('ProductService', () => {
 
     const req = httpTestingController.expectOne(`${environment.productsURL}`);
     expect(req.request.method).toEqual('POST');
-
     req.flush(productCreationResponse);
   });
 
@@ -249,7 +241,6 @@ describe('ProductService', () => {
 
     const req = httpTestingController.expectOne(`${environment.productsURL}`);
     expect(req.request.method).toEqual('POST');
-
     req.flush(productCreationResponse);
   });
 
@@ -273,7 +264,6 @@ describe('ProductService', () => {
 
     const req = httpTestingController.expectOne(`${environment.productsURL}`);
     expect(req.request.method).toEqual('POST');
-
     req.flush(errorResponse, {
       status: 500,
       statusText: 'Internal Server Error',
@@ -290,10 +280,12 @@ describe('ProductService', () => {
       id: '123',
       thumbnail: environment.placeholder,
     };
+    const spy = spyOn(service, 'updateProductAdded').and.callThrough();
     service.updateProductAdded(mockProduct);
     service.productAdded$.subscribe((product) => {
       expect(product).toEqual(mockProduct);
     });
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should update userProducts$', () => {
@@ -317,9 +309,11 @@ describe('ProductService', () => {
         thumbnail: environment.placeholder,
       },
     ] as Product[];
+    const spy = spyOn(service, 'updateUserProducts').and.callThrough();
     service.updateUserProducts(mockProducts);
     service.userProducts$.subscribe((products) => {
       expect(products).toEqual(mockProducts);
     });
+    expect(spy).toHaveBeenCalled();
   });
 });

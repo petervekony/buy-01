@@ -24,11 +24,13 @@ describe('DataService', () => {
 
   it('should send and receive product IDs', () => {
     const testId = '12345';
+    const sendIdSpy = spyOn(service, 'sendProductId').and.callThrough();
 
     service.sendProductId(testId);
     service.ids$.subscribe((id) => {
       expect(id).toBe(testId);
     });
+    expect(sendIdSpy).toHaveBeenCalled();
   });
 
   it('should change the delete image index', () => {
