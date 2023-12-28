@@ -1,6 +1,6 @@
 <div class="top-bar">
   <p>Payment method: <span><br>Pay on delivery</span></p>
-  <button (click)="confirmOrder()">CONFIRM ORDER</button>
+  <button (click)="confirmOrder()" matTooltip="Confirm order">CONFIRM ORDER</button>
 </div>
 <div class="order-container">
   <ng-container *ngFor="let message of errorMessages">
