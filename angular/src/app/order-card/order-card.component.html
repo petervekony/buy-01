@@ -9,7 +9,6 @@
       <div class="quantity-container">
         <p>Quantity: {{ card.quantity }}</p>
         <p>TOTAL: ${{ (card.product.price * card.quantity).toFixed(2) }}</p>
-        <!-- <input type="number" [(ngModel)]="card.quantity" (change)="updateQuantity()" min="1" [max]="max" /> -->
       </div>
     </ng-container>
     <ng-container *ngIf="isOnDashboard && !isAggregatedProduct">

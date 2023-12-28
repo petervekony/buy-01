@@ -3,9 +3,12 @@
   flex-direction: row;
   justify-content: space-between;
   position: fixed;
-  width: calc(100% - 2rem);
+  width: 100vw;
+  padding-left: 1rem;
+  padding-right: 1.3rem;
   align-items: center;
-  right: 1rem;
+  z-index: 3;
+  background-color: #121212;
 }
 
 .top-bar p {
@@ -35,9 +38,10 @@
 }
 
 .order-container {
+  margin-top: 100px;
   display: flex;
   width: 100vw;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 200px);
   justify-content: center;
   align-items: center;
   flex-direction: column;

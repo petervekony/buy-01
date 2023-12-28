@@ -1,12 +1,6 @@
 @import url("primeflex/primeflex.css");
 @import url("../node_modules/@angular/material/prebuilt-themes/purple-green.css");
 
-/* @font-face { */
-/*   font-family: Roboto, "Helvetica Neue", sans-serif; */
-/*   font-display: swap; */
-
-/* } */
-
 html,
 body {
   height: 100vh;
