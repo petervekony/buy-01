@@ -11,12 +11,14 @@
     </div>
     <div class="filter-bar">
       <div class="price-div">
-        <label>min price:</label>
-        <input type="text" class="price-filter" [(ngModel)]="minPrice" (keyup.enter)="search()">
+        <label for="min-price">min price:</label>
+        <input type="number" class="price-filter" [(ngModel)]="minPrice" (keyup.enter)="search()" name="min-price"
+          id="min-price">
       </div>
       <div class="price-div">
-        <label>max price:</label>
-        <input type="text" class="price-filter" [(ngModel)]="maxPrice" (keyup.enter)="search()">
+        <label for="max-price">max price:</label>
+        <input type="number" class="price-filter" [(ngModel)]="maxPrice" (keyup.enter)="search()" name="max-price"
+          id="max-price">
       </div>
     </div>
   </div>

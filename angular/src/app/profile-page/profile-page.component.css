@@ -2,7 +2,7 @@
   width: 80vw;
   height: calc(80vh - 100px);
   margin-left: 10vw;
-  margin-top: 20px;
+  padding-top: 120px;
   display: flex;
   justify-content: center;
   align-items: center;
