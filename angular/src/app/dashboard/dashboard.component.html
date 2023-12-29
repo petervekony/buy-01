@@ -8,7 +8,7 @@
       <mat-icon aria-hidden="false" aria-label="reset icon" fontIcon="refresh" matTooltip="Reset"></mat-icon>
     </button>
     <input type="text" name="oder-search" id="search-field" [(ngModel)]="searchTerm" maxlength="100"
-      (ngModelChange)="filterOrders(searchTerm)" placeholder="Search orders..">
+      (ngModelChange)="searchTermSource.next(searchTerm)" placeholder="Search orders..">
   </div>
 </div>
 <div class="dashboard-container">

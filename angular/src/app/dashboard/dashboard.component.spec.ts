@@ -1,4 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 import { DashboardComponent } from './dashboard.component';
 import { OrderService } from '../service/order.service';
 import { StateService } from '../service/state.service';
@@ -278,17 +283,21 @@ describe('DashboardComponent', () => {
   });
 
   describe('Aggregated Products Functionality', () => {
-    it('should display aggregated products correctly when filter type is BEST PRODUCTS', () => {
-      filterTypeSubject.next('BEST PRODUCTS');
-      fixture.detectChanges();
+    it(
+      'should display aggregated products correctly when filter type is BEST PRODUCTS',
+      fakeAsync(() => {
+        filterTypeSubject.next('BEST PRODUCTS');
+        fixture.detectChanges();
+        tick(500);
 
-      component.aggregatedProducts$.subscribe((aggregatedProducts) => {
-        expect(aggregatedProducts.length).toBe(2);
-        expect(aggregatedProducts).toEqual(mockAggregatedProducts);
-        expect(aggregatedProducts[0].totalPrice).toBe(400);
-        expect(aggregatedProducts[1].totalPrice).toBe(100);
-      });
-    });
+        component.aggregatedProducts$.subscribe((aggregatedProducts) => {
+          expect(aggregatedProducts.length).toBe(2);
+          expect(aggregatedProducts).toEqual(mockAggregatedProducts);
+          expect(aggregatedProducts[0].totalPrice).toBe(400);
+          expect(aggregatedProducts[1].totalPrice).toBe(100);
+        });
+      }),
+    );
   });
 
   describe('Filtering Aggregated Products', () => {
