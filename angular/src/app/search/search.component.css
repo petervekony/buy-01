@@ -1,7 +1,9 @@
 .search-container {
+  padding-top: 100px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-bottom: 2rem;
 }
 
 .top-bar {
@@ -56,6 +58,12 @@
   color: #c3b5fd;
 }
 
+.price-div label:hover,
+.price-div label:focus {
+  cursor: pointer;
+  color: #b972fd;
+}
+
 .price-filter {
   width: 4rem;
   padding: 0 3px;
@@ -64,6 +72,13 @@
   box-shadow: none;
   background-color: transparent;
 }
+
+.price-filter:focus,
+.price-filter:hover {
+  cursor: pointer;
+  border-bottom: 1px solid #b972fd;
+}
+
 
 .wrapper {
   padding-top: 10px;

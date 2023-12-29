@@ -1,6 +1,13 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { combineLatest, map, Observable, of } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  debounceTime,
+  map,
+  Observable,
+  of,
+} from 'rxjs';
 import { CartItem, Order } from '../interfaces/order';
 import { User } from '../interfaces/user';
 import { OrderService } from '../service/order.service';
@@ -32,7 +39,8 @@ export class DashboardComponent implements OnInit {
   totalAmount: string = '0';
   filterType: string = 'PENDING';
   searchTerm: string = '';
-  searchTerm$: Observable<string> = of('');
+  searchTermSource = new BehaviorSubject<string>('');
+  searchTerm$ = this.searchTermSource.asObservable().pipe(debounceTime(500));
 
   private stateService = inject(StateService);
   private orderService = inject(OrderService);
@@ -67,10 +75,14 @@ export class DashboardComponent implements OnInit {
   }
 
   private fetchAndFilterAggregatedProducts(): void {
-    this.orderService.getAggregatedProducts().pipe(
-      takeUntilDestroyed(this.destroyRef),
-      map((products) =>
-        this.applySearchFilterToAggregatedProducts(products, this.searchTerm)
+    combineLatest([
+      this.orderService.getAggregatedProducts().pipe(
+        takeUntilDestroyed(this.destroyRef),
+      ),
+      this.searchTerm$,
+    ]).pipe(
+      map(([products, searchTerm]) =>
+        this.applySearchFilterToAggregatedProducts(products, searchTerm)
       ),
     ).subscribe((filteredProducts) => {
       this.aggregatedProducts$ = of(this.sortProducts(filteredProducts));
