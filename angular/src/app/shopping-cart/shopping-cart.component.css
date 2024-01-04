@@ -40,10 +40,10 @@
 }
 
 .order-container {
-  margin-top: 150px;
+  padding-top: 170px;
   display: flex;
   width: 100vw;
-  height: calc(100vh + 150px + 1rem);
+  height: fit-content;
   justify-content: center;
   align-items: center;
   flex-direction: column;

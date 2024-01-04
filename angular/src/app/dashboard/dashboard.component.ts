@@ -214,6 +214,10 @@ export class DashboardComponent implements OnInit {
     }
   }
 
+  trackById(_: number, order: Order) {
+    return order.id;
+  }
+
   reset() {
     if (this.searchTerm === '') return;
     this.searchTerm = '';
