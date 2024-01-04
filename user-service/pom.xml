@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.gritlab.buy01</groupId>
     <artifactId>buy01-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>${project.version}</version>
   </parent>
 
   <artifactId>user-service</artifactId>
@@ -187,4 +187,11 @@
       </resource>
     </resources>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>nexus-user-service</id>
+      <name>Nexus User Service Repository</name>
+      <url>http://161.35.24.93:8081/repository/user-service-repo/</url>
+    </repository>
+  </distributionManagement>
 </project>
