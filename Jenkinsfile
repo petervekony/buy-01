@@ -168,6 +168,160 @@ pipeline {
         }
       }
     }
+    stage('Deploy User Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('user-service') {
+                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    script {
+                        sh """
+                        echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                          <mirrors>
+                            <mirror>
+                              <id>nexus-maven-central</id>
+                              <mirrorOf>*</mirrorOf>
+                              <url>http://161.35.24.93:8081/repository/maven-central/</url>
+                            </mirror>
+                          </mirrors>
+                          <servers>
+                            <server>
+                              <id>nexus-user-service</id>
+                              <username>$NEXUS_USERNAME</username>
+                              <password>$NEXUS_PASSWORD</password>
+                            </server>
+                          </servers>
+                        </settings>' > settings.xml
+                        """
+                        
+                        sh 'mvn clean deploy -s settings.xml'
+                    }
+                }
+            }
+        }
+    }
+    stage('Deploy Product Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('product-service') {
+                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    script {
+                        sh """
+                        echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                          <mirrors>
+                            <mirror>
+                              <id>nexus-maven-central</id>
+                              <mirrorOf>*</mirrorOf>
+                              <url>http://161.35.24.93:8081/repository/maven-central/</url>
+                            </mirror>
+                          </mirrors>
+                          <servers>
+                            <server>
+                              <id>nexus-product-service</id>
+                              <username>$NEXUS_USERNAME</username>
+                              <password>$NEXUS_PASSWORD</password>
+                            </server>
+                          </servers>
+                        </settings>' > settings.xml
+                        """
+                        
+                        sh 'mvn clean deploy -s settings.xml'
+                    }
+                }
+            }
+        }
+    }
+    stage('Deploy Media Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('media-service') {
+                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    script {
+                        sh """
+                        echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                          <mirrors>
+                            <mirror>
+                              <id>nexus-maven-central</id>
+                              <mirrorOf>*</mirrorOf>
+                              <url>http://161.35.24.93:8081/repository/maven-central/</url>
+                            </mirror>
+                          </mirrors>
+                          <servers>
+                            <server>
+                              <id>nexus-media-service</id>
+                              <username>$NEXUS_USERNAME</username>
+                              <password>$NEXUS_PASSWORD</password>
+                            </server>
+                          </servers>
+                        </settings>' > settings.xml
+                        """
+                        
+                        sh 'mvn clean deploy -s settings.xml'
+                    }
+                }
+            }
+        }
+    }
+    stage('Deploy Order Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('order-service') {
+                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    script {
+                        sh """
+                        echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                          <mirrors>
+                            <mirror>
+                              <id>nexus-maven-central</id>
+                              <mirrorOf>*</mirrorOf>
+                              <url>http://161.35.24.93:8081/repository/maven-central/</url>
+                            </mirror>
+                          </mirrors>
+                          <servers>
+                            <server>
+                              <id>nexus-order-service</id>
+                              <username>$NEXUS_USERNAME</username>
+                              <password>$NEXUS_PASSWORD</password>
+                            </server>
+                          </servers>
+                        </settings>' > settings.xml
+                        """
+                        
+                        sh 'mvn clean deploy -s settings.xml'
+                    }
+                }
+            }
+        }
+    }
+    stage('Deploy Frontend to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('angular') {
+                // nexus authentication for npm
+                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    sh """
+                    echo registry=http://161.35.24.93:8081/repository/npm-dependencies/ > .npmrc
+                    echo _auth=\$(echo -n $NEXUS_USERNAME:$NEXUS_PASSWORD | base64) >> .npmrc
+                    echo email=notarealperson@justabot.com >> .npmrc
+                    echo always-auth=true >> .npmrc
+                    """
+                }
+                sh 'npm install'
+                sh 'ng build --prod'
+
+                sh 'npm publish ./dist/buy-01'
+            }
+        }
+    }
     stage('Deploy to Production') {
       agent {
         label 'deploy'
