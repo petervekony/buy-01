@@ -21,7 +21,7 @@
             <h2>No pending orders</h2>
           </div>
         </ng-container>
-        <ng-container *ngFor="let card of pendingOrders$ | async">
+        <ng-container *ngFor="let card of pendingOrders$ | async; trackBy:trackById">
           <app-order-card [card]="card" [filter]="filterType" [user]="currentUser"></app-order-card>
         </ng-container>
       </ng-template>
@@ -33,7 +33,7 @@
             <h2>No confirmed orders</h2>
           </div>
         </ng-container>
-        <ng-container *ngFor="let card of confirmedOrders$ | async">
+        <ng-container *ngFor="let card of confirmedOrders$ | async; trackBy:trackById">
           <app-order-card [card]="card" [filter]="filterType" [user]="currentUser"></app-order-card>
         </ng-container>
       </ng-template>
@@ -45,7 +45,7 @@
             <h2>No cancelled orders</h2>
           </div>
         </ng-container>
-        <ng-container *ngFor="let card of cancelledOrders$ | async">
+        <ng-container *ngFor="let card of cancelledOrders$ | async; trackBy:trackById">
           <app-order-card [card]="card" [filter]="filterType" [user]="currentUser"></app-order-card>
         </ng-container>
       </ng-template>

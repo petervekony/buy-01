@@ -1,7 +1,7 @@
 <div class="modal-container">
-  <div class="modal-wrap">
-    <button class="close-button" (click)="hideModal()">X</button>
-    <div class="mat-tab-container">
+  <div class="modal-wrap" (keydown)="handleEscDown($event)">
+    <button class="close-button" (click)="hideModal()" matTooltip="Close view">X</button>
+    <div class="mat-tab-container" (keydown)="handleEscDown($event)">
       <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" #tabGroup>
         <mat-tab label="Info">
           <ng-template matTabContent>
@@ -62,7 +62,8 @@
                 </div>
                 <div class="footer" *ngIf="user?.id !== owner?.id">
                   <input type="number" id="quantity-input" [(ngModel)]="orderQuantity" min="1" [max]="maxQuantity" />
-                  <button class="buy" pButton pRiple (click)="addToCart()">
+                  <button class="buy" pButton pRiple (click)="addToCart()" [disabled]="isAmountValid()"
+                    matTooltip="Add to Cart">
                     <mat-icon aria-hidden="false" aria-label="buy icon" fontIcon="shopping_cart"></mat-icon>
                   </button>
                 </div>

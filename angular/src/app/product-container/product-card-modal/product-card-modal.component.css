@@ -145,11 +145,15 @@
 }
 
 #quantity-input {
-  height: 1.2rem;
+  height: 1.5rem;
   width: 3rem;
   align-self: center;
   text-align: center;
   margin-right: 1rem;
+  color: #8d6ff3;
+  background-color: #08101c;
+  border: 1px solid #8d6ff3;
+  border-radius: 5px;
 }
 
 #submit-button {
