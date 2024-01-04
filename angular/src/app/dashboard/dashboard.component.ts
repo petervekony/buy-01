@@ -220,6 +220,7 @@ export class DashboardComponent implements OnInit {
 
   reset() {
     if (this.searchTerm === '') return;
+    this.searchTermSource.next('');
     this.searchTerm = '';
     this.filterOrders(this.searchTerm);
   }
