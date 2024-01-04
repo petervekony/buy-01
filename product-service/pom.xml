@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.gritlab.buy01</groupId>
     <artifactId>buy01-parent</artifactId>
-    <version>${project.version}</version>
+    <version>1.0.0</version>
   </parent>
 
   <artifactId>product-service</artifactId>
