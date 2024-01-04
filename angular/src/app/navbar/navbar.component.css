@@ -94,10 +94,9 @@
   color: #8d45ce;
 }
 
-@media screen and (width <= 616px) {
+@media screen and (width <= 629px) {
   #title {
-    width: 0;
-    opacity: 0;
+    display: none;
   }
 }
 

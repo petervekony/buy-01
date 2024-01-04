@@ -195,12 +195,23 @@ export class ProductCardModalComponent implements OnInit, AfterViewInit {
     this.changeDetector.detectChanges();
   }
 
+  handleEscDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      this.hideModal();
+    }
+  }
+
   addToCart() {
     if (!this.orderQuantity) return;
     if (this.product.quantity < this.orderQuantity) {
       this.orderQuantity = this.product.quantity;
     }
     this.orderService.addToCart(this.product, this.orderQuantity);
+  }
+
+  isAmountValid() {
+    return this.product.quantity < 0 ||
+      this.orderQuantity > this.product.quantity || this.orderQuantity <= 0;
   }
 
   initFormValues() {

@@ -7,7 +7,16 @@
 }
 
 .top-bar {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  position: fixed;
+  top: 100px;
+  width: 100%;
+  display: flex;
   justify-content: center;
+  flex-direction: column;
+  background-color: #121212;
+  z-index: 3;
 }
 
 .search-bar {
@@ -20,7 +29,7 @@
 .search-bar > input {
   margin-left: 5px;
   width: 25vw;
-  height: 3vh;
+  height: 2rem;
   margin-right: 1vw;
   min-width: 250px;
   padding: 5px;
@@ -81,7 +90,7 @@
 
 
 .wrapper {
-  padding-top: 10px;
+  padding-top: 100px;
   display: flex;
   flex-wrap: column-wrap;
   justify-content: center;
