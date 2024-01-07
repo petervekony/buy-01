@@ -174,7 +174,7 @@ pipeline {
         }
         steps {
             dir('user-service') {
-              sh 'mvn clean deploy -X'
+              sh 'mvn clean deploy'
             }
         }
     }
@@ -184,7 +184,7 @@ pipeline {
         }
         steps {
             dir('product-service') {
-              sh 'mvn clean deploy -X'
+              sh 'mvn clean deploy'
             }
         }
     }
@@ -194,7 +194,7 @@ pipeline {
         }
         steps {
             dir('media-service') {
-              sh 'mvn clean deploy -X'
+              sh 'mvn clean deploy'
             }
         }
     }
@@ -204,7 +204,7 @@ pipeline {
         }
         steps {
             dir('order-service') {
-              sh 'mvn clean deploy -X'
+              sh 'mvn clean deploy'
             }
         }
     }
