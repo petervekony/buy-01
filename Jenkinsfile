@@ -215,7 +215,7 @@ pipeline {
         steps {
             dir('angular') {
                 sh 'npm install'
-                sh 'ng build --prod'
+                sh 'npm run build'
                 sh 'npm publish ./dist/buy-01'
             }
         }
