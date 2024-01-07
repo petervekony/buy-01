@@ -4,324 +4,222 @@ pipeline {
       PROJECT_NAME = "buy01"
     }
   stages {
-    stage('Run Tests: User Service') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('user-service') {
-          sh 'mvn test'
-        }
-      }
-    }
-    stage('Run Tests: Product Service') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('product-service') {
-          sh 'mvn test'
-        }
-      }
-    }
-    stage('Run Tests: Media Service') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('media-service') {
-          sh 'mvn test'
-        }
-      }
-    }
-    stage('Run Tests: Order Service') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('order-service') {
-          sh 'mvn test'
-        }
-      }
-    }
-    stage('Run Tests: Angular') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('angular') {
-          sh 'export CHROME_BIN=/usr/bin/google-chrome'
-            sh 'npm install'
-            sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
-        }
-      }
-    }
-    stage('User Service SonarQube Analysis & Quality Gate') {
-      steps {
-        script {
-          dir('user-service') {
-            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              withSonarQubeEnv('peter droplet') {
-                sh 'mvn clean compile'
-                  sh """
-                  mvn sonar:sonar \
-                  -Dsonar.projectKey=buy-01-user-service \
-                  -Dsonar.host.url=http://64.226.78.45:9000 \
-                  -Dsonar.token=$SONAR_AUTH_TOKEN
-                  """
-              }
-            }
-            timeout(time: 1, unit: 'HOURS') {
-              waitForQualityGate abortPipeline: true
-            }
-          }
-        }
-      }
-    }
-    stage('Product Service SonarQube Analysis & Quality Gate') {
-      steps {
-        script {
-          dir('product-service') {
-            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              withSonarQubeEnv('peter droplet') {
-                sh 'mvn clean compile'
-                  sh """
-                  mvn sonar:sonar \
-                  -Dsonar.projectKey=buy-01-product-service \
-                  -Dsonar.host.url=http://64.226.78.45:9000 \
-                  -Dsonar.token=$SONAR_AUTH_TOKEN
-                  """
-              }
-            }
-            timeout(time: 1, unit: 'HOURS') {
-              waitForQualityGate abortPipeline: true
-            }
-          }
-        }
-      }
-    }
-    stage('Media Service SonarQube Analysis & Quality Gate') {
-      steps {
-        script {
-          dir('media-service') {
-            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              withSonarQubeEnv('peter droplet') {
-                sh 'mvn clean compile'
-                  sh """
-                  mvn sonar:sonar \
-                  -Dsonar.projectKey=buy-01-media-service \
-                  -Dsonar.host.url=http://64.226.78.45:9000 \
-                  -Dsonar.token=$SONAR_AUTH_TOKEN
-                  """
-              }
-            }
-          }
-          timeout(time: 1, unit: 'HOURS') {
-            waitForQualityGate abortPipeline: true
-          }
-        }
-      }
-    }
-    stage('Order Service SonarQube Analysis & Quality Gate') {
-      steps {
-        script {
-          dir('order-service') {
-            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              withSonarQubeEnv('peter droplet') {
-                sh 'mvn clean compile'
-                  sh """
-                  mvn sonar:sonar \
-                  -Dsonar.projectKey=buy-01-order-service \
-                  -Dsonar.host.url=http://64.226.78.45:9000 \
-                  -Dsonar.token=$SONAR_AUTH_TOKEN
-                  """
-              }
-            }
-          }
-          timeout(time: 1, unit: 'HOURS') {
-            waitForQualityGate abortPipeline: true
-          }
-        }
-      }
-    }
-    stage('Angular SonarQube Analysis & Quality Gate') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('angular') {
-          sh 'npm install'
-            sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
-            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-              sh """
-                sonar-scanner -X \
-                -Dsonar.projectKey=buy-01-frontend \
-                -Dsonar.host.url=http://64.226.78.45:9000 \
-                -Dsonar.token=$SONAR_AUTH_TOKEN \
-                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                -Dsonar.testExecutionReportPaths=reports/test-report.xml
-                """
-            }
-          timeout(time: 1, unit: 'HOURS') {
-            waitForQualityGate abortPipeline: true
-          }
-        }
-      }
-    }
-    // stage('Deploy User Service to Nexus') {
-    //     agent {
-    //         label 'master'
+    // stage('Run Tests: User Service') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('user-service') {
+    //       sh 'mvn test'
     //     }
-    //     steps {
-    //         dir('user-service') {
-    //             withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //                 script {
-    //                     sh """
-    //                     echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-    //                       <mirrors>
-    //                         <mirror>
-    //                           <id>nexus-maven-central</id>
-    //                           <mirrorOf>*</mirrorOf>
-    //                           <url>http://161.35.24.93:8081/repository/maven-central/</url>
-    //                         </mirror>
-    //                       </mirrors>
-    //                       <servers>
-    //                         <server>
-    //                           <id>nexus-user-service</id>
-    //                           <username>$NEXUS_USERNAME</username>
-    //                           <password>$NEXUS_PASSWORD</password>
-    //                         </server>
-    //                       </servers>
-    //                     </settings>' > settings.xml
-    //                     """
-    //                     
-    //                     sh 'mvn clean deploy -s settings.xml'
-    //                 }
-    //             }
-    //         }
-    //     }
+    //   }
     // }
-    // stage('Deploy Product Service to Nexus') {
-    //     agent {
-    //         label 'master'
+    // stage('Run Tests: Product Service') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('product-service') {
+    //       sh 'mvn test'
     //     }
-    //     steps {
-    //         dir('product-service') {
-    //             withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //                 script {
-    //                     sh """
-    //                     echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-    //                       <mirrors>
-    //                         <mirror>
-    //                           <id>nexus-maven-central</id>
-    //                           <mirrorOf>*</mirrorOf>
-    //                           <url>http://161.35.24.93:8081/repository/maven-central/</url>
-    //                         </mirror>
-    //                       </mirrors>
-    //                       <servers>
-    //                         <server>
-    //                           <id>nexus-product-service</id>
-    //                           <username>$NEXUS_USERNAME</username>
-    //                           <password>$NEXUS_PASSWORD</password>
-    //                         </server>
-    //                       </servers>
-    //                     </settings>' > settings.xml
-    //                     """
-    //                     
-    //                     sh 'mvn clean deploy -s settings.xml'
-    //                 }
-    //             }
-    //         }
-    //     }
+    //   }
     // }
-    // stage('Deploy Media Service to Nexus') {
-    //     agent {
-    //         label 'master'
+    // stage('Run Tests: Media Service') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('media-service') {
+    //       sh 'mvn test'
     //     }
-    //     steps {
-    //         dir('media-service') {
-    //             withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //                 script {
-    //                     sh """
-    //                     echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-    //                       <mirrors>
-    //                         <mirror>
-    //                           <id>nexus-maven-central</id>
-    //                           <mirrorOf>*</mirrorOf>
-    //                           <url>http://161.35.24.93:8081/repository/maven-central/</url>
-    //                         </mirror>
-    //                       </mirrors>
-    //                       <servers>
-    //                         <server>
-    //                           <id>nexus-media-service</id>
-    //                           <username>$NEXUS_USERNAME</username>
-    //                           <password>$NEXUS_PASSWORD</password>
-    //                         </server>
-    //                       </servers>
-    //                     </settings>' > settings.xml
-    //                     """
-    //                     
-    //                     sh 'mvn clean deploy -s settings.xml'
-    //                 }
-    //             }
-    //         }
-    //     }
+    //   }
     // }
-    // stage('Deploy Order Service to Nexus') {
-    //     agent {
-    //         label 'master'
+    // stage('Run Tests: Order Service') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('order-service') {
+    //       sh 'mvn test'
     //     }
-    //     steps {
-    //         dir('order-service') {
-    //             withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //                 script {
-    //                     sh """
-    //                     echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-    //                       <mirrors>
-    //                         <mirror>
-    //                           <id>nexus-maven-central</id>
-    //                           <mirrorOf>*</mirrorOf>
-    //                           <url>http://161.35.24.93:8081/repository/maven-central/</url>
-    //                         </mirror>
-    //                       </mirrors>
-    //                       <servers>
-    //                         <server>
-    //                           <id>nexus-order-service</id>
-    //                           <username>$NEXUS_USERNAME</username>
-    //                           <password>$NEXUS_PASSWORD</password>
-    //                         </server>
-    //                       </servers>
-    //                     </settings>' > settings.xml
-    //                     """
-    //                     
-    //                     sh 'mvn clean deploy -s settings.xml'
-    //                 }
-    //             }
-    //         }
-    //     }
+    //   }
     // }
-    // stage('Deploy Frontend to Nexus') {
-    //     agent {
-    //         label 'master'
+    // stage('Run Tests: Angular') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('angular') {
+    //       sh 'export CHROME_BIN=/usr/bin/google-chrome'
+    //         sh 'npm install'
+    //         sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
     //     }
-    //     steps {
-    //         dir('angular') {
-    //             // nexus authentication for npm
-    //             withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //                 sh """
-    //                 echo registry=http://161.35.24.93:8081/repository/npm-dependencies/ > .npmrc
-    //                 echo _auth=\$(echo -n $NEXUS_USERNAME:$NEXUS_PASSWORD | base64) >> .npmrc
-    //                 echo email=notarealperson@justabot.com >> .npmrc
-    //                 echo always-auth=true >> .npmrc
-    //                 """
-    //             }
-    //             sh 'npm install'
-    //             sh 'ng build --prod'
-
-    //             sh 'npm publish ./dist/buy-01'
-    //         }
-    //     }
+    //   }
     // }
+    // stage('User Service SonarQube Analysis & Quality Gate') {
+    //   steps {
+    //     script {
+    //       dir('user-service') {
+    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+    //           withSonarQubeEnv('peter droplet') {
+    //             sh 'mvn clean compile'
+    //               sh """
+    //               mvn sonar:sonar \
+    //               -Dsonar.projectKey=buy-01-user-service \
+    //               -Dsonar.host.url=http://64.226.78.45:9000 \
+    //               -Dsonar.token=$SONAR_AUTH_TOKEN
+    //               """
+    //           }
+    //         }
+    //         timeout(time: 1, unit: 'HOURS') {
+    //           waitForQualityGate abortPipeline: true
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    // stage('Product Service SonarQube Analysis & Quality Gate') {
+    //   steps {
+    //     script {
+    //       dir('product-service') {
+    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+    //           withSonarQubeEnv('peter droplet') {
+    //             sh 'mvn clean compile'
+    //               sh """
+    //               mvn sonar:sonar \
+    //               -Dsonar.projectKey=buy-01-product-service \
+    //               -Dsonar.host.url=http://64.226.78.45:9000 \
+    //               -Dsonar.token=$SONAR_AUTH_TOKEN
+    //               """
+    //           }
+    //         }
+    //         timeout(time: 1, unit: 'HOURS') {
+    //           waitForQualityGate abortPipeline: true
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    // stage('Media Service SonarQube Analysis & Quality Gate') {
+    //   steps {
+    //     script {
+    //       dir('media-service') {
+    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+    //           withSonarQubeEnv('peter droplet') {
+    //             sh 'mvn clean compile'
+    //               sh """
+    //               mvn sonar:sonar \
+    //               -Dsonar.projectKey=buy-01-media-service \
+    //               -Dsonar.host.url=http://64.226.78.45:9000 \
+    //               -Dsonar.token=$SONAR_AUTH_TOKEN
+    //               """
+    //           }
+    //         }
+    //       }
+    //       timeout(time: 1, unit: 'HOURS') {
+    //         waitForQualityGate abortPipeline: true
+    //       }
+    //     }
+    //   }
+    // }
+    // stage('Order Service SonarQube Analysis & Quality Gate') {
+    //   steps {
+    //     script {
+    //       dir('order-service') {
+    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+    //           withSonarQubeEnv('peter droplet') {
+    //             sh 'mvn clean compile'
+    //               sh """
+    //               mvn sonar:sonar \
+    //               -Dsonar.projectKey=buy-01-order-service \
+    //               -Dsonar.host.url=http://64.226.78.45:9000 \
+    //               -Dsonar.token=$SONAR_AUTH_TOKEN
+    //               """
+    //           }
+    //         }
+    //       }
+    //       timeout(time: 1, unit: 'HOURS') {
+    //         waitForQualityGate abortPipeline: true
+    //       }
+    //     }
+    //   }
+    // }
+    // stage('Angular SonarQube Analysis & Quality Gate') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('angular') {
+    //       sh 'npm install'
+    //         sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
+    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+    //           sh """
+    //             sonar-scanner -X \
+    //             -Dsonar.projectKey=buy-01-frontend \
+    //             -Dsonar.host.url=http://64.226.78.45:9000 \
+    //             -Dsonar.token=$SONAR_AUTH_TOKEN \
+    //             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+    //             -Dsonar.testExecutionReportPaths=reports/test-report.xml
+    //             """
+    //         }
+    //       timeout(time: 1, unit: 'HOURS') {
+    //         waitForQualityGate abortPipeline: true
+    //       }
+    //     }
+    //   }
+    // }
+    stage('Deploy User Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('user-service') {
+              sh 'mvn clean deploy'
+            }
+        }
+    }
+    stage('Deploy Product Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('product-service') {
+              sh 'mvn clean deploy'
+            }
+        }
+    }
+    stage('Deploy Media Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('media-service') {
+              sh 'mvn clean deploy'
+            }
+        }
+    }
+    stage('Deploy Order Service to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('order-service') {
+              sh 'mvn clean deploy'
+            }
+        }
+    }
+    stage('Deploy Frontend to Nexus') {
+        agent {
+            label 'master'
+        }
+        steps {
+            dir('angular') {
+                sh 'npm install'
+                sh 'ng build --prod'
+                sh 'npm publish ./dist/buy-01'
+            }
+        }
+    }
     stage('Deploy to Production') {
       agent {
         label 'deploy'
