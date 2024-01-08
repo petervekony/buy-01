@@ -2,6 +2,7 @@ ARG VERSION
 
 FROM nginx:alpine
 ARG VERSION
+RUN echo ${VERSION}
 
 WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
