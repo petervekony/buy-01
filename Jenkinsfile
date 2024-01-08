@@ -205,7 +205,9 @@ pipeline {
         label 'master'
       }
       steps {
-        sh 'mvn clean deploy'
+        dir('order-service') {
+          sh 'mvn clean deploy'
+        }
       }
     }
     stage('Deploy Frontend to Nexus') {
