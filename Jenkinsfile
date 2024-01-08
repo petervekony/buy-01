@@ -3,7 +3,8 @@ pipeline {
     environment {
       PROJECT_NAME = "buy01"
         PROJECT_VERSION = ""
-        NEXUS_DOCKER_REPO = "http://161.35.24.93:8081/repository/buy02-docker-images"
+        NEXUS_DOCKER_REPO = "161.35.24.93:8082/repository/buy02-docker-images"
+        NEXUS_DOCKER_LOGIN_CONN = "161.35.24.93:8082"
     }
   stages {
     // stage('Run Tests: User Service') {
@@ -234,7 +235,7 @@ pipeline {
       steps {
         script {
           withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh "docker login ${NEXUS_DOCKER_REPO} -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
+            sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_DOCKER_LOGIN_CONN} -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD} --password-stdin"
           }
         }
       }
