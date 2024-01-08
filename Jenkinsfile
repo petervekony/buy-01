@@ -174,7 +174,7 @@ pipeline {
         }
         steps {
             dir('user-service') {
-                sh 'mvn clean deploy -Dspring.data.mongodb.uri=${env.SPRING_DATA_MONGODB_URI} -Dspring.data.mongodb.database=${env.SPRING_DATA_MONGODB_DB_USER} -Dbuy01.app.jwtSecret=${env.JWT_SECRET}'
+                sh 'mvn clean deploy -Pprod -Dspring.data.mongodb.uri=${env.SPRING_DATA_MONGODB_URI} -Dspring.data.mongodb.database=${env.SPRING_DATA_MONGODB_DB_USER} -Dbuy01.app.jwtSecret=${env.JWT_SECRET}'
             }
         }
     }
