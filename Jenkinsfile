@@ -260,7 +260,9 @@ pipeline {
 
         echo "Building and pushing frontend docker image"
           dir('angular') {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} ."
+            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+              sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+            }
               sh "docker push ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION}"
           }
       }
