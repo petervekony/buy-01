@@ -243,28 +243,20 @@ pipeline {
     stage('Build and Push Docker Images to Nexus') {
       steps {
         echo "Building and pushing user-service docker image"
-          dir('user-service') {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} ."
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f user-service/Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} ."
               sh "docker push ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION}"
-          }
           
         echo "Building and pushing product-service docker image"
-          dir('product-service') {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} ."
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f product-service/Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} ."
               sh "docker push ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION}"
-          }
 
         echo "Building and pushing media-service docker image"
-          dir('media-service') {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} ."
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f media-service/Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} ."
               sh "docker push ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION}"
-          }
 
         echo "Building and pushing order-service docker image"
-          dir('order-service') {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} ."
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f order-service/Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} ."
               sh "docker push ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION}"
-          }
 
         echo "Building and pushing frontend docker image"
           dir('angular') {
