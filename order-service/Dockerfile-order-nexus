@@ -1,0 +1,20 @@
+ARG VERSION
+
+FROM bellsoft/liberica-openjdk-alpine:latest 
+ARG VERSION
+
+RUN apk add --no-cache bash
+RUN apk add --no-cache curl
+
+WORKDIR /app
+
+RUN curl -o order-service.jar http://161.35.24.93:8081/repository/buy02-group/com/gritlab/buy01/order-service/${VERSION}/order-service-${VERSION}.jar
+
+COPY wait-for-it.sh /wait-for-it.sh
+COPY healthcheck.sh /healthcheck.sh
+RUN chmod +x /wait-for-it.sh
+RUN chmod +x /healthcheck.sh
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 CMD [ "/healthcheck.sh", "order" ]
+
+CMD ["/wait-for-it.sh", "kafka:9092", "--", "java", "-jar", "order-service.jar"]
