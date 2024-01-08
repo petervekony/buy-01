@@ -174,7 +174,7 @@ pipeline {
         }
         steps {
             dir('user-service') {
-              sh 'mvn clean deploy'
+                sh 'mvn clean deploy -Dspring.data.mongodb.uri=${env.SPRING_DATA_MONGODB_URI} -Dspring.data.mongodb.database=${env.SPRING_DATA_MONGODB_DB_USER} -Dbuy01.app.jwtSecret=${env.JWT_SECRET}'
             }
         }
     }
@@ -184,7 +184,7 @@ pipeline {
         }
         steps {
             dir('product-service') {
-              sh 'mvn clean deploy'
+                sh 'mvn clean deploy -Dspring.data.mongodb.uri=${env.SPRING_DATA_MONGODB_URI} -Dspring.data.mongodb.database=${env.SPRING_DATA_MONGODB_DB_PRODUCT} -Dbuy01.app.jwtSecret=${env.JWT_SECRET}'
             }
         }
     }
@@ -194,7 +194,7 @@ pipeline {
         }
         steps {
             dir('media-service') {
-              sh 'mvn clean deploy'
+                sh 'mvn clean deploy -Dspring.data.mongodb.uri=${env.SPRING_DATA_MONGODB_URI} -Dspring.data.mongodb.database=${env.SPRING_DATA_MONGODB_DB_MEDIA} -Dbuy01.app.jwtSecret=${env.JWT_SECRET}'
             }
         }
     }
@@ -204,7 +204,7 @@ pipeline {
         }
         steps {
             dir('order-service') {
-              sh 'mvn clean deploy'
+                sh 'mvn clean deploy -Dspring.data.mongodb.uri=${env.SPRING_DATA_MONGODB_URI} -Dspring.data.mongodb.database=${env.SPRING_DATA_MONGODB_DB_ORDER} -Dbuy01.app.jwtSecret=${env.JWT_SECRET}'
             }
         }
     }
