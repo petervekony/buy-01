@@ -243,24 +243,35 @@ pipeline {
     stage('Build and Push Docker Images to Nexus') {
       steps {
         echo "Building and pushing user-service docker image"
-          sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} ./user-service/"
-          sh "docker push ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION}"
+          dir('user-service') {
+            sh "ls | echo"
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} ./user-service/"
+              sh "docker push ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION}"
+          }
+          
+        echo "Building and pushing product-service docker image"
+          dir('product-service') {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} ./product-service/"
+              sh "docker push ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION}"
+          }
 
-          echo "Building and pushing product-service docker image"
-          sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} ./product-service/"
-          sh "docker push ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION}"
+        echo "Building and pushing media-service docker image"
+          dir('media-service') {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} ./media-service/"
+              sh "docker push ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION}"
+          }
 
-          echo "Building and pushing media-service docker image"
-          sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} ./media-service/"
-          sh "docker push ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION}"
+        echo "Building and pushing order-service docker image"
+          dir('order-service') {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} ./order-service/"
+              sh "docker push ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION}"
+          }
 
-          echo "Building and pushing order-service docker image"
-          sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} ./order-service/"
-          sh "docker push ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION}"
-
-          echo "Building and pushing frontend docker image"
-          sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} ./angular/"
-          sh "docker push ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION}"
+        echo "Building and pushing frontend docker image"
+          dir('angular') {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} ./angular/"
+              sh "docker push ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION}"
+          }
       }
     }
     stage('Upload Docker Compose File to Nexus') {
