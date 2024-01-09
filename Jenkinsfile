@@ -171,6 +171,14 @@ pipeline {
     //     }
     //   }
     // }
+    stage('Extract Version') {
+      steps {
+        script {
+          PROJECT_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed -r 's/\\x1B\\[[0-9;]*[JKmsu]//g'", returnStdout: true).trim()
+            echo "Project Version: ${PROJECT_VERSION}"
+        }
+      }
+    }
     stage('Deploy User Service to Nexus') {
       agent {
         label 'master'
@@ -223,14 +231,6 @@ pipeline {
               sh "tar -czvf buy-01-frontend-${PROJECT_VERSION}.tgz -C dist/buy-01 ."
               sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} --upload-file ./buy-01-frontend-${PROJECT_VERSION}.tgz http://161.35.24.93:8081/repository/frontend-repo/buy-01/-/buy-01-${PROJECT_VERSION}.tgz"
       }
-        }
-      }
-    }
-    stage('Extract Version') {
-      steps {
-        script {
-          PROJECT_VERSION = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed -r 's/\\x1B\\[[0-9;]*[JKmsu]//g'", returnStdout: true).trim()
-            echo "Project Version: ${PROJECT_VERSION}"
         }
       }
     }
