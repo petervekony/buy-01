@@ -306,6 +306,7 @@ pipeline {
                 sh "docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
                 sh "export PROJECT_VERSION=${PROJECT_VERSION}"
                 if (fileExists(file)) {
+                sh "cd /home/peter/production/buy-01"
                   sh "docker-compose --env-file .env.prod down --remove-orphans --volumes"
                     sleep time: 5, unit: 'SECONDS'
                     sh "docker system prune -a -f"
@@ -317,7 +318,7 @@ pipeline {
 
                 // health check
                 def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1', 'buy-01_order-service_1']
-                def maxWaitTime = 180 // maximum wait time in seconds
+                def maxWaitTime = 300 // maximum wait time in seconds
                 boolean allHealthy = false
                 int elapsedTime = 0
                 int checkInterval = 10 // seconds
@@ -328,6 +329,7 @@ pipeline {
                       def healthStatus = ''
                         try {
                           healthStatus = sh(script: "docker inspect --format='{{.State.Health.Status}}' ${service}", returnStdout: true).trim()
+                            echo "Health status of ${service}: ${healthStatus}"
                         } catch (Exception e) {
                           echo "Error inspecting ${service}: ${e.message}"
                             allHealthy = false
