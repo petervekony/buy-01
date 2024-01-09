@@ -227,7 +227,6 @@ pipeline {
         dir('angular') {
           withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
             sh 'npm install'
-              sh 'ng build'
               sh 'npm publish'
       }
         }
