@@ -1,6 +1,6 @@
 services:
   user-service:
-    image: ${NEXUS_DOCKER_REPO}/user-service:${SERVICE_VERSION}
+    image: 161.35.24.93:8082/repository/buy02-docker-images/user-service:${SERVICE_VERSION}
     ports:
       - "8080:8080"
     environment:
@@ -13,7 +13,7 @@ services:
       - kafka
 
   product-service:
-    image: ${NEXUS_DOCKER_REPO}/product-service:${SERVICE_VERSION}
+    image: 161.35.24.93:8082/repository/buy02-docker-images/product-service:${SERVICE_VERSION}
     ports:
       - "8081:8080"
     environment:
@@ -25,7 +25,7 @@ services:
       - kafka
 
   media-service:
-    image: ${NEXUS_DOCKER_REPO}/media-service:${SERVICE_VERSION}
+    image: 161.35.24.93:8082/repository/buy02-docker-images/media-service:${SERVICE_VERSION}
     ports:
       - "8082:8080"
     environment:
@@ -37,7 +37,7 @@ services:
       - kafka
 
   order-service:
-    image: ${NEXUS_DOCKER_REPO}/order-service:${SERVICE_VERSION}
+    image: 161.35.24.93:8082/repository/buy02-docker-images/order-service:${SERVICE_VERSION}
     ports:
       - "8083:8080"
     environment:
@@ -49,7 +49,7 @@ services:
       - kafka
 
   frontend:
-    image: ${NEXUS_DOCKER_REPO}/frontend:${SERVICE_VERSION}
+    image: 161.35.24.93:8082/repository/buy02-docker-images/frontend:${SERVICE_VERSION}
     ports:
       - "80:80"
       - "443:443"
