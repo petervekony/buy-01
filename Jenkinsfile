@@ -304,6 +304,7 @@ pipeline {
             try {
 
                 sh "docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
+                sh "export PROJECT_VERSION=${PROJECT_VERSION}"
                 if (fileExists(file)) {
                   sh "docker-compose --env-file .env.prod down --remove-orphans --volumes"
                     sleep time: 5, unit: 'SECONDS'
