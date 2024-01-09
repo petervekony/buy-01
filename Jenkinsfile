@@ -314,6 +314,7 @@ pipeline {
                 }
               sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o /home/peter/production/buy-01/docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
               sh "cd /home/peter/production/buy-01"
+              sh "cat docker-compose.yml"
                 sh "docker-compose --env-file .env.prod up -d"
 
                 // health check
