@@ -302,20 +302,19 @@ pipeline {
               }
 
             try {
-
-                sh "docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
+                sh """
+                cd /home/peter/production/buy-01
+                docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}
                 sh "export PROJECT_VERSION=${PROJECT_VERSION}"
-                if (fileExists(file)) {
-                sh "cd /home/peter/production/buy-01"
-                  sh "docker-compose --env-file .env.prod down --remove-orphans --volumes"
-                    sleep time: 5, unit: 'SECONDS'
-                    sh "docker system prune -a -f"
-                    sh "rm docker-compose.yml"
-                }
-              sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o /home/peter/production/buy-01/docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
-              sh "cd /home/peter/production/buy-01"
-              sh "cat docker-compose.yml"
-                sh "docker-compose --env-file .env.prod up -d"
+                if [ -f /home/production/buy-01/docker-compose.yml ]; then
+                  docker-compose --env-file .env.prod down --remove-orphans --volumes
+                  docker system prune -a -f
+                  rm docker-compose.yml
+                fi
+
+                curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o /home/peter/production/buy-01/docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml
+                docker-compose --env-file .env.prod up -d
+                """
 
                 // health check
                 def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1', 'buy-01_order-service_1']
@@ -357,14 +356,15 @@ pipeline {
               // rollback
               if (lastSuccessfulVersion) {
                 echo "Rolling back to version: ${lastSuccessfulVersion}"
-                  sh "cd ~/production/buy-01"
-                  sh "docker-compose --env-file .env.prod down --remove-orphans --volumes"
-                  sleep time: 5, unit: 'SECONDS'
-                  sh "docker system prune -a -f"
-                  sh "rm docker-compose.yml"
-                  sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${lastSuccessfulVersion}.yml"
-                  sh "docker-compose --env-file .env.prod up -d"
-
+                sh """
+                cd /home/peter/production/buy-01
+                docker-compose --env-file .env.prod down --remove-orphans --volumes
+                docker system prune -a -f
+                rm docker-compose.yml
+                curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${lastSuccessfulVersion}.yml
+                docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}
+                docker-compose --env-file .env.prod up -d
+                """
                   // mark the build as a failure on rollback
                   currentBuild.result = 'FAILURE'
                   error("Rollback to version ${lastSuccessfulVersion} was successful. Marking build as failure.")
