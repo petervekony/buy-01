@@ -294,7 +294,6 @@ pipeline {
           withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
           sshagent(credentials: ['jenk to prod']) {
             def file = "${env.HOME}/production/buy-01/docker-compose.yml"
-              def gitRepo = "git@github.com:petervekony/buy-01.git"
               def rollbackVersionFile = "${env.HOME}/production/rollback_version.txt"
               // check if rollback version file exists and read it
               def lastSuccessfulVersion = ''
@@ -303,7 +302,6 @@ pipeline {
               }
 
             try {
-              sh "cd ~/production/buy-01"
 
                 sh "docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
                 if (fileExists(file)) {
@@ -312,7 +310,8 @@ pipeline {
                     sh "docker system prune -a -f"
                     sh "rm docker-compose.yml"
                 }
-              sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
+              sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o /home/peter/production/buy-01/docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
+              sh "cd /home/peter/production/buy-01"
                 sh "docker-compose --env-file .env.prod up -d"
 
                 // health check
