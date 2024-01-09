@@ -285,33 +285,34 @@ pipeline {
         }
       }
     }
-    /* stage('Deploy to Production') {
+    stage('Deploy to Production') {
       agent {
         label 'deploy'
       }
       steps {
         script {
           sshagent(credentials: ['prod-jenkins-user']) {
-            def dir = "${env.HOME}/production/buy-01"
+            def file = "${env.HOME}/production/buy-01/docker-compose.yml"
               def gitRepo = "git@github.com:petervekony/buy-01.git"
               def rollbackVersionFile = "${env.HOME}/production/rollback_version.txt"
               // check if rollback version file exists and read it
-              def lastSuccessfulCommit = ''
+              def lastSuccessfulVersion = ''
               if (fileExists(rollbackVersionFile)) {
-                lastSuccessfulCommit = readFile(rollbackVersionFile).trim()
+                lastSuccessfulVersion = readFile(rollbackVersionFile).trim()
               }
 
             try {
-              // normal deployment process
-              if (fileExists(dir)) {
-                sh "cd ${dir} && docker-compose --env-file .env.prod down --remove-orphans --volumes"
-                  sleep time: 5, unit: 'SECONDS'
-                  sh "docker system prune -f"
-                  sh "rm -rf ~/production/buy-01"
-              }
+              sh "cd ~/production/buy-01"
 
-              sh "git clone ${gitRepo} ~/production/buy-01"
-                sh "cd ~/production/buy-01 && git pull origin main && docker-compose --env-file .env.prod build --no-cache && docker-compose --env-file .env.prod up -d"
+                sh "docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
+                if (fileExists(file)) {
+                  sh "docker-compose --env-file .env.prod down --remove-orphans --volumes"
+                    sleep time: 5, unit: 'SECONDS'
+                    sh "docker system prune -a -f"
+                    sh "rm docker-compose.yml"
+                }
+              sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
+                sh "docker-compose --env-file .env.prod up -d"
 
                 // health check
                 def services = ['buy-01_user-service_1', 'buy-01_product-service_1', 'buy-01_media-service_1', 'buy-01_order-service_1']
@@ -343,22 +344,26 @@ pipeline {
                 }
 
               if (allHealthy) {
-                // update the rollback version file with the current commit hash
-                def currentCommit = sh(script: "cd ~/production/buy-01 && git rev-parse HEAD", returnStdout: true).trim()
-                  writeFile file: rollbackVersionFile, text: currentCommit
+                // update the rollback version file with the current version number
+                writeFile file: rollbackVersionFile, text: ${PROJECT_VERSION}
               } else {
                 error("Deployment failed. Rolling back to last successful version.")
               }
             } catch (Exception e) {
               // rollback
-              if (lastSuccessfulCommit) {
-                echo "Rolling back to commit: ${lastSuccessfulCommit}"
-                  sh "cd ${dir} && git checkout ${lastSuccessfulCommit}"
-                  sh "cd ${dir} && docker-compose --env-file .env.prod build --no-cache && docker-compose --env-file .env.prod up -d"
+              if (lastSuccessfulVersion) {
+                echo "Rolling back to version: ${lastSuccessfulVersion}"
+                  sh "cd ~/production/buy-01"
+                  sh "docker-compose --env-file .env.prod down --remove-orphans --volumes"
+                  sleep time: 5, unit: 'SECONDS'
+                  sh "docker system prune -a -f"
+                  sh "rm docker-compose.yml"
+                  sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${lastSuccessfulVersion}.yml"
+                  sh "docker-compose --env-file .env.prod up -d"
 
                   // mark the build as a failure on rollback
                   currentBuild.result = 'FAILURE'
-                  error("Rollback to commit ${lastSuccessfulCommit} was successful. Marking build as failure.")
+                  error("Rollback to version ${lastSuccessfulVersion} was successful. Marking build as failure.")
               } else {
                 currentBuild.result = 'FAILURE'
                   error("Rollback failed. No previous successful commit available.")
@@ -367,7 +372,7 @@ pipeline {
           }
         }
       }
-    } */
+    }
   }
   post {
     success {
