@@ -291,6 +291,7 @@ pipeline {
       }
       steps {
         script {
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
           sshagent(credentials: ['jenk to prod']) {
             def file = "${env.HOME}/production/buy-01/docker-compose.yml"
               def gitRepo = "git@github.com:petervekony/buy-01.git"
@@ -304,14 +305,14 @@ pipeline {
             try {
               sh "cd ~/production/buy-01"
 
-                sh "docker login 161.35.24.93:8082 -u ${env.NEXUS_USERNAME} -p ${env.NEXUS_PASSWORD}"
+                sh "docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}"
                 if (fileExists(file)) {
                   sh "docker-compose --env-file .env.prod down --remove-orphans --volumes"
                     sleep time: 5, unit: 'SECONDS'
                     sh "docker system prune -a -f"
                     sh "rm docker-compose.yml"
                 }
-              sh "curl -u ${env.NEXUS_USERNAME}:${env.NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
+              sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
                 sh "docker-compose --env-file .env.prod up -d"
 
                 // health check
@@ -358,7 +359,7 @@ pipeline {
                   sleep time: 5, unit: 'SECONDS'
                   sh "docker system prune -a -f"
                   sh "rm docker-compose.yml"
-                  sh "curl -u ${env.NEXUS_USERNAME}:${env.NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${lastSuccessfulVersion}.yml"
+                  sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o docker-compose.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${lastSuccessfulVersion}.yml"
                   sh "docker-compose --env-file .env.prod up -d"
 
                   // mark the build as a failure on rollback
@@ -370,6 +371,7 @@ pipeline {
               }
             }
           }
+        }
         }
       }
     }
