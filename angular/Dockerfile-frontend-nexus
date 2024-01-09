@@ -15,8 +15,8 @@ RUN rm -rf ./*
 RUN apk add --no-cache curl
 
 RUN curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} -o app.tgz "http://161.35.24.93:8081/repository/frontend-repo/buy-01/-/buy-01-${VERSION}.tgz" \
-  && tar -xzvf app.tgz \
-  && rm app.tgz
+    && tar -xzvf app.tgz --strip-components=1 -C /usr/share/nginx/html dist/buy-01 \
+    && rm app.tgz
 COPY nginx.conf /etc/nginx/conf.d/default.conf.template
 
 COPY entrypoint.sh /entrypoint.sh
