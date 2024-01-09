@@ -179,112 +179,112 @@ pipeline {
         }
       }
     }
-    stage('Deploy User Service to Nexus') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('user-service') {
-          sh 'mvn clean deploy -Pprod'
-        }
-      }
-    }
-    stage('Deploy Product Service to Nexus') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('product-service') {
-          sh 'mvn clean deploy'
-        }
-      }
-    }
-    stage('Deploy Media Service to Nexus') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('media-service') {
-          sh 'mvn clean deploy'
-        }
-      }
-    }
-    stage('Deploy Order Service to Nexus') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('order-service') {
-          sh 'mvn clean deploy'
-        }
-      }
-    }
-    stage('Deploy Frontend to Nexus') {
-      agent {
-        label 'master'
-      }
-      steps {
-        dir('angular') {
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh 'npm install'
-              sh 'npm publish'
-      }
-        }
-      }
-    }
-    stage('Login to Nexus Docker Repository') {
-      steps {
-        script {
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_DOCKER_LOGIN_CONN} -u ${NEXUS_USERNAME} --password-stdin"
-          }
-        }
-      }
-    }
-    stage('Build and Push Docker Images to Nexus') {
-      steps {
-        echo "Building and pushing user-service docker image"
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f user-service/Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-          }
-        sh "docker push ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION}"
+    // stage('Deploy User Service to Nexus') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('user-service') {
+    //       sh 'mvn clean deploy -Pprod'
+    //     }
+    //   }
+    // }
+    // stage('Deploy Product Service to Nexus') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('product-service') {
+    //       sh 'mvn clean deploy'
+    //     }
+    //   }
+    // }
+    // stage('Deploy Media Service to Nexus') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('media-service') {
+    //       sh 'mvn clean deploy'
+    //     }
+    //   }
+    // }
+    // stage('Deploy Order Service to Nexus') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('order-service') {
+    //       sh 'mvn clean deploy'
+    //     }
+    //   }
+    // }
+    // stage('Deploy Frontend to Nexus') {
+    //   agent {
+    //     label 'master'
+    //   }
+    //   steps {
+    //     dir('angular') {
+    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //         sh 'npm install'
+    //           sh 'npm publish'
+    //   }
+    //     }
+    //   }
+    // }
+    // stage('Login to Nexus Docker Repository') {
+    //   steps {
+    //     script {
+    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //         sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_DOCKER_LOGIN_CONN} -u ${NEXUS_USERNAME} --password-stdin"
+    //       }
+    //     }
+    //   }
+    // }
+    // stage('Build and Push Docker Images to Nexus') {
+    //   steps {
+    //     echo "Building and pushing user-service docker image"
+    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f user-service/Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+    //       }
+    //     sh "docker push ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION}"
 
-          echo "Building and pushing product-service docker image"
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f product-service/Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-          }
-        sh "docker push ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION}"
+    //       echo "Building and pushing product-service docker image"
+    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f product-service/Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+    //       }
+    //     sh "docker push ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION}"
 
-          echo "Building and pushing media-service docker image"
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f media-service/Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-          }
-        sh "docker push ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION}"
+    //       echo "Building and pushing media-service docker image"
+    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f media-service/Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+    //       }
+    //     sh "docker push ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION}"
 
-          echo "Building and pushing order-service docker image"
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f order-service/Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-          }
-        sh "docker push ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION}"
+    //       echo "Building and pushing order-service docker image"
+    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f order-service/Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+    //       }
+    //     sh "docker push ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION}"
 
-          echo "Building and pushing frontend docker image"
-          dir('angular') {
-            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-              sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-            }
-            sh "docker push ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION}"
-          }
-      }
-    }
-    stage('Upload Docker Compose File to Nexus') {
-      steps {
-        script {
-          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-            sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} --upload-file ./docker-compose-nexus.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
-          }
-        }
-      }
-    }
+    //       echo "Building and pushing frontend docker image"
+    //       dir('angular') {
+    //         withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //           sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+    //         }
+    //         sh "docker push ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION}"
+    //       }
+    //   }
+    // }
+    // stage('Upload Docker Compose File to Nexus') {
+    //   steps {
+    //     script {
+    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+    //         sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} --upload-file ./docker-compose-nexus.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
+    //       }
+    //     }
+    //   }
+    // }
     stage('Deploy to Production') {
       agent {
         label 'deploy'
@@ -348,7 +348,7 @@ pipeline {
 
               if (allHealthy) {
                 // update the rollback version file with the current version number
-                writeFile file: rollbackVersionFile, text: ${PROJECT_VERSION}
+                writeFile file: rollbackVersionFile, text: PROJECT_VERSION
               } else {
                 error("Deployment failed. Rolling back to last successful version.")
               }
