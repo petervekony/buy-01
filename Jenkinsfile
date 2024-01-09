@@ -217,9 +217,12 @@ pipeline {
       }
       steps {
         dir('angular') {
-          sh 'npm install'
-            sh 'ng build'
-            sh 'npm publish'
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh 'npm install'
+              sh 'ng build'
+              sh "tar -czvf buy-01-frontend-${PROJECT_VERSION}.tgz -C dist/buy-01 ."
+              sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} --upload-file ./buy-01-frontend-${PROJECT_VERSION}.tgz http://161.35.24.93:8081/repository/frontend-repo/buy-01/-/buy-01-${PROJECT_VERSION}.tgz"
+      }
         }
       }
     }
@@ -284,7 +287,7 @@ pipeline {
         }
       }
     }
-    stage('Deploy to Production') {
+    /* stage('Deploy to Production') {
       agent {
         label 'deploy'
       }
@@ -366,7 +369,7 @@ pipeline {
           }
         }
       }
-    }
+    } */
   }
   post {
     success {
