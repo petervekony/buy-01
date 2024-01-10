@@ -7,170 +7,170 @@ pipeline {
         NEXUS_DOCKER_LOGIN_CONN = "161.35.24.93:8082"
     }
   stages {
-    // stage('Run Tests: User Service') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('user-service') {
-    //       sh 'mvn test'
-    //     }
-    //   }
-    // }
-    // stage('Run Tests: Product Service') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('product-service') {
-    //       sh 'mvn test'
-    //     }
-    //   }
-    // }
-    // stage('Run Tests: Media Service') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('media-service') {
-    //       sh 'mvn test'
-    //     }
-    //   }
-    // }
-    // stage('Run Tests: Order Service') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('order-service') {
-    //       sh 'mvn test'
-    //     }
-    //   }
-    // }
-    // stage('Run Tests: Angular') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('angular') {
-    //       sh 'export CHROME_BIN=/usr/bin/google-chrome'
-    //         sh 'npm install'
-    //         sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
-    //     }
-    //   }
-    // }
-    // stage('User Service SonarQube Analysis & Quality Gate') {
-    //   steps {
-    //     script {
-    //       dir('user-service') {
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           withSonarQubeEnv('peter droplet') {
-    //             sh 'mvn clean compile'
-    //               sh """
-    //               mvn sonar:sonar \
-    //               -Dsonar.projectKey=buy-01-user-service \
-    //               -Dsonar.host.url=http://64.226.78.45:9000 \
-    //               -Dsonar.token=$SONAR_AUTH_TOKEN
-    //               """
-    //           }
-    //         }
-    //         timeout(time: 1, unit: 'HOURS') {
-    //           waitForQualityGate abortPipeline: true
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Product Service SonarQube Analysis & Quality Gate') {
-    //   steps {
-    //     script {
-    //       dir('product-service') {
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           withSonarQubeEnv('peter droplet') {
-    //             sh 'mvn clean compile'
-    //               sh """
-    //               mvn sonar:sonar \
-    //               -Dsonar.projectKey=buy-01-product-service \
-    //               -Dsonar.host.url=http://64.226.78.45:9000 \
-    //               -Dsonar.token=$SONAR_AUTH_TOKEN
-    //               """
-    //           }
-    //         }
-    //         timeout(time: 1, unit: 'HOURS') {
-    //           waitForQualityGate abortPipeline: true
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Media Service SonarQube Analysis & Quality Gate') {
-    //   steps {
-    //     script {
-    //       dir('media-service') {
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           withSonarQubeEnv('peter droplet') {
-    //             sh 'mvn clean compile'
-    //               sh """
-    //               mvn sonar:sonar \
-    //               -Dsonar.projectKey=buy-01-media-service \
-    //               -Dsonar.host.url=http://64.226.78.45:9000 \
-    //               -Dsonar.token=$SONAR_AUTH_TOKEN
-    //               """
-    //           }
-    //         }
-    //       }
-    //       timeout(time: 1, unit: 'HOURS') {
-    //         waitForQualityGate abortPipeline: true
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Order Service SonarQube Analysis & Quality Gate') {
-    //   steps {
-    //     script {
-    //       dir('order-service') {
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           withSonarQubeEnv('peter droplet') {
-    //             sh 'mvn clean compile'
-    //               sh """
-    //               mvn sonar:sonar \
-    //               -Dsonar.projectKey=buy-01-order-service \
-    //               -Dsonar.host.url=http://64.226.78.45:9000 \
-    //               -Dsonar.token=$SONAR_AUTH_TOKEN
-    //               """
-    //           }
-    //         }
-    //       }
-    //       timeout(time: 1, unit: 'HOURS') {
-    //         waitForQualityGate abortPipeline: true
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Angular SonarQube Analysis & Quality Gate') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('angular') {
-    //       sh 'npm install'
-    //         sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
-    //         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-    //           sh """
-    //             sonar-scanner -X \
-    //             -Dsonar.projectKey=buy-01-frontend \
-    //             -Dsonar.host.url=http://64.226.78.45:9000 \
-    //             -Dsonar.token=$SONAR_AUTH_TOKEN \
-    //             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-    //             -Dsonar.testExecutionReportPaths=reports/test-report.xml
-    //             """
-    //         }
-    //       timeout(time: 1, unit: 'HOURS') {
-    //         waitForQualityGate abortPipeline: true
-    //       }
-    //     }
-    //   }
-    // }
+    stage('Run Tests: User Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('user-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Run Tests: Product Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('product-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Run Tests: Media Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('media-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Run Tests: Order Service') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('order-service') {
+          sh 'mvn test'
+        }
+      }
+    }
+    stage('Run Tests: Angular') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          sh 'export CHROME_BIN=/usr/bin/google-chrome'
+            sh 'npm install'
+            sh 'ng test --watch=false --progress=false --browsers ChromeHeadless'
+        }
+      }
+    }
+    stage('User Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('user-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-user-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+    }
+    stage('Product Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('product-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-product-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+            timeout(time: 1, unit: 'HOURS') {
+              waitForQualityGate abortPipeline: true
+            }
+          }
+        }
+      }
+    }
+    stage('Media Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('media-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-media-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+          }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
+        }
+      }
+    }
+    stage('Order Service SonarQube Analysis & Quality Gate') {
+      steps {
+        script {
+          dir('order-service') {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              withSonarQubeEnv('peter droplet') {
+                sh 'mvn clean compile'
+                  sh """
+                  mvn sonar:sonar \
+                  -Dsonar.projectKey=buy-01-order-service \
+                  -Dsonar.host.url=http://64.226.78.45:9000 \
+                  -Dsonar.token=$SONAR_AUTH_TOKEN
+                  """
+              }
+            }
+          }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
+        }
+      }
+    }
+    stage('Angular SonarQube Analysis & Quality Gate') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          sh 'npm install'
+            sh 'ng test --watch=false --progress=false --karma-config=karma.conf.js --code-coverage'
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+              sh """
+                sonar-scanner -X \
+                -Dsonar.projectKey=buy-01-frontend \
+                -Dsonar.host.url=http://64.226.78.45:9000 \
+                -Dsonar.token=$SONAR_AUTH_TOKEN \
+                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+                -Dsonar.testExecutionReportPaths=reports/test-report.xml
+                """
+            }
+          timeout(time: 1, unit: 'HOURS') {
+            waitForQualityGate abortPipeline: true
+          }
+        }
+      }
+    }
     stage('Extract Version') {
       steps {
         script {
@@ -179,112 +179,112 @@ pipeline {
         }
       }
     }
-    // stage('Deploy User Service to Nexus') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('user-service') {
-    //       sh 'mvn clean deploy -Pprod'
-    //     }
-    //   }
-    // }
-    // stage('Deploy Product Service to Nexus') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('product-service') {
-    //       sh 'mvn clean deploy'
-    //     }
-    //   }
-    // }
-    // stage('Deploy Media Service to Nexus') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('media-service') {
-    //       sh 'mvn clean deploy'
-    //     }
-    //   }
-    // }
-    // stage('Deploy Order Service to Nexus') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('order-service') {
-    //       sh 'mvn clean deploy'
-    //     }
-    //   }
-    // }
-    // stage('Deploy Frontend to Nexus') {
-    //   agent {
-    //     label 'master'
-    //   }
-    //   steps {
-    //     dir('angular') {
-    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //         sh 'npm install'
-    //           sh 'npm publish'
-    //   }
-    //     }
-    //   }
-    // }
-    // stage('Login to Nexus Docker Repository') {
-    //   steps {
-    //     script {
-    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //         sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_DOCKER_LOGIN_CONN} -u ${NEXUS_USERNAME} --password-stdin"
-    //       }
-    //     }
-    //   }
-    // }
-    // stage('Build and Push Docker Images to Nexus') {
-    //   steps {
-    //     echo "Building and pushing user-service docker image"
-    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f user-service/Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-    //       }
-    //     sh "docker push ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION}"
+    stage('Deploy User Service to Nexus') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('user-service') {
+          sh 'mvn clean deploy -Pprod'
+        }
+      }
+    }
+    stage('Deploy Product Service to Nexus') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('product-service') {
+          sh 'mvn clean deploy'
+        }
+      }
+    }
+    stage('Deploy Media Service to Nexus') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('media-service') {
+          sh 'mvn clean deploy'
+        }
+      }
+    }
+    stage('Deploy Order Service to Nexus') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('order-service') {
+          sh 'mvn clean deploy'
+        }
+      }
+    }
+    stage('Deploy Frontend to Nexus') {
+      agent {
+        label 'master'
+      }
+      steps {
+        dir('angular') {
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh 'npm install'
+              sh 'npm publish'
+      }
+        }
+      }
+    }
+    stage('Login to Nexus Docker Repository') {
+      steps {
+        script {
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh "echo ${NEXUS_PASSWORD} | docker login ${NEXUS_DOCKER_LOGIN_CONN} -u ${NEXUS_USERNAME} --password-stdin"
+          }
+        }
+      }
+    }
+    stage('Build and Push Docker Images to Nexus') {
+      steps {
+        echo "Building and pushing user-service docker image"
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION} -f user-service/Dockerfile-user-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+          }
+        sh "docker push ${NEXUS_DOCKER_REPO}/user-service:${PROJECT_VERSION}"
 
-    //       echo "Building and pushing product-service docker image"
-    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f product-service/Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-    //       }
-    //     sh "docker push ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION}"
+          echo "Building and pushing product-service docker image"
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION} -f product-service/Dockerfile-product-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+          }
+        sh "docker push ${NEXUS_DOCKER_REPO}/product-service:${PROJECT_VERSION}"
 
-    //       echo "Building and pushing media-service docker image"
-    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f media-service/Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-    //       }
-    //     sh "docker push ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION}"
+          echo "Building and pushing media-service docker image"
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION} -f media-service/Dockerfile-media-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+          }
+        sh "docker push ${NEXUS_DOCKER_REPO}/media-service:${PROJECT_VERSION}"
 
-    //       echo "Building and pushing order-service docker image"
-    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //         sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f order-service/Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-    //       }
-    //     sh "docker push ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION}"
+          echo "Building and pushing order-service docker image"
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh "docker build -t ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION} -f order-service/Dockerfile-order-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+          }
+        sh "docker push ${NEXUS_DOCKER_REPO}/order-service:${PROJECT_VERSION}"
 
-    //       echo "Building and pushing frontend docker image"
-    //       dir('angular') {
-    //         withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //           sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
-    //         }
-    //         sh "docker push ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION}"
-    //       }
-    //   }
-    // }
-    // stage('Upload Docker Compose File to Nexus') {
-    //   steps {
-    //     script {
-    //       withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-    //         sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} --upload-file ./docker-compose-nexus.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
-    //       }
-    //     }
-    //   }
-    // }
+          echo "Building and pushing frontend docker image"
+          dir('angular') {
+            withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+              sh "docker build -t ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION} -f Dockerfile-frontend-nexus --build-arg VERSION=${PROJECT_VERSION} --build-arg NEXUS_USERNAME=${NEXUS_USERNAME} --build-arg NEXUS_PASSWORD=${NEXUS_PASSWORD} ."
+            }
+            sh "docker push ${NEXUS_DOCKER_REPO}/frontend:${PROJECT_VERSION}"
+          }
+      }
+    }
+    stage('Upload Docker Compose File to Nexus') {
+      steps {
+        script {
+          withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+            sh "curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} --upload-file ./docker-compose-nexus.yml http://161.35.24.93:8081/repository/buy02-raw/docker-compose/docker-compose-${PROJECT_VERSION}.yml"
+          }
+        }
+      }
+    }
     stage('Deploy to Production') {
       agent {
         label 'deploy'

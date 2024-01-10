@@ -1,6 +1,6 @@
 {
   "name": "buy-01",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publishConfig": {
     "registry": "http://161.35.24.93:8081/repository/frontend-repo/"
   },
