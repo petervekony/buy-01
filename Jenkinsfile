@@ -305,7 +305,7 @@ pipeline {
                 sh """
                 cd /home/peter/production/buy-01
                 docker login 161.35.24.93:8082 -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD}
-                sh "export PROJECT_VERSION=${PROJECT_VERSION}"
+                export PROJECT_VERSION=${PROJECT_VERSION}
                 if [ -f /home/production/buy-01/docker-compose.yml ]; then
                   docker-compose --env-file .env.prod down --remove-orphans --volumes
                   docker system prune -a -f
