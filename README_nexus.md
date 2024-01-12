@@ -1,7 +1,7 @@
 ## NEXUS
 
 This project is continuation to the
-[Buy-01](https://github.com/peter.vekony/buy-01),
+[Buy-01 & Buy-02](https://github.com/peter.vekony/buy-01),
 [Mr-jenk](https://github.com/peter.vekony/buy-01) and
 [Safezone](https://github.com/peter.vekony/buy-01) projects. The Purpose is to
 add Sonatype Nexus Repository to the pipeline, to store the build artifacts and
@@ -90,3 +90,38 @@ always-auth=true
 - Modify the [**Jenkinsfile**](Jenkinsfile)
 
 - Run the pipeline and see the build artifacts in the Nexus repository.
+
+#### Version control
+
+The project uses consistent versioning between all modules. This means that the
+1.0.0 version for the docker-compose.yml should work with 1.0.0 version of all
+the other components. The version number has to be set manually in these places:
+
+- pom.xml files:
+  - root of the project (parent pom.xml)
+  - user-service
+  - product-service
+  - media-service
+  - order-service
+- package.json in the angular directory
+
+#### Available repositories
+
+<div align="center">
+      <img src="./README_pics/nexus-repos.png" alt="jenk crendentials" width="auto" height="400"/>
+  </div><br>
+
+- user-service-repo (user-service artifacts)
+- product-service-repo (product-service artifacts)
+- media-service-repo (media-service artifacts)
+- order-service-repo (order-service artifacts)
+- buy02-group (group repository for all backend service jar files)
+- maven-central (proxy repository for maven dependencies)
+- buy02-docker-images
+- buy02-raw (repository for the docker-compose files, and scripts needed to run
+  the project)
+
+## Authors
+
+- tvntvn
+- petervekony
