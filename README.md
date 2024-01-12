@@ -1,3 +1,8 @@
+# Nexus docs
+
+To see the readme about the Sonatype Nexus implementation, see
+[this file](README_nexus.md).
+
 # buy-02
 
 Buy-02 is the continuation of the buy-01 project in the Java track of 01Edu's
